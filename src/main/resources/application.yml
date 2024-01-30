@@ -1,0 +1,20 @@
+management:
+  endpoints:
+    web:
+      exposure:
+        include: '*'
+  info:
+    env:
+      enabled: true
+
+info:
+  application:
+    name: EvaluasiHUMBackEnd
+    description: A digital platform designed to employee perfomance evaluation
+    author: Yoghi Setiawan
+    version: '@project.version@'
+spring:
+  profiles:
+    active: dev
+
+
