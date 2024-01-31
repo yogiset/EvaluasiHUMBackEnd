@@ -3,13 +3,12 @@ package com.evaluasi.EvaluasiHUMBackEnd.dto;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.http.HttpStatus;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class KaryawanDto {
-    private Long idkar;
-    private String nik;
-    private String nama;
-    private String jabatan;
+public class ErrorMessage {
+    private HttpStatus status;
+    private String message;
 }

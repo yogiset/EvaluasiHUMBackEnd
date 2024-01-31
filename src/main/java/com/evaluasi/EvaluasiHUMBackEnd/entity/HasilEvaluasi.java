@@ -16,8 +16,7 @@ public class HasilEvaluasi {
     @Id
     @SequenceGenerator(name = "evaluasi_sequence",sequenceName = "evaluasi_sequence",allocationSize = 1)
     @GeneratedValue(strategy = GenerationType.SEQUENCE,generator = "evaluasi_sequence")
-    private Long id;
-    @Column(name = "kodeevaluasi", unique = true, nullable = false)
+    private Long ideva;
     private String kodeevaluasi;
     private LocalDate tanggalevaluasi;
     private String hasilevaluasi;
@@ -25,7 +24,7 @@ public class HasilEvaluasi {
     private String perluditingkatkan;
 
     @ManyToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "nik", nullable = false)
+    @JoinColumn(name = "idkar", nullable = false)
     private Karyawan karyawan;
 }
 

@@ -10,6 +10,7 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @AllArgsConstructor
 public class HasilEvaluasiDto {
+    private Long ideva;
     private String kodeevaluasi;
     private LocalDate tanggalevaluasi;
     private String hasilevaluasi;

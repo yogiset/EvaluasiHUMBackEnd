@@ -15,8 +15,7 @@ public class Pertanyaan {
     @Id
     @SequenceGenerator(name = "pertanyaan_sequence",sequenceName = "pertanyaan_sequence",allocationSize = 1)
     @GeneratedValue(strategy = GenerationType.SEQUENCE,generator = "pertanyaan_sequence")
-    private Long id;
-    @Column(name = "kodepertanyaan", unique = true, nullable = false)
+    private Long idper;
     private String kodepertanyaan;
     @Column(columnDefinition="text")
     private String pertanyaan;
@@ -25,6 +24,6 @@ public class Pertanyaan {
     private Integer bobot;
 
     @ManyToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "nik", nullable = false)
+    @JoinColumn(name = "idkar", nullable = false)
     private Karyawan karyawan;
 }

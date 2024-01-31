@@ -7,4 +7,6 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface KaryawanRepository extends JpaRepository<Karyawan,Long> {
 
+    Karyawan findByNik(String nik);
+    Karyawan findByIdkar(Long idkar);
 }

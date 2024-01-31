@@ -18,8 +18,7 @@ public class User {
     @Id
     @SequenceGenerator(name = "userr_sequence",sequenceName = "userr_sequence",allocationSize = 1)
     @GeneratedValue(strategy = GenerationType.SEQUENCE,generator = "userr_sequence")
-    private Long id;
-    @Column(name = "kodeuser", unique = true, nullable = false)
+    private Long iduser;
     private String kodeuser;
     private String username;
     private String password;
@@ -28,6 +27,6 @@ public class User {
     private Instant created;
 
     @ManyToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "nik", nullable = false)
+    @JoinColumn(name = "idkar", nullable = false)
     private Karyawan karyawan;
 }

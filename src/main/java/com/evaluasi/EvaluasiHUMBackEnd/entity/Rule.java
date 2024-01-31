@@ -15,8 +15,8 @@ public class Rule {
     @Id
     @SequenceGenerator(name = "rule_sequence",sequenceName = "rule_sequence",allocationSize = 1)
     @GeneratedValue(strategy = GenerationType.SEQUENCE,generator = "rule_sequence")
-    private Long id;
-    @Column(name = "koderule", unique = true, nullable = false)
+    private Long idrule;
     private String koderule;
     private String rule;
+
 }

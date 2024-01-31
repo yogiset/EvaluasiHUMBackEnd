@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class PertanyaanDto {
-
+    private Long idper;
     private String kodepertanyaan;
     private String pertanyaan;
     private String jawaban;

@@ -10,11 +10,13 @@ import java.time.Instant;
 @NoArgsConstructor
 @AllArgsConstructor
 public class UserDto {
+    private Long iduser;
     private String kodeuser;
     private String username;
     private String password;
     private String role;
     private String status;
     private Instant created;
+    private Long idkar;
 
 }

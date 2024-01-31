@@ -17,11 +17,11 @@ public class Karyawan {
     @Id
     @SequenceGenerator(name = "karyawan_sequence",sequenceName = "karyawan_sequence",allocationSize = 1)
     @GeneratedValue(strategy = GenerationType.SEQUENCE,generator = "karyawan_sequence")
-    private Long id;
-    @Column(name = "nik", unique = true, nullable = false)
+    private Long idkar;
     private String nik;
     private String nama;
     private String jabatan;
+
 
     @OneToMany(mappedBy = "karyawan", cascade = CascadeType.ALL)
     private List<Pertanyaan> pertanyaanList;
