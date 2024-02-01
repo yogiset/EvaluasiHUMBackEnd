@@ -1,18 +1,12 @@
 package com.evaluasi.EvaluasiHUMBackEnd.controller;
 
-import com.evaluasi.EvaluasiHUMBackEnd.constant.ApiConstant;
-import com.evaluasi.EvaluasiHUMBackEnd.dto.RuleDto;
 import com.evaluasi.EvaluasiHUMBackEnd.dto.UserDto;
-import com.evaluasi.EvaluasiHUMBackEnd.entity.User;
 import com.evaluasi.EvaluasiHUMBackEnd.service.UserService;
-import com.evaluasi.EvaluasiHUMBackEnd.utils.UserUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
