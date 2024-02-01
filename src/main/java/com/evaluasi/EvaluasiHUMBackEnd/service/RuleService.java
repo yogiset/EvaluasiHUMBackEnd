@@ -19,7 +19,7 @@ import java.util.stream.Collectors;
 public class RuleService {
     private final RuleRepository ruleRepository;
 
-    public ResponseEntity<String> add(RuleDto ruleDto) {
+    public ResponseEntity<Object> add(RuleDto ruleDto) {
         log.info("Inside Add rule");
         try{
             Rule rule = new Rule();
