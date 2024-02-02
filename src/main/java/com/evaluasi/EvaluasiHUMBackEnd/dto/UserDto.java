@@ -17,6 +17,6 @@ public class UserDto {
     private String role;
     private String status;
     private Instant created;
-    private Long idkar;
+    private String nik;
 
 }
