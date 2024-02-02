@@ -26,7 +26,7 @@ public class User {
     private String status;
     private Instant created;
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne(cascade = CascadeType.PERSIST)
     @JoinColumn(name = "nik", nullable = false)
     private Karyawan karyawan;
 }
