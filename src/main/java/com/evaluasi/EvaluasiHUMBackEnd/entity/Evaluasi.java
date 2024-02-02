@@ -24,7 +24,7 @@ public class Evaluasi {
     @Column(columnDefinition="text")
     private String perluditingkatkan;
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne(cascade = CascadeType.PERSIST)
     @JoinColumn(name = "nik", nullable = false)
     private Karyawan karyawan;
 
