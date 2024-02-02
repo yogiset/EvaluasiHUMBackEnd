@@ -1,6 +1,7 @@
 package com.evaluasi.EvaluasiHUMBackEnd.controller;
 
 
+import com.evaluasi.EvaluasiHUMBackEnd.dto.PertanyaanDto;
 import com.evaluasi.EvaluasiHUMBackEnd.dto.RuleDto;
 import com.evaluasi.EvaluasiHUMBackEnd.service.RuleService;
 import lombok.RequiredArgsConstructor;
@@ -31,5 +32,24 @@ public class RuleController {
     @GetMapping(path = "/all")
     public List<RuleDto> showallrule(){
         return ruleService.showall();
+    }
+
+    @PutMapping(path = "/editrule/{id}")
+    public ResponseEntity<Object>editRule(@PathVariable("id")Long id,@RequestBody RuleDto ruleDto) {
+        try {
+            return ruleService.editrule(id,ruleDto);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+    @DeleteMapping(path = "/hapusrule/{id}")
+    public ResponseEntity<Object>hapusRule(@PathVariable("id")Long id) {
+        try {
+            return ruleService.hapusRule(id);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 }

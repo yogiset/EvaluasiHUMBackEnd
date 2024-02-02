@@ -30,6 +30,25 @@ public class EvaluasiController {
         return evaluasiService.showAll();
     }
 
+    @PutMapping(path = "/editevaluasi/{id}")
+    public ResponseEntity<Object>editHasilEvaluasi(@PathVariable("id")Long id,@RequestBody EvaluasiDto evaluasiDto) {
+        try {
+            return evaluasiService.editEvaluasi(id,evaluasiDto);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+    @DeleteMapping(path = "/hapusevaluasi/{id}")
+    public ResponseEntity<Object>hapusEvaluasi(@PathVariable("id")Long id) {
+        try {
+            return evaluasiService.hapusEvaluasi(id);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
 
 
 }
