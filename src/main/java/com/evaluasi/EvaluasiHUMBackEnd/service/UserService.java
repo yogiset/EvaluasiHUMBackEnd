@@ -46,9 +46,9 @@ public class UserService {
             user.setCreated(Instant.now());
 
 
-            Karyawan karyawan = karyawanRepository.findByIdkar(userDto.getIdkar());
+            Karyawan karyawan = karyawanRepository.findByNik(userDto.getNik());
             if (karyawan == null) {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Karyawan not found for idkar: " + userDto.getIdkar());
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Karyawan not found for NIK: " + userDto.getNik());
             }
 
             user.setKaryawan(karyawan);
@@ -78,7 +78,7 @@ public class UserService {
                     userDto.setRole(user.getRole());
                     userDto.setStatus(user.getStatus());
                     userDto.setCreated(user.getCreated());
-                    userDto.setIdkar(user.getKaryawan().getIdkar());
+                    userDto.setNik(user.getKaryawan().getNik());
                     return userDto;
                 })
                 .collect(Collectors.toList());
