@@ -11,5 +11,8 @@ public class KaryawanDto {
     private Long idkar;
     private String nik;
     private String nama;
+    private String divisi;
     private String jabatan;
+    private String cadangan1;
+    private Integer cadangan2;
 }
