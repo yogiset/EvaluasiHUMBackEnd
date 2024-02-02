@@ -12,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -64,5 +65,42 @@ public class EvaluasiService {
                 .collect(Collectors.toList());
 
     }
+
+    public ResponseEntity<Object> editEvaluasi(Long id,EvaluasiDto evaluasiDto) {
+        try {
+            log.info("Inside editEvaluasi");
+            Optional<Evaluasi>optionalEvaluasi =evaluasiRepository.findById(id);
+            Evaluasi evaluasi = optionalEvaluasi.get();
+            evaluasi.setKodeevaluasi(evaluasiDto.getKodeevaluasi());
+            evaluasi.setTanggalevaluasi(evaluasiDto.getTanggalevaluasi());
+            evaluasi.setHasilevaluasi(evaluasiDto.getHasilevaluasi());
+            evaluasi.setPerluditingkatkan(evaluasiDto.getPerluditingkatkan());
+
+            evaluasiRepository.save(evaluasi);
+            return ResponseEntity.ok("Evaluasi edited successfully");
+
+        }catch (Exception e){
+            log.error("Error edited evaluasi", e);
+            return ResponseEntity.status(500).body("Error edited evaluasi");
+        }
+    }
+
+    public ResponseEntity<Object> hapusEvaluasi(Long id) {
+        try {
+            log.info("Inside hapus evaluasi");
+            Optional<Evaluasi> optionalEvaluasi = evaluasiRepository.findById(id);
+
+            if (optionalEvaluasi.isPresent()) {
+                evaluasiRepository.deleteById(id);
+                return ResponseEntity.ok("Successfully deleted evaluasi");
+            } else {
+                return ResponseEntity.status(404).body("Evaluasi not found");
+            }
+        } catch (Exception e) {
+            log.error("Error delete evaluasi", e);
+            return ResponseEntity.status(500).body("Error delete evaluasi");
+        }
+    }
+
 
 }

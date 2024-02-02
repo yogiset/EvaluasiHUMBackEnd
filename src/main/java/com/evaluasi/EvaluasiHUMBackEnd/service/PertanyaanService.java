@@ -12,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -63,5 +64,42 @@ public class PertanyaanService {
                     return pertanyaanDto;
                 })
                 .collect(Collectors.toList());
+    }
+
+    public ResponseEntity<Object> editPertanyaan(Long id, PertanyaanDto pertanyaanDto) {
+        try {
+            log.info("Inside edit pertanyaan");
+            Optional<Pertanyaan> optionalPertanyaan = pertanyaanRepository.findById(id);
+            Pertanyaan pertanyaan = optionalPertanyaan.get();
+
+            pertanyaan.setKodepertanyaan(pertanyaanDto.getKodepertanyaan());
+            pertanyaan.setPertanyaan(pertanyaanDto.getPertanyaan());
+            pertanyaan.setJawaban(pertanyaanDto.getJawaban());
+            pertanyaan.setBobot(pertanyaanDto.getBobot());
+
+            pertanyaanRepository.save(pertanyaan);
+            return ResponseEntity.ok("Pertanyaan edited successfully");
+
+        }catch (Exception e){
+            log.error("Error edited pertanyaan", e);
+            return ResponseEntity.status(500).body("Error edited pertanyaan");
+        }
+    }
+
+    public ResponseEntity<Object> hapusPertanyaan(Long id) {
+        try {
+            log.info("Inside hapus pertanyaan");
+            Optional<Pertanyaan> optionalPertanyaan = pertanyaanRepository.findById(id);
+
+            if (optionalPertanyaan.isPresent()) {
+                pertanyaanRepository.deleteById(id);
+                return ResponseEntity.ok("Successfully deleted pertanyaan");
+            } else {
+                return ResponseEntity.status(404).body("Pertanyaan not found");
+            }
+        } catch (Exception e) {
+            log.error("Error delete pertanyaan", e);
+            return ResponseEntity.status(500).body("Error delete pertanyaan");
+        }
     }
 }

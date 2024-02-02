@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -24,7 +25,7 @@ public class KaryawanService {
         List<Karyawan>karyawanList= karyawanRepository.findAll();
 
         return karyawanList.stream()
-                .map(item -> new KaryawanDto(item.getIdkar(),item.getNik(),item.getNama(),item.getJabatan()))
+                .map(item -> new KaryawanDto(item.getIdkar(),item.getNik(),item.getNama(),item.getDivisi(),item.getJabatan(),item.getCadangan1(),item.getCadangan2()))
                 .collect(Collectors.toList());
     }
 
@@ -34,13 +35,57 @@ public class KaryawanService {
             Karyawan karyawan = new Karyawan();
             karyawan.setNik(karyawanDto.getNik());
             karyawan.setNama(karyawanDto.getNama());
+            karyawan.setDivisi(karyawanDto.getDivisi());
             karyawan.setJabatan(karyawanDto.getJabatan());
+            karyawan.setCadangan1(karyawanDto.getCadangan1());
+            karyawan.setCadangan2(karyawanDto.getCadangan2());
+
             karyawanRepository.save(karyawan);
 
             return ResponseEntity.ok("New karyawan added successfully");
         } catch (Exception e) {
             log.error("Error creating new karyawan", e);
             return ResponseEntity.status(500).body("Error creating new karyawan");
+        }
+    }
+
+    public ResponseEntity<Object> editKaryawan(Long id, KaryawanDto karyawanDto) {
+        try {
+            log.info("Inside edit karyawan");
+            Optional<Karyawan> optionalKaryawan = karyawanRepository.findById(id);
+            Karyawan karyawan = optionalKaryawan.get();
+
+            karyawan.setNik(karyawanDto.getNik());
+            karyawan.setNama(karyawanDto.getNama());
+            karyawan.setDivisi(karyawanDto.getDivisi());
+            karyawan.setJabatan(karyawanDto.getJabatan());
+            karyawan.setJabatan(karyawanDto.getJabatan());
+            karyawan.setCadangan1(karyawanDto.getCadangan1());
+            karyawan.setCadangan2(karyawanDto.getCadangan2());
+
+            karyawanRepository.save(karyawan);
+            return ResponseEntity.ok("Evaluasi edited successfully");
+
+        }catch (Exception e){
+            log.error("Error edited evaluasi", e);
+            return ResponseEntity.status(500).body("Error edited evaluasi");
+        }
+    }
+
+    public ResponseEntity<Object> hapusKaryawan(Long id) {
+        try {
+            log.info("Inside hapus karyawan");
+            Optional<Karyawan> optionalKaryawan = karyawanRepository.findById(id);
+
+            if (optionalKaryawan.isPresent()) {
+                karyawanRepository.deleteById(id);
+                return ResponseEntity.ok("Successfully deleted karyawan");
+            } else {
+                return ResponseEntity.status(404).body("Karyawan not found");
+            }
+        } catch (Exception e) {
+            log.error("Error delete karyawan ", e);
+            return ResponseEntity.status(500).body("Error delete karyawan ");
         }
     }
 }

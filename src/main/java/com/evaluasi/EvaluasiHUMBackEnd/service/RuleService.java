@@ -1,9 +1,7 @@
 package com.evaluasi.EvaluasiHUMBackEnd.service;
 
-import com.evaluasi.EvaluasiHUMBackEnd.dto.KaryawanDto;
 import com.evaluasi.EvaluasiHUMBackEnd.dto.RuleDto;
 import com.evaluasi.EvaluasiHUMBackEnd.entity.Evaluasi;
-import com.evaluasi.EvaluasiHUMBackEnd.entity.Karyawan;
 import com.evaluasi.EvaluasiHUMBackEnd.entity.Rule;
 import com.evaluasi.EvaluasiHUMBackEnd.repository.EvaluasiRepository;
 import com.evaluasi.EvaluasiHUMBackEnd.repository.RuleRepository;
@@ -14,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -62,4 +61,39 @@ public class RuleService {
                 .collect(Collectors.toList());
     }
 
-}
+    public ResponseEntity<Object> editrule(Long id, RuleDto ruleDto) {
+        try {
+            log.info("Inside edit pertanyaan");
+            Optional<Rule> optionalRule = ruleRepository.findById(id);
+            Rule rule = optionalRule.get();
+
+            rule.setKoderule(ruleDto.getKoderule());
+            rule.setRule(ruleDto.getRule());
+
+            ruleRepository.save(rule);
+            return ResponseEntity.ok("Rule edited successfully");
+
+        }catch (Exception e){
+            log.error("Error edited rule", e);
+            return ResponseEntity.status(500).body("Error edited rule");
+        }
+    }
+    public ResponseEntity<Object> hapusRule(Long id) {
+        try {
+            log.info("Inside hapus rule");
+            Optional<Rule> optionalRule = ruleRepository.findById(id);
+
+            if (optionalRule.isPresent()) {
+                ruleRepository.deleteById(id);
+                return ResponseEntity.ok("Successfully deleted rule");
+            } else {
+                return ResponseEntity.status(404).body("rule not found");
+            }
+        } catch (Exception e) {
+            log.error("Error delete rule", e);
+            return ResponseEntity.status(500).body("Error delete rule");
+        }
+     }
+    }
+
+
