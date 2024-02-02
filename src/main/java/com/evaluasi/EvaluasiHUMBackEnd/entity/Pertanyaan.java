@@ -24,6 +24,6 @@ public class Pertanyaan {
     private Integer bobot;
 
     @ManyToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "idkar", nullable = false)
+    @JoinColumn(name = "nik", nullable = false)
     private Karyawan karyawan;
 }
