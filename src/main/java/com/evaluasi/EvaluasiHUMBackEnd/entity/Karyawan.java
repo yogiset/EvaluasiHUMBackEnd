@@ -18,6 +18,7 @@ public class Karyawan {
     @SequenceGenerator(name = "karyawan_sequence",sequenceName = "karyawan_sequence",allocationSize = 1)
     @GeneratedValue(strategy = GenerationType.SEQUENCE,generator = "karyawan_sequence")
     private Long idkar;
+    @Column(unique = true,nullable = false)
     private String nik;
     private String nama;
     private String jabatan;
@@ -30,5 +31,6 @@ public class Karyawan {
     private List<User> userList;
 
     @OneToMany(mappedBy = "karyawan", cascade = CascadeType.ALL)
-    private List<HasilEvaluasi> hasilEvaluasiList;
+    private List<Evaluasi> evaluasiList;
+
 }
