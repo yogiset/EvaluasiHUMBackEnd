@@ -14,4 +14,5 @@ public class PertanyaanDto {
     private String pertanyaan;
     private String jawaban;
     private Integer bobot;
+    private String nik;
 }
