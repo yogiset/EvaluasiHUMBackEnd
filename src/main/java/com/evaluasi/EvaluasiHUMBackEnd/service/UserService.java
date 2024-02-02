@@ -1,5 +1,6 @@
 package com.evaluasi.EvaluasiHUMBackEnd.service;
 
+import com.evaluasi.EvaluasiHUMBackEnd.dto.AuthResponse;
 import com.evaluasi.EvaluasiHUMBackEnd.dto.RuleDto;
 import com.evaluasi.EvaluasiHUMBackEnd.dto.UserDto;
 import com.evaluasi.EvaluasiHUMBackEnd.entity.Karyawan;
@@ -13,11 +14,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -61,8 +64,6 @@ public class UserService {
         }
     }
 
-
-
     public List<UserDto> showall() {
         log.info("Inside Show User");
 
@@ -84,4 +85,87 @@ public class UserService {
                 .collect(Collectors.toList());
     }
 
-}
+    public ResponseEntity<Object> editUser(Long id, UserDto userDto) {
+        try {
+            log.info("Inside edit user");
+            Optional<User> optionalUser = userRepository.findById(id);
+            User user = optionalUser.get();
+
+            user.setKodeuser(userDto.getKodeuser());
+            user.setUsername(userDto.getUsername());
+            String rawPassword = userDto.getPassword();
+            String encodedPassword = passwordEncoder.encode(rawPassword);
+            user.setPassword(encodedPassword);
+            user.setRole(userDto.getRole());
+            user.setStatus(userDto.getStatus());
+
+            userRepository.save(user);
+            return ResponseEntity.ok("User edited successfully");
+
+        }catch (Exception e){
+            log.error("Error edited user", e);
+            return ResponseEntity.status(500).body("Error edited user");
+        }
+    }
+
+    public ResponseEntity<Object> hapusUser(Long id) {
+        try {
+            log.info("Inside hapus User");
+            Optional<User> optionalUser  = userRepository.findById(id);
+
+            if (optionalUser.isPresent()) {
+                userRepository.deleteById(id);
+                return ResponseEntity.ok("Successfully deleted user");
+            } else {
+                return ResponseEntity.status(404).body("user not found");
+            }
+        } catch (Exception e) {
+            log.error("Error delete user", e);
+            return ResponseEntity.status(500).body("Error delete user");
+        }
+    }
+
+    public ResponseEntity<Object> login(AuthResponse authResponse) {
+        try {
+            log.info("Inside login");
+            String username = authResponse.getUsername();
+            String password = authResponse.getPassword();
+
+            Optional<User> userOpt1 = userRepository.findByUsername(username);
+            if (!userOpt1.isPresent()) {
+                return new ResponseEntity<>("{\"message\":\"Our System didn't find your username, Please Contact Admin/HRD !\"}", HttpStatus.BAD_REQUEST);
+            }
+            User userr = userRepository.findByUsernameId(username);
+            if (userr != null) {
+
+                if ("true".equalsIgnoreCase(userr.getStatus())) {
+
+                    authenticationManager.authenticate(
+                            new UsernamePasswordAuthenticationToken(
+                                    username, password
+                            )
+                    );
+                    String jwtToken = jwtUtil.generateToken(userr.getUsername(),userr.getRole(),userr.getStatus());
+
+                    return new ResponseEntity<>("{\"token\":\"" + jwtToken + "\"}", HttpStatus.OK);
+                } else {
+                    return new ResponseEntity<>("{\"message\":\"Please Ask Admin/HRD to Activate your account.\"}", HttpStatus.BAD_REQUEST);
+                }
+
+                }
+            }catch (Exception ex) {
+            log.error("{}", ex);
+        }
+        return new ResponseEntity<>("{\"message\":\"Bad Credentials. Please check your username or password\"}", HttpStatus.BAD_REQUEST);
+    }
+
+
+
+
+
+
+
+
+
+        }
+
