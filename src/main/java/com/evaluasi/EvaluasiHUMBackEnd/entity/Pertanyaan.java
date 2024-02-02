@@ -23,7 +23,7 @@ public class Pertanyaan {
     private String jawaban;
     private Integer bobot;
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne(cascade = CascadeType.PERSIST)
     @JoinColumn(name = "nik", nullable = false)
     private Karyawan karyawan;
 }
