@@ -19,4 +19,14 @@ public class Rule {
     private String koderule;
     private String rule;
 
+    @OneToOne(
+        cascade = CascadeType.ALL,
+        fetch = FetchType.LAZY
+    )
+    @JoinColumn(
+            name = "kodeevaluasi",
+            referencedColumnName = "kodeevaluasi"
+    )
+    private Evaluasi evaluasi;
+
 }
