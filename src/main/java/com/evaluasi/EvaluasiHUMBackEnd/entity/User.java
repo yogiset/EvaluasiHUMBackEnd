@@ -27,6 +27,6 @@ public class User {
     private Instant created;
 
     @ManyToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "idkar", nullable = false)
+    @JoinColumn(name = "nik", nullable = false)
     private Karyawan karyawan;
 }
