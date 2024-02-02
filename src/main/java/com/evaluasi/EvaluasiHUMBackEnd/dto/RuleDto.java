@@ -11,4 +11,5 @@ public class RuleDto {
     private Long idrule;
     private String koderule;
     private String rule;
+    private String kodeevaluasi;
 }
