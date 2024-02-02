@@ -53,7 +53,7 @@ public class SecurityConfig {
         http    .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .csrf(csrf -> csrf.disable())
                 .authorizeRequests()
-                .requestMatchers("/karyawan/**","/rule/**","/evaluasi/**","/pertanyaan/**","/user/**")
+                .requestMatchers("/karyawan/**","/rule/**","/evaluasi/**","/pertanyaan/**","/user/**","/hasilevaluasi/**")
                 .permitAll()
                 .anyRequest()
                 .authenticated()
