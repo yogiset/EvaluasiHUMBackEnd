@@ -21,7 +21,11 @@ public class Karyawan {
     @Column(unique = true,nullable = false)
     private String nik;
     private String nama;
+    private String divisi;
     private String jabatan;
+    private String cadangan1;
+    private Integer cadangan2;
+
 
 
     @OneToMany(mappedBy = "karyawan", cascade = CascadeType.ALL)
