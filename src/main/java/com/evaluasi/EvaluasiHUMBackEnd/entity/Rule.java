@@ -20,7 +20,7 @@ public class Rule {
     private String rule;
 
     @OneToOne(
-        cascade = CascadeType.ALL,
+        cascade = CascadeType.PERSIST,
         fetch = FetchType.LAZY
     )
     @JoinColumn(
