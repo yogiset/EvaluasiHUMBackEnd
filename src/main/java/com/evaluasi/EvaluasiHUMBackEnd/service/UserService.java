@@ -146,7 +146,7 @@ public class UserService {
                     );
 
                     try {
-                        String jwtToken = jwtUtil.generateToken(user.getUsername(), user.getRole(), user.getStatus());
+                        String jwtToken = jwtUtil.generateToken(user.getUsername(), user.getRole(), user.getIduser());
                         return ResponseEntity.ok().body(Collections.singletonMap("token", jwtToken));
                     } catch (Exception e) {
                         return ResponseEntity.badRequest().body(Collections.singletonMap("message", "Token has expired. Please log in again."));
