@@ -3,10 +3,13 @@ package com.evaluasi.EvaluasiHUMBackEnd.controller;
 import com.evaluasi.EvaluasiHUMBackEnd.dto.AuthResponse;
 import com.evaluasi.EvaluasiHUMBackEnd.dto.RuleDto;
 import com.evaluasi.EvaluasiHUMBackEnd.dto.UserDto;
+import com.evaluasi.EvaluasiHUMBackEnd.dto.UserEvaResultDto;
 import com.evaluasi.EvaluasiHUMBackEnd.service.UserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
@@ -61,5 +64,14 @@ public class UserController {
         }
     }
 
+    @GetMapping("/userresult")
+    public ResponseEntity<UserEvaResultDto> getUserInfoByUsername(@RequestParam String username,UserEvaResultDto userEvaResultDtoo,AuthResponse authResponse) {
+        try {
+            UserEvaResultDto userEvaResultDto = userService.getUserEvaResultByUsername(username,userEvaResultDtoo,authResponse);
+            return new ResponseEntity<>(userEvaResultDto, HttpStatus.OK);
+        } catch (UsernameNotFoundException e) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+    }
 
 }
