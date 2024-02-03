@@ -17,16 +17,16 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 public class ApplicationConfig {
     @Bean
     public UserDetailsService userDetailsService(){
-//        UserDetails admin = User.withUsername("yogi@gmail.com")
-//                .password(passwordEncoder().encode("yogiset"))
+//        UserDetails admin = User.withUsername("USER")
+//                .password(passwordEncoder().encode("USER"))
 //                .roles("USER")
 ////                .accountExpired(false)
 ////                .accountLocked(false)
 ////                .credentialsExpired(false)
 ////                .disabled(false)
 //                .build();
-//        UserDetails user = User.withUsername("john@gmail.com")
-//                .password(passwordEncoder().encode("johnna"))
+//        UserDetails user = User.withUsername("ADMIN")
+//                .password(passwordEncoder().encode("ADMIN"))
 //                .roles("USER","ADMIN","HR")
 ////                .accountExpired(false)
 ////                .accountLocked(false)
