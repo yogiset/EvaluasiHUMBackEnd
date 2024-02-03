@@ -19,9 +19,12 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+
+import static com.fasterxml.jackson.databind.type.LogicalType.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -131,32 +134,33 @@ public class UserService {
             String username = authResponse.getUsername();
             String password = authResponse.getPassword();
 
-            Optional<User> userOpt1 = userRepository.findByUsername(username);
-            if (!userOpt1.isPresent()) {
-                return new ResponseEntity<>("{\"message\":\"Our System didn't find your username, Please Contact Admin/HRD !\"}", HttpStatus.BAD_REQUEST);
-            }
-            User userr = userRepository.findByUsernameId(username);
-            if (userr != null) {
+            Optional<User> userOpt = userRepository.findByUsername(username);
+            if (userOpt.isPresent()) {
+                User user = userOpt.get();
 
-                if ("true".equalsIgnoreCase(userr.getStatus())) {
-
+                if ("true".equalsIgnoreCase(user.getStatus())) {
                     authenticationManager.authenticate(
                             new UsernamePasswordAuthenticationToken(
                                     username, password
                             )
                     );
-                    String jwtToken = jwtUtil.generateToken(userr.getUsername(),userr.getRole(),userr.getStatus());
 
-                    return new ResponseEntity<>("{\"token\":\"" + jwtToken + "\"}", HttpStatus.OK);
+                    try {
+                        String jwtToken = jwtUtil.generateToken(user.getUsername(), user.getRole(), user.getStatus());
+                        return ResponseEntity.ok().body(Collections.singletonMap("token", jwtToken));
+                    } catch (Exception e) {
+                        return ResponseEntity.badRequest().body(Collections.singletonMap("message", "Token has expired. Please log in again."));
+                    }
                 } else {
-                    return new ResponseEntity<>("{\"message\":\"Please Ask Admin/HRD to Activate your account.\"}", HttpStatus.BAD_REQUEST);
+                    return ResponseEntity.badRequest().body(Collections.singletonMap("message", "Please ask Admin/HRD to activate your account."));
                 }
-
-                }
-            }catch (Exception ex) {
-            log.error("{}", ex);
+            } else {
+                return ResponseEntity.badRequest().body(Collections.singletonMap("message", "Our system didn't find your username. Please contact Admin/HRD."));
+            }
+        } catch (Exception ex) {
+            log.error("Exception during login", ex);
+            return ResponseEntity.badRequest().body(Collections.singletonMap("message", "Bad Credentials. Please check your username or password"));
         }
-        return new ResponseEntity<>("{\"message\":\"Bad Credentials. Please check your username or password\"}", HttpStatus.BAD_REQUEST);
     }
 
 
@@ -167,5 +171,7 @@ public class UserService {
 
 
 
-        }
+
+
+}
 
