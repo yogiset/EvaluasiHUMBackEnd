@@ -15,12 +15,9 @@ public class UserEvaResultDto {
     private String nama;
     private String divisi;
     private String jabatan;
-<<<<<<< Updated upstream
-=======
     private String cadangan1;
     private Integer cadangan2;
     private String kodeevaluasi;
->>>>>>> Stashed changes
     private LocalDate tanggalevaluasi;
     private String hasilevaluasi;
     private String perluditingkatkan;
