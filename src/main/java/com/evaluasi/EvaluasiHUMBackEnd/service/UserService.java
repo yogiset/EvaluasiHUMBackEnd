@@ -193,6 +193,10 @@ public class UserService {
         userEvaResultDtoo.setNama(karyawan.getNama());
         userEvaResultDtoo.setDivisi(karyawan.getDivisi());
         userEvaResultDtoo.setJabatan(karyawan.getJabatan());
+<<<<<<< Updated upstream
+=======
+        userEvaResultDtoo.setKodeevaluasi(latestEvaluasi.getKodeevaluasi());
+>>>>>>> Stashed changes
         userEvaResultDtoo.setTanggalevaluasi(latestEvaluasi.getTanggalevaluasi());
         userEvaResultDtoo.setHasilevaluasi(latestEvaluasi.getHasilevaluasi());
         userEvaResultDtoo.setPerluditingkatkan(latestEvaluasi.getPerluditingkatkan());
