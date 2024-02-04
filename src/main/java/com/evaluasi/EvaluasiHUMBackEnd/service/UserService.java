@@ -194,6 +194,7 @@ public class UserService {
         userEvaResultDtoo.setDivisi(karyawan.getDivisi());
         userEvaResultDtoo.setJabatan(karyawan.getJabatan());
         userEvaResultDtoo.setKodeevaluasi(latestEvaluasi.getKodeevaluasi());
+        userEvaResultDtoo.setKodeevaluasi(latestEvaluasi.getKodeevaluasi());
         userEvaResultDtoo.setTanggalevaluasi(latestEvaluasi.getTanggalevaluasi());
         userEvaResultDtoo.setHasilevaluasi(latestEvaluasi.getHasilevaluasi());
         userEvaResultDtoo.setPerluditingkatkan(latestEvaluasi.getPerluditingkatkan());
