@@ -1,8 +1,12 @@
 package com.evaluasi.EvaluasiHUMBackEnd.controller;
 
 import com.evaluasi.EvaluasiHUMBackEnd.dto.EvaluasiDto;
+import com.evaluasi.EvaluasiHUMBackEnd.dto.UserEvaResultDto;
+import com.evaluasi.EvaluasiHUMBackEnd.entity.Evaluasi;
 import com.evaluasi.EvaluasiHUMBackEnd.service.EvaluasiService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -49,6 +53,38 @@ public class EvaluasiController {
         }
     }
 
+    @GetMapping("/hasilevaluasipagination/{offset}/{pageSize}")
+    public ResponseEntity<List<UserEvaResultDto>> showAllEvaluationPagination(@PathVariable int offset, @PathVariable int pageSize) {
+        Page<UserEvaResultDto> userEvaResultDtoPage = evaluasiService.showAllEvaluationWithPagination(offset, pageSize);
+
+        List<UserEvaResultDto> userEvaResultDtoList = userEvaResultDtoPage.getContent();
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("X-Total-Count", String.valueOf(userEvaResultDtoPage.getTotalElements()));
+
+        return new ResponseEntity<>(userEvaResultDtoList, headers, HttpStatus.OK);
+    }
+    @GetMapping("/hasilevaluasipaginationasctanggal/{offset}/{pageSize}")
+    public ResponseEntity<List<UserEvaResultDto>> showAllEvaluationPaginationAscTanggal(@PathVariable int offset, @PathVariable int pageSize) {
+        Page<UserEvaResultDto> userEvaResultDtoPage = evaluasiService.showAllEvaluationWithPaginationAscTanggal(offset, pageSize);
+
+        List<UserEvaResultDto> userEvaResultDtoList = userEvaResultDtoPage.getContent();
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("X-Total-Count", String.valueOf(userEvaResultDtoPage.getTotalElements()));
+
+        return new ResponseEntity<>(userEvaResultDtoList, headers, HttpStatus.OK);
+    }
+    @GetMapping("/hasilevaluasipaginationdesctanggal/{offset}/{pageSize}")
+    public ResponseEntity<List<UserEvaResultDto>> showAllEvaluationPaginationDescTanggal(@PathVariable int offset, @PathVariable int pageSize) {
+        Page<UserEvaResultDto> userEvaResultDtoPage = evaluasiService.showAllEvaluationWithPaginationDescTanggal(offset, pageSize);
+
+        List<UserEvaResultDto> userEvaResultDtoList = userEvaResultDtoPage.getContent();
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("X-Total-Count", String.valueOf(userEvaResultDtoPage.getTotalElements()));
+
+        return new ResponseEntity<>(userEvaResultDtoList, headers, HttpStatus.OK);
+    }
+
+    
 
 
 }

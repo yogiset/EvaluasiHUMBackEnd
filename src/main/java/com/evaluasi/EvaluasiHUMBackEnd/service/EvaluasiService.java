@@ -1,12 +1,17 @@
 package com.evaluasi.EvaluasiHUMBackEnd.service;
 
 import com.evaluasi.EvaluasiHUMBackEnd.dto.EvaluasiDto;
+import com.evaluasi.EvaluasiHUMBackEnd.dto.UserEvaResultDto;
 import com.evaluasi.EvaluasiHUMBackEnd.entity.Evaluasi;
 import com.evaluasi.EvaluasiHUMBackEnd.entity.Karyawan;
 import com.evaluasi.EvaluasiHUMBackEnd.repository.EvaluasiRepository;
 import com.evaluasi.EvaluasiHUMBackEnd.repository.KaryawanRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -105,4 +110,85 @@ public class EvaluasiService {
     }
 
 
+    public Page<UserEvaResultDto> showAllEvaluationWithPagination(int offset, int pageSize) {
+        log.info("Inside showAllEvaluationWithPagination");
+
+        Page<Evaluasi> evaluasiPage = evaluasiRepository.findAll(PageRequest.of(offset, pageSize));
+
+        List<UserEvaResultDto> resultList = evaluasiPage.getContent().stream()
+                .map(evaluasi -> {
+                    UserEvaResultDto resultDto = new UserEvaResultDto();
+                    Karyawan karyawan = evaluasi.getKaryawan();
+                    resultDto.setIdkar(karyawan.getIdkar());
+                    resultDto.setNik(karyawan.getNik());
+                    resultDto.setNama(karyawan.getNama());
+                    resultDto.setDivisi(karyawan.getDivisi());
+                    resultDto.setJabatan(karyawan.getJabatan());
+                    resultDto.setCadangan1(karyawan.getCadangan1());
+                    resultDto.setCadangan2(karyawan.getCadangan2());
+                    resultDto.setKodeevaluasi(evaluasi.getKodeevaluasi());
+                    resultDto.setTanggalevaluasi(evaluasi.getTanggalevaluasi());
+                    resultDto.setHasilevaluasi(evaluasi.getHasilevaluasi());
+                    resultDto.setPerluditingkatkan(evaluasi.getPerluditingkatkan());
+                    return resultDto;
+                })
+                .collect(Collectors.toList());
+
+        return new PageImpl<>(resultList, evaluasiPage.getPageable(), evaluasiPage.getTotalElements());
+    }
+
+
+    public Page<UserEvaResultDto> showAllEvaluationWithPaginationAscTanggal(int offset, int pageSize) {
+        log.info("Inside showAllEvaluationWithPaginationAscTaggal");
+
+        Page<Evaluasi> evaluasiPage = evaluasiRepository.findAll(PageRequest.of(offset, pageSize, Sort.by("tanggalevaluasi").ascending()));
+
+        List<UserEvaResultDto> resultList = evaluasiPage.getContent().stream()
+                .map(evaluasi -> {
+                    UserEvaResultDto resultDto = new UserEvaResultDto();
+                    Karyawan karyawan = evaluasi.getKaryawan();
+                    resultDto.setIdkar(karyawan.getIdkar());
+                    resultDto.setNik(karyawan.getNik());
+                    resultDto.setNama(karyawan.getNama());
+                    resultDto.setDivisi(karyawan.getDivisi());
+                    resultDto.setJabatan(karyawan.getJabatan());
+                    resultDto.setCadangan1(karyawan.getCadangan1());
+                    resultDto.setCadangan2(karyawan.getCadangan2());
+                    resultDto.setKodeevaluasi(evaluasi.getKodeevaluasi());
+                    resultDto.setTanggalevaluasi(evaluasi.getTanggalevaluasi());
+                    resultDto.setHasilevaluasi(evaluasi.getHasilevaluasi());
+                    resultDto.setPerluditingkatkan(evaluasi.getPerluditingkatkan());
+                    return resultDto;
+                })
+                .collect(Collectors.toList());
+
+        return new PageImpl<>(resultList, evaluasiPage.getPageable(), evaluasiPage.getTotalElements());
+    }
+
+    public Page<UserEvaResultDto> showAllEvaluationWithPaginationDescTanggal(int offset, int pageSize) {
+        log.info("Inside showAllEvaluationWithPaginationDescTanggal");
+
+        Page<Evaluasi> evaluasiPage = evaluasiRepository.findAll(PageRequest.of(offset, pageSize,Sort.by("tanggalevaluasi").descending()));
+
+        List<UserEvaResultDto> resultList = evaluasiPage.getContent().stream()
+                .map(evaluasi -> {
+                    UserEvaResultDto resultDto = new UserEvaResultDto();
+                    Karyawan karyawan = evaluasi.getKaryawan();
+                    resultDto.setIdkar(karyawan.getIdkar());
+                    resultDto.setNik(karyawan.getNik());
+                    resultDto.setNama(karyawan.getNama());
+                    resultDto.setDivisi(karyawan.getDivisi());
+                    resultDto.setJabatan(karyawan.getJabatan());
+                    resultDto.setCadangan1(karyawan.getCadangan1());
+                    resultDto.setCadangan2(karyawan.getCadangan2());
+                    resultDto.setKodeevaluasi(evaluasi.getKodeevaluasi());
+                    resultDto.setTanggalevaluasi(evaluasi.getTanggalevaluasi());
+                    resultDto.setHasilevaluasi(evaluasi.getHasilevaluasi());
+                    resultDto.setPerluditingkatkan(evaluasi.getPerluditingkatkan());
+                    return resultDto;
+                })
+                .collect(Collectors.toList());
+
+        return new PageImpl<>(resultList, evaluasiPage.getPageable(), evaluasiPage.getTotalElements());
+    }
 }

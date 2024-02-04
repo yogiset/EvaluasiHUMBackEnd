@@ -3,23 +3,29 @@ package com.evaluasi.EvaluasiHUMBackEnd.service;
 import com.evaluasi.EvaluasiHUMBackEnd.dto.AuthResponse;
 import com.evaluasi.EvaluasiHUMBackEnd.dto.RuleDto;
 import com.evaluasi.EvaluasiHUMBackEnd.dto.UserDto;
+import com.evaluasi.EvaluasiHUMBackEnd.dto.UserEvaResultDto;
+import com.evaluasi.EvaluasiHUMBackEnd.entity.Evaluasi;
 import com.evaluasi.EvaluasiHUMBackEnd.entity.Karyawan;
 import com.evaluasi.EvaluasiHUMBackEnd.entity.Rule;
 import com.evaluasi.EvaluasiHUMBackEnd.entity.User;
+import com.evaluasi.EvaluasiHUMBackEnd.exception.AllException;
 import com.evaluasi.EvaluasiHUMBackEnd.jwt.JwtUtil;
 import com.evaluasi.EvaluasiHUMBackEnd.repository.KaryawanRepository;
 import com.evaluasi.EvaluasiHUMBackEnd.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -146,7 +152,7 @@ public class UserService {
                     );
 
                     try {
-                        String jwtToken = jwtUtil.generateToken(user.getUsername(), user.getRole(), user.getStatus());
+                        String jwtToken = jwtUtil.generateToken(user.getUsername(), user.getRole(), user.getIduser());
                         return ResponseEntity.ok().body(Collections.singletonMap("token", jwtToken));
                     } catch (Exception e) {
                         return ResponseEntity.badRequest().body(Collections.singletonMap("message", "Token has expired. Please log in again."));
@@ -164,14 +170,36 @@ public class UserService {
     }
 
 
+    public UserEvaResultDto getUserEvaResultByUsername(String username,UserEvaResultDto userEvaResultDtoo,AuthResponse authResponse) {
+        log.info("Inside Userevaresul");
+        username = authResponse.getUsername();
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
 
+        Karyawan karyawan = user.getKaryawan();
+        List<Evaluasi> evaluasiList = karyawan.getEvaluasiList();
 
+        if (evaluasiList.isEmpty()) {
+            // Handle the case where no evaluations are found for the user
+            return null;
+        }
 
+        Evaluasi latestEvaluasi = evaluasiList.stream()
+                .max(Comparator.comparing(Evaluasi::getTanggalevaluasi))
+                .orElseThrow(() -> new UsernameNotFoundException("Evaluasi not found"));
 
+        userEvaResultDtoo.setIdkar(karyawan.getIdkar());
+        userEvaResultDtoo.setNik(karyawan.getNik());
+        userEvaResultDtoo.setNama(karyawan.getNama());
+        userEvaResultDtoo.setDivisi(karyawan.getDivisi());
+        userEvaResultDtoo.setJabatan(karyawan.getJabatan());
+        userEvaResultDtoo.setKodeevaluasi(latestEvaluasi.getKodeevaluasi());
+        userEvaResultDtoo.setTanggalevaluasi(latestEvaluasi.getTanggalevaluasi());
+        userEvaResultDtoo.setHasilevaluasi(latestEvaluasi.getHasilevaluasi());
+        userEvaResultDtoo.setPerluditingkatkan(latestEvaluasi.getPerluditingkatkan());
 
-
-
-
-
+        return userEvaResultDtoo;
+    }
 }
+
 
