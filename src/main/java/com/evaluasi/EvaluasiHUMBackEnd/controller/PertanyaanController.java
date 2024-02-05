@@ -2,6 +2,7 @@ package com.evaluasi.EvaluasiHUMBackEnd.controller;
 
 import com.evaluasi.EvaluasiHUMBackEnd.dto.KaryawanDto;
 import com.evaluasi.EvaluasiHUMBackEnd.dto.PertanyaanDto;
+import com.evaluasi.EvaluasiHUMBackEnd.exception.AllException;
 import com.evaluasi.EvaluasiHUMBackEnd.service.PertanyaanService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -29,6 +30,11 @@ public class PertanyaanController {
     @GetMapping(path = "/all")
     public List<PertanyaanDto> showAllPertanyaan(){
         return pertanyaanService.showAll();
+    }
+
+    @GetMapping(path = "/findbyid/{id}")
+    public PertanyaanDto findById(@PathVariable Long id) throws AllException {
+        return pertanyaanService.findByIdPer(id);
     }
 
     @PutMapping(path = "/editpertanyaan/{id}")

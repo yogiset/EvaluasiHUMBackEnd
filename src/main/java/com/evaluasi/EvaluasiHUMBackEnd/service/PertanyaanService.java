@@ -3,6 +3,7 @@ package com.evaluasi.EvaluasiHUMBackEnd.service;
 import com.evaluasi.EvaluasiHUMBackEnd.dto.PertanyaanDto;
 import com.evaluasi.EvaluasiHUMBackEnd.entity.Karyawan;
 import com.evaluasi.EvaluasiHUMBackEnd.entity.Pertanyaan;
+import com.evaluasi.EvaluasiHUMBackEnd.exception.AllException;
 import com.evaluasi.EvaluasiHUMBackEnd.repository.KaryawanRepository;
 import com.evaluasi.EvaluasiHUMBackEnd.repository.PertanyaanRepository;
 import lombok.RequiredArgsConstructor;
@@ -101,5 +102,24 @@ public class PertanyaanService {
             log.error("Error delete pertanyaan", e);
             return ResponseEntity.status(500).body("Error delete pertanyaan");
         }
+    }
+
+    public PertanyaanDto findByIdPer(Long id) throws AllException {
+        log.info("Inside findbyidper");
+        Pertanyaan pertanyaan = pertanyaanRepository.findById(id).orElseThrow(() -> new AllException("pertanyaan with id" +id+"not found"));
+
+        return mapPertanyaanToPertanyaanDto(pertanyaan);
+    }
+    public PertanyaanDto mapPertanyaanToPertanyaanDto(Pertanyaan pertanyaan){
+        PertanyaanDto pertanyaanDto = new PertanyaanDto();
+        pertanyaanDto.setIdper(pertanyaan.getIdper());
+        pertanyaanDto.setKodepertanyaan(pertanyaan.getKodepertanyaan());
+        pertanyaanDto.setPertanyaan(pertanyaan.getPertanyaan());
+        pertanyaanDto.setJawaban(pertanyaan.getJawaban());
+        pertanyaanDto.setBobot(pertanyaan.getBobot());
+        if(pertanyaan.getKaryawan() != null){
+            pertanyaanDto.setNik(pertanyaan.getKaryawan().getNik());
+        }
+        return pertanyaanDto;
     }
 }

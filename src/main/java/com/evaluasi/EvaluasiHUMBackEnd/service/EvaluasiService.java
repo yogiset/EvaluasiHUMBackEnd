@@ -4,6 +4,7 @@ import com.evaluasi.EvaluasiHUMBackEnd.dto.EvaluasiDto;
 import com.evaluasi.EvaluasiHUMBackEnd.dto.UserEvaResultDto;
 import com.evaluasi.EvaluasiHUMBackEnd.entity.Evaluasi;
 import com.evaluasi.EvaluasiHUMBackEnd.entity.Karyawan;
+import com.evaluasi.EvaluasiHUMBackEnd.exception.AllException;
 import com.evaluasi.EvaluasiHUMBackEnd.repository.EvaluasiRepository;
 import com.evaluasi.EvaluasiHUMBackEnd.repository.KaryawanRepository;
 import lombok.RequiredArgsConstructor;
@@ -190,5 +191,27 @@ public class EvaluasiService {
                 .collect(Collectors.toList());
 
         return new PageImpl<>(resultList, evaluasiPage.getPageable(), evaluasiPage.getTotalElements());
+    }
+
+    public EvaluasiDto findByIdEva(Long id) throws AllException {
+        log.info("inside findbyideva");
+        Evaluasi evaluasi = evaluasiRepository.findById(id).orElseThrow(() -> new AllException("Evaluasi with id " + id + " not found"));
+
+        return mapEvaluasiToEvaluasiDto(evaluasi);
+    }
+
+    public EvaluasiDto mapEvaluasiToEvaluasiDto(Evaluasi evaluasi){
+        EvaluasiDto evaluasiDto = new EvaluasiDto();
+        evaluasiDto.setIdeva(evaluasi.getIdeva());
+        evaluasiDto.setKodeevaluasi(evaluasi.getKodeevaluasi());
+        evaluasiDto.setTanggalevaluasi(evaluasi.getTanggalevaluasi());
+        evaluasiDto.setHasilevaluasi(evaluasi.getHasilevaluasi());
+        evaluasiDto.setPerluditingkatkan(evaluasi.getPerluditingkatkan());
+
+        if(evaluasi.getKaryawan() != null){
+            evaluasiDto.setNik(evaluasi.getKaryawan().getNik());
+        }
+
+        return  evaluasiDto;
     }
 }
