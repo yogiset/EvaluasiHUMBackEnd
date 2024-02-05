@@ -43,6 +43,7 @@ public class UserService {
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
 
+
     public ResponseEntity<Object> createAccount(UserDto userDto) {
         try {
             log.info("Inside Create Account {}", userDto);
@@ -152,7 +153,7 @@ public class UserService {
                     );
 
                     try {
-                        String jwtToken = jwtUtil.generateToken(user.getUsername(), user.getRole(), user.getIduser());
+                        String jwtToken = jwtUtil.generateToken(user.getUsername(), user.getRole(), user.getIduser(),user.getKaryawan().getNik());
                         return ResponseEntity.ok().body(Collections.singletonMap("token", jwtToken));
                     } catch (Exception e) {
                         return ResponseEntity.badRequest().body(Collections.singletonMap("message", "Token has expired. Please log in again."));
