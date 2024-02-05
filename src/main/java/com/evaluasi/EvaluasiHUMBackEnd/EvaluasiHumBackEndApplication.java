@@ -32,7 +32,7 @@ public class EvaluasiHumBackEndApplication implements CommandLineRunner {
 	@Override
 	public void run(String... args) throws Exception {
 
-			User userr = userRepository.findByUsernameId("SUPERADMIN");
+		User userr = userRepository.findByUsernameId("SUPERADMIN");
 		if (userr == null) {
 
 			User user = new User();
