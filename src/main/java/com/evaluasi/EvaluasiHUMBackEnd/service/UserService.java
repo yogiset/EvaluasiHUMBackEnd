@@ -43,6 +43,7 @@ public class UserService {
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
 
+
     public ResponseEntity<Object> createAccount(UserDto userDto) {
         try {
             log.info("Inside Create Account {}", userDto);
@@ -152,7 +153,7 @@ public class UserService {
                     );
 
                     try {
-                        String jwtToken = jwtUtil.generateToken(user.getUsername(), user.getRole(), user.getIduser());
+                        String jwtToken = jwtUtil.generateToken(user.getUsername(), user.getRole(), user.getIduser(),user.getKaryawan().getNik());
                         return ResponseEntity.ok().body(Collections.singletonMap("token", jwtToken));
                     } catch (Exception e) {
                         return ResponseEntity.badRequest().body(Collections.singletonMap("message", "Token has expired. Please log in again."));
@@ -194,13 +195,39 @@ public class UserService {
         userEvaResultDtoo.setDivisi(karyawan.getDivisi());
         userEvaResultDtoo.setJabatan(karyawan.getJabatan());
         userEvaResultDtoo.setKodeevaluasi(latestEvaluasi.getKodeevaluasi());
-        userEvaResultDtoo.setKodeevaluasi(latestEvaluasi.getKodeevaluasi());
         userEvaResultDtoo.setTanggalevaluasi(latestEvaluasi.getTanggalevaluasi());
         userEvaResultDtoo.setHasilevaluasi(latestEvaluasi.getHasilevaluasi());
         userEvaResultDtoo.setPerluditingkatkan(latestEvaluasi.getPerluditingkatkan());
 
         return userEvaResultDtoo;
     }
+
+    public UserDto mapUserToUserDto(User user) {
+        UserDto userDto = new UserDto();
+        userDto.setIduser(user.getIduser());
+        userDto.setKodeuser(user.getKodeuser());
+        userDto.setUsername(user.getUsername());
+        userDto.setPassword(user.getPassword());
+        userDto.setRole(user.getRole());
+        userDto.setStatus(user.getStatus());
+        userDto.setCreated(user.getCreated());
+
+
+        if (user.getKaryawan() != null) {
+            userDto.setNik(user.getKaryawan().getNik());
+            userDto.setIdkar(user.getKaryawan().getIdkar());
+        }
+
+        return userDto;
+    }
+    public UserDto fetchUserDtoByIdkar(Long idkar) throws AllException {
+        log.info("Inside fetchUserDtoByIdkar");
+        User user = userRepository.findByIdkar(idkar)
+                .orElseThrow(() -> new AllException("User with idkar " + idkar + " not found"));
+
+        return mapUserToUserDto(user);
+    }
+
 }
 
 
