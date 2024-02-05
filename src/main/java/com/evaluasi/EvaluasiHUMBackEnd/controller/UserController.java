@@ -4,6 +4,8 @@ import com.evaluasi.EvaluasiHUMBackEnd.dto.AuthResponse;
 import com.evaluasi.EvaluasiHUMBackEnd.dto.RuleDto;
 import com.evaluasi.EvaluasiHUMBackEnd.dto.UserDto;
 import com.evaluasi.EvaluasiHUMBackEnd.dto.UserEvaResultDto;
+import com.evaluasi.EvaluasiHUMBackEnd.entity.User;
+import com.evaluasi.EvaluasiHUMBackEnd.exception.AllException;
 import com.evaluasi.EvaluasiHUMBackEnd.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.crossstore.ChangeSetPersister;
@@ -62,6 +64,10 @@ public class UserController {
             ex.printStackTrace();
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
+    }
+    @GetMapping("/findid/{idkar}")
+    public UserDto fetchUserByIdkar(@PathVariable("idkar") Long idkar) throws AllException {
+        return userService.fetchUserDtoByIdkar(idkar);
     }
 
     @GetMapping("/userresult")
