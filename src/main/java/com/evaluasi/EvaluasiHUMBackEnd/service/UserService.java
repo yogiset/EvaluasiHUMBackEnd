@@ -1,9 +1,6 @@
 package com.evaluasi.EvaluasiHUMBackEnd.service;
 
-import com.evaluasi.EvaluasiHUMBackEnd.dto.AuthResponse;
-import com.evaluasi.EvaluasiHUMBackEnd.dto.ChangePassword;
-import com.evaluasi.EvaluasiHUMBackEnd.dto.UserDto;
-import com.evaluasi.EvaluasiHUMBackEnd.dto.UserEvaResultDto;
+import com.evaluasi.EvaluasiHUMBackEnd.dto.*;
 import com.evaluasi.EvaluasiHUMBackEnd.entity.Evaluasi;
 import com.evaluasi.EvaluasiHUMBackEnd.entity.Karyawan;
 import com.evaluasi.EvaluasiHUMBackEnd.entity.User;
@@ -256,6 +253,36 @@ public class UserService {
         }
     }
 
+    public ResponseEntity<Object> changeUsername(ChangeUsername changeUsername) {
+        try {
+            log.info("Change password");
+            log.info("Received request with payload: {}", changeUsername);
+
+            Long id = changeUsername.getId();
+            if (id != null) {
+                User user = userRepository.findByIduser(id);
+                if (user != null) {
+                    String oldUser = changeUsername.getOldusername();
+                    String newUser = changeUsername.getNewusername();
+                    if (oldUser.equals(user.getUsername())) {
+                        user.setUsername(newUser);
+                        userRepository.save(user);
+                        return ResponseEntity.ok(Collections.singletonMap("message", "Username updated successfully"));
+                    } else {
+                        return ResponseEntity.badRequest().body(Collections.singletonMap("error", "Incorrect old username"));
+                    }
+                } else {
+                    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Collections.singletonMap("error", "User not found"));
+                }
+            } else {
+                log.error("Token is null or empty");
+                return ResponseEntity.badRequest().body(Collections.singletonMap("error", "Token is null or empty"));
+            }
+        } catch (Exception ex) {
+            log.error("An error occurred while changing the password", ex);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Collections.singletonMap("error", "An error occurred while changing the password"));
+        }
+    }
 }
 
 
