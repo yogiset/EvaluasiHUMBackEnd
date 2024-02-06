@@ -1,7 +1,10 @@
 package com.evaluasi.EvaluasiHUMBackEnd.service;
 
 import com.evaluasi.EvaluasiHUMBackEnd.dto.KaryawanDto;
+import com.evaluasi.EvaluasiHUMBackEnd.dto.UserDto;
 import com.evaluasi.EvaluasiHUMBackEnd.entity.Karyawan;
+import com.evaluasi.EvaluasiHUMBackEnd.entity.User;
+import com.evaluasi.EvaluasiHUMBackEnd.exception.AllException;
 import com.evaluasi.EvaluasiHUMBackEnd.repository.KaryawanRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -87,6 +90,25 @@ public class KaryawanService {
             log.error("Error delete karyawan ", e);
             return ResponseEntity.status(500).body("Error delete karyawan ");
         }
+    }
+
+    public KaryawanDto findByIdKar(Long id) throws AllException {
+        log.info("Inside findbyidkar");
+        Karyawan karyawan = karyawanRepository.findById(id).orElseThrow(() -> new AllException("karyawan with idkar " + id + " not found"));
+         return mapKaryawanToKaryawanDto(karyawan);
+    }
+    
+    public KaryawanDto mapKaryawanToKaryawanDto(Karyawan karyawan) {
+        KaryawanDto karyawanDto = new KaryawanDto();
+        karyawanDto.setIdkar(karyawan.getIdkar());
+        karyawanDto.setNik(karyawan.getNik());
+        karyawanDto.setNama(karyawan.getNama());
+        karyawanDto.setDivisi(karyawan.getDivisi());
+        karyawanDto.setJabatan(karyawan.getJabatan());
+        karyawanDto.setCadangan1(karyawan.getCadangan1());
+        karyawanDto.setCadangan2(karyawan.getCadangan2());
+
+        return karyawanDto;
     }
 }
 

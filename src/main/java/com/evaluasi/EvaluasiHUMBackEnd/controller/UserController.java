@@ -4,6 +4,8 @@ import com.evaluasi.EvaluasiHUMBackEnd.dto.AuthResponse;
 import com.evaluasi.EvaluasiHUMBackEnd.dto.RuleDto;
 import com.evaluasi.EvaluasiHUMBackEnd.dto.UserDto;
 import com.evaluasi.EvaluasiHUMBackEnd.dto.UserEvaResultDto;
+import com.evaluasi.EvaluasiHUMBackEnd.entity.User;
+import com.evaluasi.EvaluasiHUMBackEnd.exception.AllException;
 import com.evaluasi.EvaluasiHUMBackEnd.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.crossstore.ChangeSetPersister;
@@ -34,7 +36,6 @@ public class UserController {
         return userService.showall();
     }
 
-
     @PutMapping(path = "/edituser/{id}")
     public ResponseEntity<Object>editUser(@PathVariable("id")Long id,@RequestBody UserDto userDto) {
         try {
@@ -44,6 +45,7 @@ public class UserController {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+    
     @DeleteMapping(path = "/hapususer/{id}")
     public ResponseEntity<Object>hapusUser(@PathVariable("id")Long id) {
         try {
@@ -62,6 +64,11 @@ public class UserController {
             ex.printStackTrace();
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
+    }
+    
+    @GetMapping("/findById/{id}")
+    public UserDto fetchUserByIduser(@PathVariable("id") Long id) throws AllException {
+        return userService.fetchUserDtoByIduser(id);
     }
 
     @GetMapping("/userresult")

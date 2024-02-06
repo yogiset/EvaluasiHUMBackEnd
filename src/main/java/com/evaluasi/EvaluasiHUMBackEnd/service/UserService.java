@@ -170,7 +170,6 @@ public class UserService {
         }
     }
 
-
     public UserEvaResultDto getUserEvaResultByUsername(String username,UserEvaResultDto userEvaResultDtoo,AuthResponse authResponse) {
         log.info("Inside Userevaresul");
         username = authResponse.getUsername();
@@ -195,13 +194,40 @@ public class UserService {
         userEvaResultDtoo.setDivisi(karyawan.getDivisi());
         userEvaResultDtoo.setJabatan(karyawan.getJabatan());
         userEvaResultDtoo.setKodeevaluasi(latestEvaluasi.getKodeevaluasi());
-        userEvaResultDtoo.setKodeevaluasi(latestEvaluasi.getKodeevaluasi());
         userEvaResultDtoo.setTanggalevaluasi(latestEvaluasi.getTanggalevaluasi());
         userEvaResultDtoo.setHasilevaluasi(latestEvaluasi.getHasilevaluasi());
         userEvaResultDtoo.setPerluditingkatkan(latestEvaluasi.getPerluditingkatkan());
 
         return userEvaResultDtoo;
     }
+
+    public UserDto mapUserToUserDto(User user) {
+        UserDto userDto = new UserDto();
+        userDto.setIduser(user.getIduser());
+        userDto.setKodeuser(user.getKodeuser());
+        userDto.setUsername(user.getUsername());
+        userDto.setPassword(user.getPassword());
+        userDto.setRole(user.getRole());
+        userDto.setStatus(user.getStatus());
+        userDto.setCreated(user.getCreated());
+
+
+        if (user.getKaryawan() != null) {
+            userDto.setNik(user.getKaryawan().getNik());
+            userDto.setIdkar(user.getKaryawan().getIdkar());
+        }
+
+        return userDto;
+    }
+    
+    public UserDto fetchUserDtoByIduser(Long id) throws AllException {
+        log.info("Inside fetchUserDtoByIduser");
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new AllException("User with iduser " + id + " not found"));
+
+        return mapUserToUserDto(user);
+    }
+
 }
 
 
