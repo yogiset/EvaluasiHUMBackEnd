@@ -1,6 +1,5 @@
 package com.evaluasi.EvaluasiHUMBackEnd.repository;
 
-import com.evaluasi.EvaluasiHUMBackEnd.entity.Evaluasi;
 import com.evaluasi.EvaluasiHUMBackEnd.entity.Pertanyaan;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;

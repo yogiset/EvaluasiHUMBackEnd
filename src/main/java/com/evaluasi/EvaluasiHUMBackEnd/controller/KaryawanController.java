@@ -1,9 +1,7 @@
 package com.evaluasi.EvaluasiHUMBackEnd.controller;
 
 
-import com.evaluasi.EvaluasiHUMBackEnd.dto.EvaluasiDto;
 import com.evaluasi.EvaluasiHUMBackEnd.dto.KaryawanDto;
-import com.evaluasi.EvaluasiHUMBackEnd.entity.Karyawan;
 import com.evaluasi.EvaluasiHUMBackEnd.exception.AllException;
 import com.evaluasi.EvaluasiHUMBackEnd.service.KaryawanService;
 import lombok.RequiredArgsConstructor;

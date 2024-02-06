@@ -2,7 +2,6 @@ package com.evaluasi.EvaluasiHUMBackEnd.controller;
 
 import com.evaluasi.EvaluasiHUMBackEnd.dto.EvaluasiDto;
 import com.evaluasi.EvaluasiHUMBackEnd.dto.UserEvaResultDto;
-import com.evaluasi.EvaluasiHUMBackEnd.entity.Evaluasi;
 import com.evaluasi.EvaluasiHUMBackEnd.exception.AllException;
 import com.evaluasi.EvaluasiHUMBackEnd.service.EvaluasiService;
 import lombok.RequiredArgsConstructor;

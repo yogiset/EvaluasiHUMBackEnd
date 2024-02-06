@@ -16,7 +16,7 @@ import java.util.stream.Collectors;
 public class CustomUserDetails implements UserDetails {
     private String username;
     private String password;
-    private String status;
+    private Boolean status;
     private List<GrantedAuthority> authorities;
 
     public CustomUserDetails(User user) {
@@ -60,6 +60,6 @@ public class CustomUserDetails implements UserDetails {
 
     @Override
     public boolean isEnabled() {
-        return "true".equalsIgnoreCase(status);
+        return status;
     }
 }

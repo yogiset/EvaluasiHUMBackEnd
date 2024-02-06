@@ -52,21 +52,22 @@ public class SecurityConfig {
 
         http    .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .csrf(csrf -> csrf.disable())
-                .authorizeRequests()
+                .authorizeHttpRequests((authorizeHttpRequests) -> authorizeHttpRequests
                 .requestMatchers("/karyawan/**","/rule/**","/evaluasi/**","/pertanyaan/**","/user/**","/hasilevaluasi/**")
                 .permitAll()
                 .anyRequest()
                 .authenticated()
-                .and()
+                )
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authenticationProvider(authenticationProvider)
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
-    }
+        }
 
-    @Bean
-    CorsConfigurationSource corsConfigurationSource() {
+
+        @Bean
+        CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowedOrigins(Arrays.asList("http://localhost:5173","http://localhost:5173/"));
         configuration.setAllowedHeaders(Arrays.asList("Origin", "Access-Control-Allow-Origin",

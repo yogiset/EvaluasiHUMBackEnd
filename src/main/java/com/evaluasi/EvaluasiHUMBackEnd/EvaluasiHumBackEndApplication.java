@@ -1,9 +1,8 @@
 package com.evaluasi.EvaluasiHUMBackEnd;
 
-import com.evaluasi.EvaluasiHUMBackEnd.dto.UserDto;
 import com.evaluasi.EvaluasiHUMBackEnd.entity.Karyawan;
 import com.evaluasi.EvaluasiHUMBackEnd.entity.User;
-import com.evaluasi.EvaluasiHUMBackEnd.repository.KaryawanRepository;
+// import com.evaluasi.EvaluasiHUMBackEnd.repository.KaryawanRepository;
 import com.evaluasi.EvaluasiHUMBackEnd.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
@@ -19,8 +18,8 @@ public class EvaluasiHumBackEndApplication implements CommandLineRunner {
 	@Autowired
 	private UserRepository userRepository;
 
-	@Autowired
-	private KaryawanRepository karyawanRepository;
+	// @Autowired
+	// private KaryawanRepository karyawanRepository;
 
 	@Autowired
 	private PasswordEncoder passwordEncoder;
@@ -44,7 +43,7 @@ public class EvaluasiHumBackEndApplication implements CommandLineRunner {
 			String encodedPassword = passwordEncoder.encode(rawPassword);
 			user.setPassword(encodedPassword);
 			user.setRole("ADMIN");
-			user.setStatus("True");
+			user.setStatus(true);
 			user.setCreated(Instant.now());
 			karyawan.setNik("SUPERADMIN");
 			karyawan.setNama("SUPERADMIN");
@@ -68,7 +67,7 @@ public class EvaluasiHumBackEndApplication implements CommandLineRunner {
 			String encodedPassword = passwordEncoder.encode(rawPassword);
 			regulerUser.setPassword(encodedPassword);
 			regulerUser.setRole("USER");
-			regulerUser.setStatus("True");
+			regulerUser.setStatus(true);
 			regulerUser.setCreated(Instant.now());
 			regulerKaryawan.setNik("USER");
 			regulerKaryawan.setNama("USER");
