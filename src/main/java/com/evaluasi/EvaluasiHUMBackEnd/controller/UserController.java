@@ -1,8 +1,6 @@
 package com.evaluasi.EvaluasiHUMBackEnd.controller;
 
-import com.evaluasi.EvaluasiHUMBackEnd.dto.AuthResponse;
-import com.evaluasi.EvaluasiHUMBackEnd.dto.UserDto;
-import com.evaluasi.EvaluasiHUMBackEnd.dto.UserEvaResultDto;
+import com.evaluasi.EvaluasiHUMBackEnd.dto.*;
 import com.evaluasi.EvaluasiHUMBackEnd.exception.AllException;
 import com.evaluasi.EvaluasiHUMBackEnd.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -75,6 +73,24 @@ public class UserController {
             return new ResponseEntity<>(userEvaResultDto, HttpStatus.OK);
         } catch (UsernameNotFoundException e) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+    }
+    @PostMapping("/changepassword")
+    public ResponseEntity<Object>changePassword(@RequestBody ChangePassword changePassword){
+        try {
+            return userService.changePasswords(changePassword);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+    @PostMapping("/changeusername")
+    public ResponseEntity<Object>changeUser(@RequestBody ChangeUsername changeUsername){
+        try {
+            return userService.changeUsername(changeUsername);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 

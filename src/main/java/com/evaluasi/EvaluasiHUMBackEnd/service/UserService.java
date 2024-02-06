@@ -1,8 +1,6 @@
 package com.evaluasi.EvaluasiHUMBackEnd.service;
 
-import com.evaluasi.EvaluasiHUMBackEnd.dto.AuthResponse;
-import com.evaluasi.EvaluasiHUMBackEnd.dto.UserDto;
-import com.evaluasi.EvaluasiHUMBackEnd.dto.UserEvaResultDto;
+import com.evaluasi.EvaluasiHUMBackEnd.dto.*;
 import com.evaluasi.EvaluasiHUMBackEnd.entity.Evaluasi;
 import com.evaluasi.EvaluasiHUMBackEnd.entity.Karyawan;
 import com.evaluasi.EvaluasiHUMBackEnd.entity.User;
@@ -19,7 +17,6 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-
 import java.time.Instant;
 import java.util.Collections;
 import java.util.Comparator;
@@ -224,6 +221,68 @@ public class UserService {
         return mapUserToUserDto(user);
     }
 
+    public ResponseEntity<Object> changePasswords(ChangePassword changePassword) {
+        try {
+            log.info("Change password");
+            log.info("Received request with payload: {}", changePassword);
+
+            Long id = changePassword.getId();
+            if (id != null) {
+                User user = userRepository.findByIduser(id);
+                if (user != null) {
+                    String oldPassword = changePassword.getOldpassword();
+                    String newPassword = changePassword.getNewpassword();
+                    if (passwordEncoder.matches(oldPassword, user.getPassword())) {
+                        String encodedNewPassword = passwordEncoder.encode(newPassword);
+                        user.setPassword(encodedNewPassword);
+                        userRepository.save(user);
+                        return ResponseEntity.ok(Collections.singletonMap("message", "Password updated successfully"));
+                    } else {
+                        return ResponseEntity.badRequest().body(Collections.singletonMap("error", "Incorrect old password"));
+                    }
+                } else {
+                    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Collections.singletonMap("error", "User not found"));
+                }
+            } else {
+                log.error("Token is null or empty");
+                return ResponseEntity.badRequest().body(Collections.singletonMap("error", "Token is null or empty"));
+            }
+        } catch (Exception ex) {
+            log.error("An error occurred while changing the password", ex);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Collections.singletonMap("error", "An error occurred while changing the password"));
+        }
+    }
+
+    public ResponseEntity<Object> changeUsername(ChangeUsername changeUsername) {
+        try {
+            log.info("Change password");
+            log.info("Received request with payload: {}", changeUsername);
+
+            Long id = changeUsername.getId();
+            if (id != null) {
+                User user = userRepository.findByIduser(id);
+                if (user != null) {
+                    String oldUser = changeUsername.getOldusername();
+                    String newUser = changeUsername.getNewusername();
+                    if (oldUser.equals(user.getUsername())) {
+                        user.setUsername(newUser);
+                        userRepository.save(user);
+                        return ResponseEntity.ok(Collections.singletonMap("message", "Username updated successfully"));
+                    } else {
+                        return ResponseEntity.badRequest().body(Collections.singletonMap("error", "Incorrect old username"));
+                    }
+                } else {
+                    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Collections.singletonMap("error", "User not found"));
+                }
+            } else {
+                log.error("Token is null or empty");
+                return ResponseEntity.badRequest().body(Collections.singletonMap("error", "Token is null or empty"));
+            }
+        } catch (Exception ex) {
+            log.error("An error occurred while changing the password", ex);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Collections.singletonMap("error", "An error occurred while changing the password"));
+        }
+    }
 }
 
 
