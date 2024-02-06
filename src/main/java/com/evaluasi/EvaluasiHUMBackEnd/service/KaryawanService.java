@@ -1,9 +1,7 @@
 package com.evaluasi.EvaluasiHUMBackEnd.service;
 
 import com.evaluasi.EvaluasiHUMBackEnd.dto.KaryawanDto;
-import com.evaluasi.EvaluasiHUMBackEnd.dto.UserDto;
 import com.evaluasi.EvaluasiHUMBackEnd.entity.Karyawan;
-import com.evaluasi.EvaluasiHUMBackEnd.entity.User;
 import com.evaluasi.EvaluasiHUMBackEnd.exception.AllException;
 import com.evaluasi.EvaluasiHUMBackEnd.repository.KaryawanRepository;
 import lombok.RequiredArgsConstructor;
@@ -97,6 +95,7 @@ public class KaryawanService {
         Karyawan karyawan = karyawanRepository.findById(id).orElseThrow(() -> new AllException("karyawan with idkar " + id + " not found"));
          return mapKaryawanToKaryawanDto(karyawan);
     }
+    
     public KaryawanDto mapKaryawanToKaryawanDto(Karyawan karyawan) {
         KaryawanDto karyawanDto = new KaryawanDto();
         karyawanDto.setIdkar(karyawan.getIdkar());

@@ -1,7 +1,6 @@
 package com.evaluasi.EvaluasiHUMBackEnd.controller;
 
 
-import com.evaluasi.EvaluasiHUMBackEnd.dto.PertanyaanDto;
 import com.evaluasi.EvaluasiHUMBackEnd.dto.RuleDto;
 import com.evaluasi.EvaluasiHUMBackEnd.exception.AllException;
 import com.evaluasi.EvaluasiHUMBackEnd.service.RuleService;

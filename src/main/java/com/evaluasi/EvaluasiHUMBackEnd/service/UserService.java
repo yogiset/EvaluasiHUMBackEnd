@@ -1,12 +1,10 @@
 package com.evaluasi.EvaluasiHUMBackEnd.service;
 
 import com.evaluasi.EvaluasiHUMBackEnd.dto.AuthResponse;
-import com.evaluasi.EvaluasiHUMBackEnd.dto.RuleDto;
 import com.evaluasi.EvaluasiHUMBackEnd.dto.UserDto;
 import com.evaluasi.EvaluasiHUMBackEnd.dto.UserEvaResultDto;
 import com.evaluasi.EvaluasiHUMBackEnd.entity.Evaluasi;
 import com.evaluasi.EvaluasiHUMBackEnd.entity.Karyawan;
-import com.evaluasi.EvaluasiHUMBackEnd.entity.Rule;
 import com.evaluasi.EvaluasiHUMBackEnd.entity.User;
 import com.evaluasi.EvaluasiHUMBackEnd.exception.AllException;
 import com.evaluasi.EvaluasiHUMBackEnd.jwt.JwtUtil;
@@ -14,7 +12,6 @@ import com.evaluasi.EvaluasiHUMBackEnd.repository.KaryawanRepository;
 import com.evaluasi.EvaluasiHUMBackEnd.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -29,8 +26,6 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
-
-import static com.fasterxml.jackson.databind.type.LogicalType.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -55,7 +50,7 @@ public class UserService {
             String encodedPassword = passwordEncoder.encode(rawPassword);
             user.setPassword(encodedPassword);
             user.setRole(userDto.getRole());
-            user.setStatus("true");
+            user.setStatus(true);
             user.setCreated(Instant.now());
 
 
@@ -146,7 +141,7 @@ public class UserService {
             if (userOpt.isPresent()) {
                 User user = userOpt.get();
 
-                if ("true".equalsIgnoreCase(user.getStatus())) {
+                if (user.getStatus()) {
                     authenticationManager.authenticate(
                             new UsernamePasswordAuthenticationToken(
                                     username, password
@@ -170,7 +165,6 @@ public class UserService {
             return ResponseEntity.badRequest().body(Collections.singletonMap("message", "Bad Credentials. Please check your username or password"));
         }
     }
-
 
     public UserEvaResultDto getUserEvaResultByUsername(String username,UserEvaResultDto userEvaResultDtoo,AuthResponse authResponse) {
         log.info("Inside Userevaresul");
@@ -221,10 +215,11 @@ public class UserService {
 
         return userDto;
     }
-    public UserDto fetchUserDtoByIdkar(Long idkar) throws AllException {
-        log.info("Inside fetchUserDtoByIdkar");
-        User user = userRepository.findByIdkar(idkar)
-                .orElseThrow(() -> new AllException("User with idkar " + idkar + " not found"));
+    
+    public UserDto fetchUserDtoByIduser(Long id) throws AllException {
+        log.info("Inside fetchUserDtoByIduser");
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new AllException("User with iduser " + id + " not found"));
 
         return mapUserToUserDto(user);
     }

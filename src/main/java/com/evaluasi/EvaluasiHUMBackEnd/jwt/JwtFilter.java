@@ -1,6 +1,6 @@
 package com.evaluasi.EvaluasiHUMBackEnd.jwt;
 
-import io.jsonwebtoken.Claims;
+// import io.jsonwebtoken.Claims;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -24,7 +24,7 @@ public class JwtFilter extends OncePerRequestFilter {
     private final UserDetailsService userDetailsService;
 
 
-    private Claims claims = null;
+    // private Claims claims = null;
     private String username = null;
     private String token = null;
 
@@ -42,7 +42,7 @@ public class JwtFilter extends OncePerRequestFilter {
             if(authorizationHeader != null && authorizationHeader.startsWith("Bearer ")){
                 token = authorizationHeader.substring(7);
                 username = jwtUtil.extractUsername(token);
-                claims = jwtUtil.extractAllClaims(token);
+                // claims = jwtUtil.extractAllClaims(token);
             }
 
             if(username != null && SecurityContextHolder.getContext().getAuthentication()==null){

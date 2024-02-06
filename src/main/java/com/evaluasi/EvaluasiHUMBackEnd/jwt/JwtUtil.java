@@ -36,7 +36,7 @@ public class JwtUtil {
     }
 
     public Claims extractAllClaims(String token) {
-        return Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token).getBody();
+        return Jwts.parserBuilder().setSigningKey(secretKey).build().parseClaimsJws(token).getBody();
     }
 
     private Boolean isTokenExpired(String token) {
@@ -66,10 +66,8 @@ public class JwtUtil {
     }
 
     public Claims decodeJwt(String jwtToken,String secretKey) {
-        Claims claims = Jwts.parser()
-                .setSigningKey(secretKey)
-                .parseClaimsJws(jwtToken)
-                .getBody();
+        SecretKey key = Keys.hmacShaKeyFor(secretKey.getBytes());
+        Claims claims = Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(jwtToken).getBody();
 
         return claims;
     }
@@ -79,8 +77,9 @@ public class JwtUtil {
 
     public Claims validateAndExtractClaims(String token) {
         try {
-            Claims claims = Jwts.parser()
+            Claims claims = Jwts.parserBuilder()
                     .setSigningKey(secretKey)
+                    .build()
                     .parseClaimsJws(token)
                     .getBody();
 
@@ -93,7 +92,7 @@ public class JwtUtil {
         } catch (ExpiredJwtException ex) {
             // Handle token expiration
             throw ex;
-        } catch (MalformedJwtException | UnsupportedJwtException | SignatureException e) {
+        } catch (JwtException e) {
             // Handle invalid tokens
             throw new RuntimeException("Invalid token");
         }

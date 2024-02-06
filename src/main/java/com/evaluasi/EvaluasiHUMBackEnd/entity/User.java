@@ -23,7 +23,7 @@ public class User {
     private String username;
     private String password;
     private String role;
-    private String status;
+    private Boolean status;
     private Instant created;
 
     @ManyToOne(cascade = CascadeType.PERSIST)
