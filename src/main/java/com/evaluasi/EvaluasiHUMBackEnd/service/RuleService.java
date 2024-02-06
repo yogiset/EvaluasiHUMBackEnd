@@ -3,6 +3,7 @@ package com.evaluasi.EvaluasiHUMBackEnd.service;
 import com.evaluasi.EvaluasiHUMBackEnd.dto.RuleDto;
 import com.evaluasi.EvaluasiHUMBackEnd.entity.Evaluasi;
 import com.evaluasi.EvaluasiHUMBackEnd.entity.Rule;
+import com.evaluasi.EvaluasiHUMBackEnd.exception.AllException;
 import com.evaluasi.EvaluasiHUMBackEnd.repository.EvaluasiRepository;
 import com.evaluasi.EvaluasiHUMBackEnd.repository.RuleRepository;
 import lombok.RequiredArgsConstructor;
@@ -94,6 +95,25 @@ public class RuleService {
             return ResponseEntity.status(500).body("Error delete rule");
         }
      }
+
+    public RuleDto findByIdRule(Long id) throws AllException {
+        log.info("Inside find by id rule");
+        Rule rule = ruleRepository.findById(id).orElseThrow(() -> new AllException("Rule with id " + id + " not found"));
+
+        return mapRuleToRuleDto(rule);
     }
+    public RuleDto mapRuleToRuleDto(Rule rule){
+        RuleDto ruleDto = new RuleDto();
+        ruleDto.setIdrule(rule.getIdrule());
+        ruleDto.setKoderule(rule.getKoderule());
+        ruleDto.setRule(rule.getRule());
+        if(rule.getEvaluasi() != null){
+            ruleDto.setKodeevaluasi(rule.getEvaluasi().getKodeevaluasi());
+        }
+
+        return ruleDto;
+    }
+
+}
 
 

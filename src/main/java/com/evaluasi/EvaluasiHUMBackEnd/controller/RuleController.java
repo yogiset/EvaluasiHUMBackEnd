@@ -3,6 +3,7 @@ package com.evaluasi.EvaluasiHUMBackEnd.controller;
 
 import com.evaluasi.EvaluasiHUMBackEnd.dto.PertanyaanDto;
 import com.evaluasi.EvaluasiHUMBackEnd.dto.RuleDto;
+import com.evaluasi.EvaluasiHUMBackEnd.exception.AllException;
 import com.evaluasi.EvaluasiHUMBackEnd.service.RuleService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -50,4 +51,10 @@ public class RuleController {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+    @GetMapping(path = "/findbyid/{id}")
+    public RuleDto findById(@PathVariable Long id) throws AllException {
+        return ruleService.findByIdRule(id);
+    }
+
+
 }

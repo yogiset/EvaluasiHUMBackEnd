@@ -90,6 +90,7 @@ public class UserService {
                     userDto.setStatus(user.getStatus());
                     userDto.setCreated(user.getCreated());
                     userDto.setNik(user.getKaryawan().getNik());
+                    userDto.setIdkar(user.getKaryawan().getIdkar());
                     return userDto;
                 })
                 .collect(Collectors.toList());

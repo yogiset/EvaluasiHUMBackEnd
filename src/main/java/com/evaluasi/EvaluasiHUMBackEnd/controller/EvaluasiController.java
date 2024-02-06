@@ -3,6 +3,7 @@ package com.evaluasi.EvaluasiHUMBackEnd.controller;
 import com.evaluasi.EvaluasiHUMBackEnd.dto.EvaluasiDto;
 import com.evaluasi.EvaluasiHUMBackEnd.dto.UserEvaResultDto;
 import com.evaluasi.EvaluasiHUMBackEnd.entity.Evaluasi;
+import com.evaluasi.EvaluasiHUMBackEnd.exception.AllException;
 import com.evaluasi.EvaluasiHUMBackEnd.service.EvaluasiService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -84,6 +85,10 @@ public class EvaluasiController {
         return new ResponseEntity<>(userEvaResultDtoList, headers, HttpStatus.OK);
     }
 
+    @GetMapping("/findbyid/{id}")
+    public EvaluasiDto findById(@PathVariable Long id) throws AllException {
+        return evaluasiService.findByIdEva(id);
+    }
     
 
 
