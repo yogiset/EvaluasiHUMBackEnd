@@ -3,11 +3,19 @@ package com.evaluasi.EvaluasiHUMBackEnd.service;
 import com.evaluasi.EvaluasiHUMBackEnd.dto.JawabanDto;
 import com.evaluasi.EvaluasiHUMBackEnd.entity.Jawaban;
 import com.evaluasi.EvaluasiHUMBackEnd.entity.Pertanyaan;
+import com.evaluasi.EvaluasiHUMBackEnd.dto.PertanyaanDto;
+import com.evaluasi.EvaluasiHUMBackEnd.entity.Jawaban;
+import com.evaluasi.EvaluasiHUMBackEnd.entity.Pertanyaan;
+import com.evaluasi.EvaluasiHUMBackEnd.entity.Rule;
 import com.evaluasi.EvaluasiHUMBackEnd.exception.AllException;
 import com.evaluasi.EvaluasiHUMBackEnd.repository.JawabanRepository;
 import com.evaluasi.EvaluasiHUMBackEnd.repository.PertanyaanRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -110,5 +118,69 @@ public class JawabanService {
         }
 
         return jawabanDto;
+    }
+
+
+    public Page<JawabanDto> showAllJawabanPagination(int offset, int pageSize) {
+        log.info("Inside showAllJawabanPagination");
+
+        Page<Jawaban> jawabanPage = jawabanRepository.findAll(PageRequest.of(offset, pageSize));
+
+        List<JawabanDto> resultList = jawabanPage.getContent().stream()
+                .map(jawaban -> {
+                    JawabanDto jawabanDto = new JawabanDto();
+                    Pertanyaan pertanyaan = jawaban.getPertanyaan();
+
+                    jawabanDto.setIdja(jawaban.getIdja());
+                    jawabanDto.setJawaban(jawaban.getJawaban());
+                    jawabanDto.setBobot(jawaban.getBobot());
+                    jawabanDto.setIdper(pertanyaan.getIdper());
+                    return jawabanDto;
+                })
+                .collect(Collectors.toList());
+
+        return new PageImpl<>(resultList, jawabanPage.getPageable(), jawabanPage.getTotalElements());
+    }
+
+    public Page<JawabanDto> showAllJawabanPaginationAscBobot(int offset, int pageSize) {
+        log.info("Inside showAllJawabanPaginationAscIdper");
+
+        Page<Jawaban> jawabanPage = jawabanRepository.findAll(PageRequest.of(offset, pageSize, Sort.by("bobot").ascending()));
+
+        List<JawabanDto> resultList = jawabanPage.getContent().stream()
+                .map(jawaban -> {
+                    JawabanDto jawabanDto = new JawabanDto();
+                    Pertanyaan pertanyaan = jawaban.getPertanyaan();
+
+                    jawabanDto.setIdja(jawaban.getIdja());
+                    jawabanDto.setJawaban(jawaban.getJawaban());
+                    jawabanDto.setBobot(jawaban.getBobot());
+                    jawabanDto.setIdper(pertanyaan.getIdper());
+                    return jawabanDto;
+                })
+                .collect(Collectors.toList());
+
+        return new PageImpl<>(resultList, jawabanPage.getPageable(), jawabanPage.getTotalElements());
+    }
+
+    public Page<JawabanDto> showAllJawabanPaginationDescBobot(int offset, int pageSize) {
+        log.info("Inside showAllJawabanPaginationDescIdper");
+
+        Page<Jawaban> jawabanPage = jawabanRepository.findAll(PageRequest.of(offset, pageSize,Sort.by("bobot").descending()));
+
+        List<JawabanDto> resultList = jawabanPage.getContent().stream()
+                .map(jawaban -> {
+                    JawabanDto jawabanDto = new JawabanDto();
+                    Pertanyaan pertanyaan = jawaban.getPertanyaan();
+
+                    jawabanDto.setIdja(jawaban.getIdja());
+                    jawabanDto.setJawaban(jawaban.getJawaban());
+                    jawabanDto.setBobot(jawaban.getBobot());
+                    jawabanDto.setIdper(pertanyaan.getIdper());
+                    return jawabanDto;
+                })
+                .collect(Collectors.toList());
+
+        return new PageImpl<>(resultList, jawabanPage.getPageable(), jawabanPage.getTotalElements());
     }
 }
