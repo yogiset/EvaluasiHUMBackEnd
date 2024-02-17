@@ -26,7 +26,7 @@ public class KaryawanService {
         List<Karyawan>karyawanList= karyawanRepository.findAll();
 
         return karyawanList.stream()
-                .map(item -> new KaryawanDto(item.getIdkar(),item.getNik(),item.getNama(),item.getDivisi(),item.getJabatan(),item.getCadangan1(),item.getCadangan2()))
+                .map(item -> new KaryawanDto(item.getIdkar(),item.getNik(),item.getNama(),item.getDivisi(),item.getJabatan(),item.getTanggalmasuk(),item.getMasakerja(),item.getTingkatan()))
                 .collect(Collectors.toList());
     }
 
@@ -38,8 +38,21 @@ public class KaryawanService {
             karyawan.setNama(karyawanDto.getNama());
             karyawan.setDivisi(karyawanDto.getDivisi());
             karyawan.setJabatan(karyawanDto.getJabatan());
-            karyawan.setCadangan1(karyawanDto.getCadangan1());
-            karyawan.setCadangan2(karyawanDto.getCadangan2());
+            karyawan.setTanggalmasuk(karyawanDto.getTanggalmasuk());
+
+            String masakerjaString = karyawan.getMasakerja();
+            String[] masakerjaParts = masakerjaString.split(" ");
+            int years = Integer.parseInt(masakerjaParts[0]);
+
+            String tingkat;
+            if(years == 0){
+                tingkat = "Trial/Kontrak";
+            }else if (years < 5) {
+                tingkat = "Junior";
+            } else {
+                tingkat = "Senior";
+            }
+            karyawan.setTingkatan(tingkat);
 
             karyawanRepository.save(karyawan);
 
@@ -60,9 +73,21 @@ public class KaryawanService {
             karyawan.setNama(karyawanDto.getNama());
             karyawan.setDivisi(karyawanDto.getDivisi());
             karyawan.setJabatan(karyawanDto.getJabatan());
-            karyawan.setJabatan(karyawanDto.getJabatan());
-            karyawan.setCadangan1(karyawanDto.getCadangan1());
-            karyawan.setCadangan2(karyawanDto.getCadangan2());
+            karyawan.setTanggalmasuk(karyawanDto.getTanggalmasuk());
+
+            String masakerjaString = karyawan.getMasakerja();
+            String[] masakerjaParts = masakerjaString.split(" ");
+            int years = Integer.parseInt(masakerjaParts[0]);
+
+            String tingkat;
+            if(years == 0){
+                tingkat = "Trial/Kontrak";
+            }else if (years < 5) {
+                tingkat = "Junior";
+            } else {
+                tingkat = "Senior";
+            }
+            karyawan.setTingkatan(tingkat);
 
             karyawanRepository.save(karyawan);
             return ResponseEntity.ok("Evaluasi edited successfully");
@@ -103,8 +128,9 @@ public class KaryawanService {
         karyawanDto.setNama(karyawan.getNama());
         karyawanDto.setDivisi(karyawan.getDivisi());
         karyawanDto.setJabatan(karyawan.getJabatan());
-        karyawanDto.setCadangan1(karyawan.getCadangan1());
-        karyawanDto.setCadangan2(karyawan.getCadangan2());
+        karyawanDto.setTanggalmasuk(karyawan.getTanggalmasuk());
+        karyawanDto.setMasakerja(karyawan.getMasakerja());
+        karyawanDto.setTingkatan(karyawan.getTingkatan());
 
         return karyawanDto;
     }

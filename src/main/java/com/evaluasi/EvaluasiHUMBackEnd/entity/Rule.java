@@ -16,17 +16,13 @@ public class Rule {
     @SequenceGenerator(name = "rule_sequence",sequenceName = "rule_sequence",allocationSize = 1)
     @GeneratedValue(strategy = GenerationType.SEQUENCE,generator = "rule_sequence")
     private Long idrule;
+    @Column(unique = true,nullable = false)
     private String koderule;
     private String rule;
+    private String jabatan;
 
-    @OneToOne(
-        cascade = CascadeType.PERSIST,
-        fetch = FetchType.LAZY
-    )
-    @JoinColumn(
-            name = "kodeevaluasi",
-            referencedColumnName = "kodeevaluasi"
-    )
-    private Evaluasi evaluasi;
+    @OneToOne(mappedBy = "rule")
+    private Pertanyaan pertanyaan;
+
 
 }

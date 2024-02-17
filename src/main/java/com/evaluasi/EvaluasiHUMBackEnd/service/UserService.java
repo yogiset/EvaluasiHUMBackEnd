@@ -101,6 +101,11 @@ public class UserService {
             user.setPassword(encodedPassword);
             user.setRole(userDto.getRole());
             user.setStatus(userDto.getStatus());
+            Karyawan karyawan = karyawanRepository.findByNik(userDto.getNik());
+            if (karyawan == null) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Karyawan not found for NIK: " + userDto.getNik());
+            }
+            user.setKaryawan(karyawan);
 
             userRepository.save(user);
             return ResponseEntity.ok("User edited successfully");

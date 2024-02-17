@@ -10,7 +10,9 @@ import java.util.Optional;
 
 @Repository
 public interface PertanyaanRepository extends JpaRepository<Pertanyaan,Long> {
+    Pertanyaan findByIdper(Long idper);
+    Pertanyaan findByKodepertanyaan(String kodepertanyaan);
 
-    @Query("SELECT u FROM Pertanyaan u WHERE u.karyawan.idkar = :idkar")
-    Optional<Pertanyaan> findByIdkar(@Param("idkar") Long idkar);
+//    @Query("SELECT u FROM Pertanyaan u WHERE u.karyawan.idkar = :idkar")
+//    Optional<Pertanyaan> findByIdkar(@Param("idkar") Long idkar);
 }

@@ -9,4 +9,5 @@ public interface KaryawanRepository extends JpaRepository<Karyawan,Long> {
 
     Karyawan findByNik(String nik);
     Karyawan findByIdkar(Long idkar);
+    Karyawan findByJabatan(String jabatan);
 }

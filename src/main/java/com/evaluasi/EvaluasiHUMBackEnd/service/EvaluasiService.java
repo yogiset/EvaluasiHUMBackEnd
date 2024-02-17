@@ -83,6 +83,12 @@ public class EvaluasiService {
             evaluasi.setTanggalevaluasi(evaluasiDto.getTanggalevaluasi());
             evaluasi.setHasilevaluasi(evaluasiDto.getHasilevaluasi());
             evaluasi.setPerluditingkatkan(evaluasiDto.getPerluditingkatkan());
+            Karyawan karyawan = karyawanRepository.findByNik(evaluasiDto.getNik());
+            if (karyawan == null) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Karyawan not found for NIK: " + evaluasiDto.getNik());
+            }
+
+            evaluasi.setKaryawan(karyawan);
 
             evaluasiRepository.save(evaluasi);
             return ResponseEntity.ok("Evaluasi edited successfully");
@@ -125,8 +131,9 @@ public class EvaluasiService {
                     resultDto.setNama(karyawan.getNama());
                     resultDto.setDivisi(karyawan.getDivisi());
                     resultDto.setJabatan(karyawan.getJabatan());
-                    resultDto.setCadangan1(karyawan.getCadangan1());
-                    resultDto.setCadangan2(karyawan.getCadangan2());
+                    resultDto.setTanggalmasuk(karyawan.getTanggalmasuk());
+                    resultDto.setMasakerja(karyawan.getMasakerja());
+                    resultDto.setTingkatan(karyawan.getTingkatan());
                     resultDto.setKodeevaluasi(evaluasi.getKodeevaluasi());
                     resultDto.setTanggalevaluasi(evaluasi.getTanggalevaluasi());
                     resultDto.setHasilevaluasi(evaluasi.getHasilevaluasi());
@@ -153,8 +160,9 @@ public class EvaluasiService {
                     resultDto.setNama(karyawan.getNama());
                     resultDto.setDivisi(karyawan.getDivisi());
                     resultDto.setJabatan(karyawan.getJabatan());
-                    resultDto.setCadangan1(karyawan.getCadangan1());
-                    resultDto.setCadangan2(karyawan.getCadangan2());
+                    resultDto.setTanggalmasuk(karyawan.getTanggalmasuk());
+                    resultDto.setMasakerja(karyawan.getMasakerja());
+                    resultDto.setTingkatan(karyawan.getTingkatan());
                     resultDto.setKodeevaluasi(evaluasi.getKodeevaluasi());
                     resultDto.setTanggalevaluasi(evaluasi.getTanggalevaluasi());
                     resultDto.setHasilevaluasi(evaluasi.getHasilevaluasi());
@@ -180,8 +188,9 @@ public class EvaluasiService {
                     resultDto.setNama(karyawan.getNama());
                     resultDto.setDivisi(karyawan.getDivisi());
                     resultDto.setJabatan(karyawan.getJabatan());
-                    resultDto.setCadangan1(karyawan.getCadangan1());
-                    resultDto.setCadangan2(karyawan.getCadangan2());
+                    resultDto.setTanggalmasuk(karyawan.getTanggalmasuk());
+                    resultDto.setMasakerja(karyawan.getMasakerja());
+                    resultDto.setTingkatan(karyawan.getTingkatan());
                     resultDto.setKodeevaluasi(evaluasi.getKodeevaluasi());
                     resultDto.setTanggalevaluasi(evaluasi.getTanggalevaluasi());
                     resultDto.setHasilevaluasi(evaluasi.getHasilevaluasi());
