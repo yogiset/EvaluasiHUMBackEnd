@@ -6,6 +6,7 @@ import com.evaluasi.EvaluasiHUMBackEnd.entity.Pertanyaan;
 import com.evaluasi.EvaluasiHUMBackEnd.exception.AllException;
 import com.evaluasi.EvaluasiHUMBackEnd.repository.KaryawanRepository;
 import com.evaluasi.EvaluasiHUMBackEnd.repository.PertanyaanRepository;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -15,6 +16,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+
 
 @Service
 @RequiredArgsConstructor
@@ -26,6 +28,7 @@ public class PertanyaanService {
     public ResponseEntity<Object> addPertanyaan(PertanyaanDto pertanyaanDto) {
         try{
             log.info("Inside Add Pertanyaan");
+
             Pertanyaan pertanyaan = new Pertanyaan();
             pertanyaan.setKodepertanyaan(pertanyaanDto.getKodepertanyaan());
             pertanyaan.setPertanyaan(pertanyaanDto.getPertanyaan());
