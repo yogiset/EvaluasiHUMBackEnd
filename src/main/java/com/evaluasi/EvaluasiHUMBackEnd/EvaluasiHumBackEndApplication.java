@@ -11,6 +11,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.time.Instant;
+import java.time.LocalDate;
 
 @SpringBootApplication
 public class EvaluasiHumBackEndApplication implements CommandLineRunner {
@@ -49,8 +50,9 @@ public class EvaluasiHumBackEndApplication implements CommandLineRunner {
 			karyawan.setNama("SUPERADMIN");
 			karyawan.setDivisi("SUPERADMIN");
 			karyawan.setJabatan("SUPERADMIN");
-			karyawan.setCadangan1("SUPERADMIN");
-			karyawan.setCadangan2(0);
+			LocalDate tanggal = LocalDate.of(1, 1, 1);
+			karyawan.setTanggalmasuk(tanggal);
+			karyawan.setTingkatan("HighestAdministrator");
 			user.setKaryawan(karyawan);
 			userRepository.save(user);
 		}
@@ -73,8 +75,9 @@ public class EvaluasiHumBackEndApplication implements CommandLineRunner {
 			regulerKaryawan.setNama("USER");
 			regulerKaryawan.setDivisi("USER");
 			regulerKaryawan.setJabatan("USER");
-			regulerKaryawan.setCadangan1("USER");
-			regulerKaryawan.setCadangan2(0);
+			LocalDate tanggal = LocalDate.of(1, 1, 1);
+			regulerKaryawan.setTanggalmasuk(tanggal);
+			regulerKaryawan.setTingkatan("USER");
 			regulerUser.setKaryawan(regulerKaryawan);
 			userRepository.save(regulerUser);
 		}

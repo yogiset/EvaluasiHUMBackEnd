@@ -1,13 +1,18 @@
 package com.evaluasi.EvaluasiHUMBackEnd.service;
 
+import com.evaluasi.EvaluasiHUMBackEnd.dto.PertanyaanDto;
 import com.evaluasi.EvaluasiHUMBackEnd.dto.RuleDto;
-import com.evaluasi.EvaluasiHUMBackEnd.entity.Evaluasi;
+
 import com.evaluasi.EvaluasiHUMBackEnd.entity.Rule;
 import com.evaluasi.EvaluasiHUMBackEnd.exception.AllException;
-import com.evaluasi.EvaluasiHUMBackEnd.repository.EvaluasiRepository;
+import com.evaluasi.EvaluasiHUMBackEnd.repository.KaryawanRepository;
 import com.evaluasi.EvaluasiHUMBackEnd.repository.RuleRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -21,7 +26,6 @@ import java.util.stream.Collectors;
 @Slf4j
 public class RuleService {
     private final RuleRepository ruleRepository;
-    private final EvaluasiRepository evaluasiRepository;
 
     public ResponseEntity<Object> add(RuleDto ruleDto) {
         log.info("Inside Add rule");
@@ -29,13 +33,7 @@ public class RuleService {
             Rule rule = new Rule();
             rule.setKoderule(ruleDto.getKoderule());
             rule.setRule(ruleDto.getRule());
-
-            Evaluasi evaluasi = evaluasiRepository.findByKodeevaluasi(ruleDto.getKodeevaluasi());
-            if (evaluasi == null) {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Evaluasi not found for Kode evaluasi: " + ruleDto.getKodeevaluasi());
-            }
-
-            rule.setEvaluasi(evaluasi);
+            rule.setJabatan(ruleDto.getJabatan());
             ruleRepository.save(rule);
 
             return ResponseEntity.ok("New rule added successfully");
@@ -56,7 +54,7 @@ public class RuleService {
                     ruleDto.setIdrule(rule.getIdrule());
                     ruleDto.setKoderule(rule.getKoderule());
                     ruleDto.setRule(rule.getRule());
-                    ruleDto.setKodeevaluasi(rule.getEvaluasi().getKodeevaluasi());
+                    ruleDto.setJabatan(rule.getJabatan());
                     return ruleDto;
                 })
                 .collect(Collectors.toList());
@@ -68,9 +66,8 @@ public class RuleService {
             Optional<Rule> optionalRule = ruleRepository.findById(id);
             Rule rule = optionalRule.get();
 
-            rule.setKoderule(ruleDto.getKoderule());
             rule.setRule(ruleDto.getRule());
-
+            rule.setJabatan(ruleDto.getJabatan());
             ruleRepository.save(rule);
             return ResponseEntity.ok("Rule edited successfully");
 
@@ -107,12 +104,85 @@ public class RuleService {
         ruleDto.setIdrule(rule.getIdrule());
         ruleDto.setKoderule(rule.getKoderule());
         ruleDto.setRule(rule.getRule());
-        if(rule.getEvaluasi() != null){
-            ruleDto.setKodeevaluasi(rule.getEvaluasi().getKodeevaluasi());
-        }
+        ruleDto.setJabatan(rule.getJabatan());
 
         return ruleDto;
     }
+
+    public Page<RuleDto> showAllRulePagination(int offset, int pageSize) {
+        log.info("Inside showAllRulePagination");
+
+        Page<Rule> rulePage = ruleRepository.findAll(PageRequest.of(offset, pageSize));
+
+        List<RuleDto> resultList = rulePage.getContent().stream()
+                .map(rule -> {
+                    RuleDto ruleDto = new RuleDto();
+                    ruleDto.setIdrule(rule.getIdrule());
+                    ruleDto.setKoderule(rule.getKoderule());
+                    ruleDto.setRule(rule.getRule());
+                    ruleDto.setJabatan(rule.getJabatan());
+                    return ruleDto;
+                })
+                .collect(Collectors.toList());
+
+        return new PageImpl<>(resultList, rulePage.getPageable(), rulePage.getTotalElements());
+    }
+    public Page<RuleDto> showAllRulePaginationByJabatan(String jabatan, int offset, int pageSize) {
+        log.info("Inside showAllRulePaginationByJabatan");
+        Page<Rule> rulePage = ruleRepository.findByJabatan(jabatan,PageRequest.of(offset, pageSize));
+
+        List<RuleDto> resultList = rulePage.getContent().stream()
+                .map(rule -> {
+                    RuleDto ruleDto = new RuleDto();
+                    ruleDto.setIdrule(rule.getIdrule());
+                    ruleDto.setKoderule(rule.getKoderule());
+                    ruleDto.setRule(rule.getRule());
+                    ruleDto.setJabatan(rule.getJabatan());
+                    return ruleDto;
+                })
+                .collect(Collectors.toList());
+
+        return new PageImpl<>(resultList, rulePage.getPageable(), rulePage.getTotalElements());
+    }
+
+    public Page<RuleDto> showAllRulePaginationAscJabatan(int offset, int pageSize) {
+        log.info("Inside showAllRulePaginationAscJabatan");
+
+        Page<Rule> rulePage = ruleRepository.findAll(PageRequest.of(offset, pageSize, Sort.by("jabatan").ascending()));
+
+        List<RuleDto> resultList = rulePage.getContent().stream()
+                .map(rule -> {
+                    RuleDto ruleDto = new RuleDto();
+                    ruleDto.setIdrule(rule.getIdrule());
+                    ruleDto.setKoderule(rule.getKoderule());
+                    ruleDto.setRule(rule.getRule());
+                    ruleDto.setJabatan(rule.getJabatan());
+                    return ruleDto;
+                })
+                .collect(Collectors.toList());
+
+        return new PageImpl<>(resultList, rulePage.getPageable(), rulePage.getTotalElements());
+    }
+
+    public Page<RuleDto> showAllRulePaginationDescJabatan(int offset, int pageSize) {
+        log.info("Inside showAllRulePaginationAscJabatan");
+
+        Page<Rule> rulePage = ruleRepository.findAll(PageRequest.of(offset, pageSize, Sort.by("jabatan").descending()));
+
+        List<RuleDto> resultList = rulePage.getContent().stream()
+                .map(rule -> {
+                    RuleDto ruleDto = new RuleDto();
+                    ruleDto.setIdrule(rule.getIdrule());
+                    ruleDto.setKoderule(rule.getKoderule());
+                    ruleDto.setRule(rule.getRule());
+                    ruleDto.setJabatan(rule.getJabatan());
+                    return ruleDto;
+                })
+                .collect(Collectors.toList());
+
+        return new PageImpl<>(resultList, rulePage.getPageable(), rulePage.getTotalElements());
+    }
+
 
 }
 

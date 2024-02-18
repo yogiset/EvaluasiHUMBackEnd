@@ -11,8 +11,7 @@ import lombok.NoArgsConstructor;
 public class PertanyaanDto {
     private Long idper;
     private String kodepertanyaan;
+    private String koderule;
     private String pertanyaan;
-    private String jawaban;
-    private Integer bobot;
-    private String nik;
+    private String jabatan;
 }

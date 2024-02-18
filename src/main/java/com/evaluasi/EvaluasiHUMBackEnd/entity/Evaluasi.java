@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
 import java.time.LocalDate;
 
 @Data
@@ -28,7 +29,4 @@ public class Evaluasi {
     @JoinColumn(name = "nik", nullable = false)
     private Karyawan karyawan;
 
-    @OneToOne(mappedBy = "evaluasi")
-    private Rule rule;
 }
-

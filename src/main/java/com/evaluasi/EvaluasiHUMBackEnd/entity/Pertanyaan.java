@@ -6,6 +6,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @Entity
 @Data
 @NoArgsConstructor
@@ -19,11 +21,21 @@ public class Pertanyaan {
     private String kodepertanyaan;
     @Column(columnDefinition="text")
     private String pertanyaan;
-    @Column(columnDefinition="text")
-    private String jawaban;
-    private Integer bobot;
+    private String jabatan;
 
-    @ManyToOne(cascade = CascadeType.PERSIST)
-    @JoinColumn(name = "nik", nullable = false)
-    private Karyawan karyawan;
+    @OneToOne(
+            cascade = CascadeType.PERSIST,
+            fetch = FetchType.LAZY
+    )
+    @JoinColumn(
+            name = "koderule",
+            referencedColumnName = "koderule"
+    )
+    private Rule rule;
+
+//    @OneToOne(mappedBy = "pertanyaan")
+//    private Jawaban jawaban;
+
+    @OneToMany(mappedBy = "pertanyaan", cascade = CascadeType.ALL)
+    private List<Jawaban> jawabanList;
 }
