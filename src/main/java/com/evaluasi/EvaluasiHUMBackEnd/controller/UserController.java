@@ -4,6 +4,8 @@ import com.evaluasi.EvaluasiHUMBackEnd.dto.*;
 import com.evaluasi.EvaluasiHUMBackEnd.exception.AllException;
 import com.evaluasi.EvaluasiHUMBackEnd.service.UserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -93,5 +95,41 @@ public class UserController {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
+    @GetMapping("/findByUsername/{username}")
+    public UserDto fetchUserByUsername(@PathVariable("username") String username) throws AllException {
+        return userService.fetchUserDtoByUsername(username);
+    }
+    @GetMapping("/userpagination/{offset}/{pageSize}")
+    public ResponseEntity<List<UserDto>> showAllUserPagination(@PathVariable int offset, @PathVariable int pageSize) {
+        Page<UserDto> userDtoPage = userService.showAllUserPagination(offset, pageSize);
+
+        List<UserDto> userDtoList = userDtoPage.getContent();
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("X-Total-Count", String.valueOf(userDtoPage.getTotalElements()));
+
+        return new ResponseEntity<>(userDtoList, headers, HttpStatus.OK);
+    }
+    @GetMapping("/userpaginationascusername/{offset}/{pageSize}")
+    public ResponseEntity<List<UserDto>> showAllUserPaginationAscUsername(@PathVariable int offset, @PathVariable int pageSize) {
+        Page<UserDto> userDtoPage = userService.showAllUserPaginationAscUsername(offset, pageSize);
+
+        List<UserDto> userDtoList = userDtoPage.getContent();
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("X-Total-Count", String.valueOf(userDtoPage.getTotalElements()));
+
+        return new ResponseEntity<>(userDtoList, headers, HttpStatus.OK);
+    }
+    @GetMapping("/userpaginationdescusername/{offset}/{pageSize}")
+    public ResponseEntity<List<UserDto>> showAllUserPaginationDescUsername(@PathVariable int offset, @PathVariable int pageSize) {
+        Page<UserDto> userDtoPage = userService.showAllUserPaginationDescUsername(offset, pageSize);
+
+        List<UserDto> userDtoList = userDtoPage.getContent();
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("X-Total-Count", String.valueOf(userDtoPage.getTotalElements()));
+
+        return new ResponseEntity<>(userDtoList, headers, HttpStatus.OK);
+    }
+
 
 }

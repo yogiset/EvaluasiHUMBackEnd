@@ -1,6 +1,9 @@
 package com.evaluasi.EvaluasiHUMBackEnd.repository;
 
+import com.evaluasi.EvaluasiHUMBackEnd.entity.Rule;
 import com.evaluasi.EvaluasiHUMBackEnd.entity.User;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -20,6 +23,9 @@ public interface UserRepository extends JpaRepository<User,Long> {
 
     @Query("select u from User u where u.username=:username")
     User findByUsernameId(@Param("username") String username);
+
+    @Query("SELECT p FROM User p WHERE p.username = :username")
+    Page<User> findByUserPage(String username, Pageable pageable);
 
     boolean existsByUsername(String username);
 }

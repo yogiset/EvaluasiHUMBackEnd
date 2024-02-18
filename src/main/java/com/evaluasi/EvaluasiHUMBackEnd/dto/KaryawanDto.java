@@ -4,6 +4,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -13,6 +15,7 @@ public class KaryawanDto {
     private String nama;
     private String divisi;
     private String jabatan;
-    private String cadangan1;
-    private Integer cadangan2;
+    private LocalDate tanggalmasuk;
+    private String masakerja;
+    private String tingkatan;
 }
