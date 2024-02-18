@@ -1,11 +1,17 @@
 package com.evaluasi.EvaluasiHUMBackEnd.service;
 
 import com.evaluasi.EvaluasiHUMBackEnd.dto.KaryawanDto;
+import com.evaluasi.EvaluasiHUMBackEnd.dto.RuleDto;
 import com.evaluasi.EvaluasiHUMBackEnd.entity.Karyawan;
+import com.evaluasi.EvaluasiHUMBackEnd.entity.Rule;
 import com.evaluasi.EvaluasiHUMBackEnd.exception.AllException;
 import com.evaluasi.EvaluasiHUMBackEnd.repository.KaryawanRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
@@ -120,6 +126,11 @@ public class KaryawanService {
         Karyawan karyawan = karyawanRepository.findById(id).orElseThrow(() -> new AllException("karyawan with idkar " + id + " not found"));
          return mapKaryawanToKaryawanDto(karyawan);
     }
+    public KaryawanDto findByIdNama(String nama) throws AllException {
+        log.info("Inside findbynama");
+        Karyawan karyawan = karyawanRepository.findByNama(nama).orElseThrow(() -> new AllException("karyawan with nama " + nama + " not found"));
+        return mapKaryawanToKaryawanDto(karyawan);
+    }
     
     public KaryawanDto mapKaryawanToKaryawanDto(Karyawan karyawan) {
         KaryawanDto karyawanDto = new KaryawanDto();
@@ -134,5 +145,99 @@ public class KaryawanService {
 
         return karyawanDto;
     }
+
+    public Page<KaryawanDto> showAllKaryawanPagination(int offset, int pageSize) {
+        log.info("Inside showAllKaryawanPagination");
+
+        Page<Karyawan> karyawanPage = karyawanRepository.findAll(PageRequest.of(offset, pageSize));
+
+        List<KaryawanDto> resultList = karyawanPage.getContent().stream()
+                .map(karyawan -> {
+                    KaryawanDto karyawanDto = new KaryawanDto();
+                    karyawanDto.setIdkar(karyawan.getIdkar());
+                    karyawanDto.setNik(karyawan.getNik());
+                    karyawanDto.setNama(karyawan.getNama());
+                    karyawanDto.setDivisi(karyawan.getDivisi());
+                    karyawanDto.setJabatan(karyawan.getJabatan());
+                    karyawanDto.setTanggalmasuk(karyawan.getTanggalmasuk());
+                    karyawanDto.setMasakerja(karyawan.getMasakerja());
+                    karyawanDto.setTingkatan(karyawan.getTingkatan());
+                    return karyawanDto;
+                })
+                .collect(Collectors.toList());
+
+        return new PageImpl<>(resultList, karyawanPage.getPageable(), karyawanPage.getTotalElements());
+    }
+
+    public Page<KaryawanDto> showAllKaryawanPaginationByJabatan(String jabatan, int offset, int pageSize) {
+        log.info("Inside showAllKaryawanPaginationByJabatan");
+
+        Page<Karyawan> karyawanPage = karyawanRepository.findByJabatan(jabatan,PageRequest.of(offset, pageSize));
+
+        List<KaryawanDto> resultList = karyawanPage.getContent().stream()
+                .map(karyawan -> {
+                    KaryawanDto karyawanDto = new KaryawanDto();
+                    karyawanDto.setIdkar(karyawan.getIdkar());
+                    karyawanDto.setNik(karyawan.getNik());
+                    karyawanDto.setNama(karyawan.getNama());
+                    karyawanDto.setDivisi(karyawan.getDivisi());
+                    karyawanDto.setJabatan(karyawan.getJabatan());
+                    karyawanDto.setTanggalmasuk(karyawan.getTanggalmasuk());
+                    karyawanDto.setMasakerja(karyawan.getMasakerja());
+                    karyawanDto.setTingkatan(karyawan.getTingkatan());
+                    return karyawanDto;
+                })
+                .collect(Collectors.toList());
+
+        return new PageImpl<>(resultList, karyawanPage.getPageable(), karyawanPage.getTotalElements());
+    }
+
+    public Page<KaryawanDto> showAllKaryawanPaginationAscJabatan(int offset, int pageSize) {
+        log.info("Inside showAllKaryawanPaginationAscJabatan");
+
+        Page<Karyawan> karyawanPage = karyawanRepository.findAll(PageRequest.of(offset, pageSize, Sort.by("jabatan").ascending()));
+
+        List<KaryawanDto> resultList = karyawanPage.getContent().stream()
+                .map(karyawan -> {
+                    KaryawanDto karyawanDto = new KaryawanDto();
+                    karyawanDto.setIdkar(karyawan.getIdkar());
+                    karyawanDto.setNik(karyawan.getNik());
+                    karyawanDto.setNama(karyawan.getNama());
+                    karyawanDto.setDivisi(karyawan.getDivisi());
+                    karyawanDto.setJabatan(karyawan.getJabatan());
+                    karyawanDto.setTanggalmasuk(karyawan.getTanggalmasuk());
+                    karyawanDto.setMasakerja(karyawan.getMasakerja());
+                    karyawanDto.setTingkatan(karyawan.getTingkatan());
+                    return karyawanDto;
+                })
+                .collect(Collectors.toList());
+
+        return new PageImpl<>(resultList, karyawanPage.getPageable(), karyawanPage.getTotalElements());
+    }
+
+    public Page<KaryawanDto> showAllKaryawanPaginationDescJabatan(int offset, int pageSize) {
+        log.info("Inside showAllKaryawanPaginationDescJabatan");
+
+        Page<Karyawan> karyawanPage = karyawanRepository.findAll(PageRequest.of(offset, pageSize, Sort.by("jabatan").descending()));
+
+        List<KaryawanDto> resultList = karyawanPage.getContent().stream()
+                .map(karyawan -> {
+                    KaryawanDto karyawanDto = new KaryawanDto();
+                    karyawanDto.setIdkar(karyawan.getIdkar());
+                    karyawanDto.setNik(karyawan.getNik());
+                    karyawanDto.setNama(karyawan.getNama());
+                    karyawanDto.setDivisi(karyawan.getDivisi());
+                    karyawanDto.setJabatan(karyawan.getJabatan());
+                    karyawanDto.setTanggalmasuk(karyawan.getTanggalmasuk());
+                    karyawanDto.setMasakerja(karyawan.getMasakerja());
+                    karyawanDto.setTingkatan(karyawan.getTingkatan());
+                    return karyawanDto;
+                })
+                .collect(Collectors.toList());
+
+        return new PageImpl<>(resultList, karyawanPage.getPageable(), karyawanPage.getTotalElements());
+    }
+
+
 }
 

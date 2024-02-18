@@ -1,9 +1,11 @@
 package com.evaluasi.EvaluasiHUMBackEnd.controller;
 
 import com.evaluasi.EvaluasiHUMBackEnd.dto.JawabanDto;
+
 import com.evaluasi.EvaluasiHUMBackEnd.exception.AllException;
 import com.evaluasi.EvaluasiHUMBackEnd.service.JawabanService;
 import lombok.RequiredArgsConstructor;
+
 import com.evaluasi.EvaluasiHUMBackEnd.dto.RuleDto;
 import com.evaluasi.EvaluasiHUMBackEnd.exception.AllException;
 import com.evaluasi.EvaluasiHUMBackEnd.service.JawabanService;
@@ -60,7 +62,6 @@ public class JawabanController {
     public JawabanDto findById(@PathVariable Long id) throws AllException {
         return jawabanService.findByIdJawab(id);
     }
-
 
     @GetMapping("/jawabanpagination/{offset}/{pageSize}")
     public ResponseEntity<List<JawabanDto>> showAllJawabanPagination(@PathVariable int offset, @PathVariable int pageSize) {

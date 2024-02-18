@@ -16,9 +16,12 @@ public interface PertanyaanRepository extends JpaRepository<Pertanyaan,Long> {
     Pertanyaan findByKodepertanyaan(String kodepertanyaan);
 
 
+
     @Query("SELECT p FROM Pertanyaan p WHERE p.jabatan = :jabatan")
     Page<Pertanyaan> findByJabatan(String jabatan, Pageable pageable);
 
+    @Query("SELECT p FROM Pertanyaan p WHERE p.jabatan = :jabatan")
+    Page<Pertanyaan> findByJabatan(String jabatan, Pageable pageable);
 
 //    @Query("SELECT u FROM Pertanyaan u WHERE u.karyawan.idkar = :idkar")
 //    Optional<Pertanyaan> findByIdkar(@Param("idkar") Long idkar);

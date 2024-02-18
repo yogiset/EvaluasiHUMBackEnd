@@ -120,7 +120,6 @@ public class JawabanService {
         return jawabanDto;
     }
 
-
     public Page<JawabanDto> showAllJawabanPagination(int offset, int pageSize) {
         log.info("Inside showAllJawabanPagination");
 

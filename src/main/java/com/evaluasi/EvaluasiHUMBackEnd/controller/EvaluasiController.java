@@ -1,6 +1,7 @@
 package com.evaluasi.EvaluasiHUMBackEnd.controller;
 
 import com.evaluasi.EvaluasiHUMBackEnd.dto.EvaluasiDto;
+import com.evaluasi.EvaluasiHUMBackEnd.dto.KaryawanDto;
 import com.evaluasi.EvaluasiHUMBackEnd.dto.UserEvaResultDto;
 import com.evaluasi.EvaluasiHUMBackEnd.exception.AllException;
 import com.evaluasi.EvaluasiHUMBackEnd.service.EvaluasiService;
@@ -63,6 +64,12 @@ public class EvaluasiController {
 
         return new ResponseEntity<>(userEvaResultDtoList, headers, HttpStatus.OK);
     }
+    @GetMapping("/hasilevaluasipaginationbyhasil/{hasilevaluasi}/{offset}/{pageSize}")
+    public ResponseEntity<Page<UserEvaResultDto>> showAllEvaluasiPaginationByHasil(
+            @PathVariable String hasilevaluasi,@PathVariable int offset, @PathVariable int pageSize) {
+        Page<UserEvaResultDto> userEvaResultDtoPage = evaluasiService.showAllEvaluasiPaginationByHasil(hasilevaluasi, offset, pageSize);
+        return ResponseEntity.ok(userEvaResultDtoPage);
+    }
     @GetMapping("/hasilevaluasipaginationasctanggal/{offset}/{pageSize}")
     public ResponseEntity<List<UserEvaResultDto>> showAllEvaluationPaginationAscTanggal(@PathVariable int offset, @PathVariable int pageSize) {
         Page<UserEvaResultDto> userEvaResultDtoPage = evaluasiService.showAllEvaluationWithPaginationAscTanggal(offset, pageSize);
@@ -83,6 +90,8 @@ public class EvaluasiController {
 
         return new ResponseEntity<>(userEvaResultDtoList, headers, HttpStatus.OK);
     }
+
+
 
     @GetMapping("/findbyid/{id}")
     public EvaluasiDto findById(@PathVariable Long id) throws AllException {

@@ -12,7 +12,10 @@ import org.springframework.stereotype.Repository;
 public interface RuleRepository extends JpaRepository<Rule,Long> {
     Rule findByKoderule(String koderule);
 
+
     @Query("SELECT p FROM Rule p WHERE p.jabatan = :jabatan")
     Page<Rule> findByJabatan(String jabatan, Pageable pageable);
 
+    @Query("SELECT p FROM Rule p WHERE p.jabatan = :jabatan")
+    Page<Rule> findByJabatan(String jabatan, Pageable pageable);
 }

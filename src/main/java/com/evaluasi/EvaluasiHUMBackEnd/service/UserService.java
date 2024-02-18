@@ -10,6 +10,10 @@ import com.evaluasi.EvaluasiHUMBackEnd.repository.KaryawanRepository;
 import com.evaluasi.EvaluasiHUMBackEnd.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -288,6 +292,89 @@ public class UserService {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Collections.singletonMap("error", "An error occurred while changing the password"));
         }
     }
+    public UserDto fetchUserDtoByUsername(String username) throws AllException {
+        log.info("Inside fetchUserDtoByUsername");
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new AllException("User with username " + username + " not found"));
+
+        return mapUserToUserDto(user);
+    }
+
+    public Page<UserDto> showAllUserPagination(int offset, int pageSize) {
+        log.info("Inside showAllUserPagination");
+
+        Page<User> userPage = userRepository.findAll(PageRequest.of(offset, pageSize));
+
+        List<UserDto> resultList = userPage.getContent().stream()
+                .map(user -> {
+                    UserDto userDto = new UserDto();
+                    Karyawan karyawan = user.getKaryawan();
+                    userDto.setIduser(user.getIduser());
+                    userDto.setKodeuser(user.getKodeuser());
+                    userDto.setUsername(user.getUsername());
+                    userDto.setPassword(user.getPassword());
+                    userDto.setRole(user.getRole());
+                    userDto.setStatus(user.getStatus());
+                    userDto.setCreated(user.getCreated());
+                    userDto.setIdkar(karyawan.getIdkar());
+                    userDto.setNik(karyawan.getNik());
+                    return userDto;
+                })
+                .collect(Collectors.toList());
+
+        return new PageImpl<>(resultList, userPage.getPageable(), userPage.getTotalElements());
+    }
+
+    public Page<UserDto> showAllUserPaginationAscUsername(int offset, int pageSize) {
+        log.info("Inside showAllUserPagination");
+
+        Page<User> userPage = userRepository.findAll(PageRequest.of(offset, pageSize, Sort.by("username").ascending()));
+
+        List<UserDto> resultList = userPage.getContent().stream()
+                .map(user -> {
+                    UserDto userDto = new UserDto();
+                    Karyawan karyawan = user.getKaryawan();
+                    userDto.setIduser(user.getIduser());
+                    userDto.setKodeuser(user.getKodeuser());
+                    userDto.setUsername(user.getUsername());
+                    userDto.setPassword(user.getPassword());
+                    userDto.setRole(user.getRole());
+                    userDto.setStatus(user.getStatus());
+                    userDto.setCreated(user.getCreated());
+                    userDto.setIdkar(karyawan.getIdkar());
+                    userDto.setNik(karyawan.getNik());
+                    return userDto;
+                })
+                .collect(Collectors.toList());
+
+        return new PageImpl<>(resultList, userPage.getPageable(), userPage.getTotalElements());
+    }
+
+    public Page<UserDto> showAllUserPaginationDescUsername(int offset, int pageSize) {
+        log.info("Inside showAllUserPagination");
+
+        Page<User> userPage = userRepository.findAll(PageRequest.of(offset, pageSize,Sort.by("username").descending()));
+
+        List<UserDto> resultList = userPage.getContent().stream()
+                .map(user -> {
+                    UserDto userDto = new UserDto();
+                    Karyawan karyawan = user.getKaryawan();
+                    userDto.setIduser(user.getIduser());
+                    userDto.setKodeuser(user.getKodeuser());
+                    userDto.setUsername(user.getUsername());
+                    userDto.setPassword(user.getPassword());
+                    userDto.setRole(user.getRole());
+                    userDto.setStatus(user.getStatus());
+                    userDto.setCreated(user.getCreated());
+                    userDto.setIdkar(karyawan.getIdkar());
+                    userDto.setNik(karyawan.getNik());
+                    return userDto;
+                })
+                .collect(Collectors.toList());
+
+        return new PageImpl<>(resultList, userPage.getPageable(), userPage.getTotalElements());
+    }
+
 }
 
 

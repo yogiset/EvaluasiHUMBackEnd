@@ -144,7 +144,34 @@ public class EvaluasiService {
 
         return new PageImpl<>(resultList, evaluasiPage.getPageable(), evaluasiPage.getTotalElements());
     }
+    public Page<UserEvaResultDto> showAllEvaluasiPaginationByHasil(String hasilevaluasi, int offset, int pageSize) {
+        log.info("Inside showAllEvaluationWithPaginationByHasil");
 
+        Page<Evaluasi> evaluasiPage = evaluasiRepository.findByHasilEvaluasi(hasilevaluasi,PageRequest.of(offset, pageSize));
+
+        List<UserEvaResultDto> resultList = evaluasiPage.getContent().stream()
+                .map(evaluasi -> {
+                    UserEvaResultDto resultDto = new UserEvaResultDto();
+                    Karyawan karyawan = evaluasi.getKaryawan();
+                    resultDto.setIdkar(karyawan.getIdkar());
+                    resultDto.setNik(karyawan.getNik());
+                    resultDto.setNama(karyawan.getNama());
+                    resultDto.setDivisi(karyawan.getDivisi());
+                    resultDto.setJabatan(karyawan.getJabatan());
+                    resultDto.setTanggalmasuk(karyawan.getTanggalmasuk());
+                    resultDto.setMasakerja(karyawan.getMasakerja());
+                    resultDto.setTingkatan(karyawan.getTingkatan());
+                    resultDto.setKodeevaluasi(evaluasi.getKodeevaluasi());
+                    resultDto.setTanggalevaluasi(evaluasi.getTanggalevaluasi());
+                    resultDto.setHasilevaluasi(evaluasi.getHasilevaluasi());
+                    resultDto.setPerluditingkatkan(evaluasi.getPerluditingkatkan());
+                    return resultDto;
+                })
+                .collect(Collectors.toList());
+
+        return new PageImpl<>(resultList, evaluasiPage.getPageable(), evaluasiPage.getTotalElements());
+
+    }
 
     public Page<UserEvaResultDto> showAllEvaluationWithPaginationAscTanggal(int offset, int pageSize) {
         log.info("Inside showAllEvaluationWithPaginationAscTaggal");
@@ -223,4 +250,6 @@ public class EvaluasiService {
 
         return  evaluasiDto;
     }
+
+
 }

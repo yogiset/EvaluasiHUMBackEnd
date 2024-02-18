@@ -3,6 +3,7 @@ package com.evaluasi.EvaluasiHUMBackEnd.service;
 import com.evaluasi.EvaluasiHUMBackEnd.dto.PertanyaanDto;
 import com.evaluasi.EvaluasiHUMBackEnd.dto.RuleDto;
 import com.evaluasi.EvaluasiHUMBackEnd.entity.Karyawan;
+import com.evaluasi.EvaluasiHUMBackEnd.entity.Pertanyaan;
 
 import com.evaluasi.EvaluasiHUMBackEnd.entity.Pertanyaan;
 
