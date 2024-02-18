@@ -63,7 +63,6 @@ public class JawabanController {
         return jawabanService.findByIdJawab(id);
     }
 
-
     @GetMapping("/jawabanpagination/{offset}/{pageSize}")
     public ResponseEntity<List<JawabanDto>> showAllJawabanPagination(@PathVariable int offset, @PathVariable int pageSize) {
         Page<JawabanDto> jawabanDtoPage = jawabanService.showAllJawabanPagination(offset, pageSize);

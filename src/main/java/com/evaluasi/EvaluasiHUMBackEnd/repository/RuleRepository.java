@@ -14,6 +14,4 @@ public interface RuleRepository extends JpaRepository<Rule,Long> {
 
     @Query("SELECT p FROM Rule p WHERE p.jabatan = :jabatan")
     Page<Rule> findByJabatan(String jabatan, Pageable pageable);
-
-
 }
