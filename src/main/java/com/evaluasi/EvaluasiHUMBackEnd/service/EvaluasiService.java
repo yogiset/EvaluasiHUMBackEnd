@@ -71,6 +71,85 @@ public class EvaluasiService {
                 .collect(Collectors.toList());
 
     }
+    public Page<EvaluasiDto> showAllEvaWithPagination(int offset, int pageSize) {
+        log.info("Inside showAllEvaWithPagination");
+        Page<Evaluasi> evaluasiPage = evaluasiRepository.findAll(PageRequest.of(offset, pageSize));
+
+        List<EvaluasiDto> resultList = evaluasiPage.getContent().stream()
+                .map(evaluasi -> {
+                    EvaluasiDto evaluasiDto = new EvaluasiDto();
+                    Karyawan karyawan = evaluasi.getKaryawan();
+                    evaluasiDto.setNik(karyawan.getNik());
+                    evaluasiDto.setKodeevaluasi(evaluasi.getKodeevaluasi());
+                    evaluasiDto.setTanggalevaluasi(evaluasi.getTanggalevaluasi());
+                    evaluasiDto.setHasilevaluasi(evaluasi.getHasilevaluasi());
+                    evaluasiDto.setPerluditingkatkan(evaluasi.getPerluditingkatkan());
+                    return evaluasiDto;
+                })
+                .collect(Collectors.toList());
+
+        return new PageImpl<>(resultList, evaluasiPage.getPageable(), evaluasiPage.getTotalElements());
+    }
+
+    public Page<EvaluasiDto> showAllEvaPaginationByHasil(String hasilevaluasi, int offset, int pageSize) {
+        log.info("Inside showAllEvaWithPaginationByHasil");
+        Page<Evaluasi> evaluasiPage = evaluasiRepository.findByHasilEvaluasi(hasilevaluasi,PageRequest.of(offset, pageSize));
+
+        List<EvaluasiDto> resultList = evaluasiPage.getContent().stream()
+                .map(evaluasi -> {
+                    EvaluasiDto evaluasiDto = new EvaluasiDto();
+                    Karyawan karyawan = evaluasi.getKaryawan();
+                    evaluasiDto.setNik(karyawan.getNik());
+                    evaluasiDto.setKodeevaluasi(evaluasi.getKodeevaluasi());
+                    evaluasiDto.setTanggalevaluasi(evaluasi.getTanggalevaluasi());
+                    evaluasiDto.setHasilevaluasi(evaluasi.getHasilevaluasi());
+                    evaluasiDto.setPerluditingkatkan(evaluasi.getPerluditingkatkan());
+                    return evaluasiDto;
+                })
+                .collect(Collectors.toList());
+
+        return new PageImpl<>(resultList, evaluasiPage.getPageable(), evaluasiPage.getTotalElements());
+    }
+
+    public Page<EvaluasiDto> showAllEvaWithPaginationAscTanggal(int offset, int pageSize) {
+        log.info("Inside showAllEvaWithPaginationAscTanggal");
+        Page<Evaluasi> evaluasiPage = evaluasiRepository.findAll(PageRequest.of(offset, pageSize,Sort.by("tanggalevaluasi").ascending()));
+
+        List<EvaluasiDto> resultList = evaluasiPage.getContent().stream()
+                .map(evaluasi -> {
+                    EvaluasiDto evaluasiDto = new EvaluasiDto();
+                    Karyawan karyawan = evaluasi.getKaryawan();
+                    evaluasiDto.setNik(karyawan.getNik());
+                    evaluasiDto.setKodeevaluasi(evaluasi.getKodeevaluasi());
+                    evaluasiDto.setTanggalevaluasi(evaluasi.getTanggalevaluasi());
+                    evaluasiDto.setHasilevaluasi(evaluasi.getHasilevaluasi());
+                    evaluasiDto.setPerluditingkatkan(evaluasi.getPerluditingkatkan());
+                    return evaluasiDto;
+                })
+                .collect(Collectors.toList());
+
+        return new PageImpl<>(resultList, evaluasiPage.getPageable(), evaluasiPage.getTotalElements());
+    }
+
+    public Page<EvaluasiDto> showAllEvaWithPaginationDescTanggal(int offset, int pageSize) {
+        log.info("Inside showAllEvaWithPaginationDescTanggal");
+        Page<Evaluasi> evaluasiPage = evaluasiRepository.findAll(PageRequest.of(offset, pageSize,Sort.by("tanggalevaluasi").descending()));
+
+        List<EvaluasiDto> resultList = evaluasiPage.getContent().stream()
+                .map(evaluasi -> {
+                    EvaluasiDto evaluasiDto = new EvaluasiDto();
+                    Karyawan karyawan = evaluasi.getKaryawan();
+                    evaluasiDto.setNik(karyawan.getNik());
+                    evaluasiDto.setKodeevaluasi(evaluasi.getKodeevaluasi());
+                    evaluasiDto.setTanggalevaluasi(evaluasi.getTanggalevaluasi());
+                    evaluasiDto.setHasilevaluasi(evaluasi.getHasilevaluasi());
+                    evaluasiDto.setPerluditingkatkan(evaluasi.getPerluditingkatkan());
+                    return evaluasiDto;
+                })
+                .collect(Collectors.toList());
+
+        return new PageImpl<>(resultList, evaluasiPage.getPageable(), evaluasiPage.getTotalElements());
+    }
 
 
 
@@ -83,6 +162,12 @@ public class EvaluasiService {
             evaluasi.setTanggalevaluasi(evaluasiDto.getTanggalevaluasi());
             evaluasi.setHasilevaluasi(evaluasiDto.getHasilevaluasi());
             evaluasi.setPerluditingkatkan(evaluasiDto.getPerluditingkatkan());
+            Karyawan karyawan = karyawanRepository.findByNik(evaluasiDto.getNik());
+            if (karyawan == null) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Karyawan not found for NIK: " + evaluasiDto.getNik());
+            }
+
+            evaluasi.setKaryawan(karyawan);
 
             evaluasiRepository.save(evaluasi);
             return ResponseEntity.ok("Evaluasi edited successfully");
@@ -125,8 +210,9 @@ public class EvaluasiService {
                     resultDto.setNama(karyawan.getNama());
                     resultDto.setDivisi(karyawan.getDivisi());
                     resultDto.setJabatan(karyawan.getJabatan());
-                    resultDto.setCadangan1(karyawan.getCadangan1());
-                    resultDto.setCadangan2(karyawan.getCadangan2());
+                    resultDto.setTanggalmasuk(karyawan.getTanggalmasuk());
+                    resultDto.setMasakerja(karyawan.getMasakerja());
+                    resultDto.setTingkatan(karyawan.getTingkatan());
                     resultDto.setKodeevaluasi(evaluasi.getKodeevaluasi());
                     resultDto.setTanggalevaluasi(evaluasi.getTanggalevaluasi());
                     resultDto.setHasilevaluasi(evaluasi.getHasilevaluasi());
@@ -137,7 +223,34 @@ public class EvaluasiService {
 
         return new PageImpl<>(resultList, evaluasiPage.getPageable(), evaluasiPage.getTotalElements());
     }
+    public Page<UserEvaResultDto> showAllEvaluasiPaginationByHasil(String hasilevaluasi, int offset, int pageSize) {
+        log.info("Inside showAllEvaluationWithPaginationByHasil");
 
+        Page<Evaluasi> evaluasiPage = evaluasiRepository.findByHasilEvaluasi(hasilevaluasi,PageRequest.of(offset, pageSize));
+
+        List<UserEvaResultDto> resultList = evaluasiPage.getContent().stream()
+                .map(evaluasi -> {
+                    UserEvaResultDto resultDto = new UserEvaResultDto();
+                    Karyawan karyawan = evaluasi.getKaryawan();
+                    resultDto.setIdkar(karyawan.getIdkar());
+                    resultDto.setNik(karyawan.getNik());
+                    resultDto.setNama(karyawan.getNama());
+                    resultDto.setDivisi(karyawan.getDivisi());
+                    resultDto.setJabatan(karyawan.getJabatan());
+                    resultDto.setTanggalmasuk(karyawan.getTanggalmasuk());
+                    resultDto.setMasakerja(karyawan.getMasakerja());
+                    resultDto.setTingkatan(karyawan.getTingkatan());
+                    resultDto.setKodeevaluasi(evaluasi.getKodeevaluasi());
+                    resultDto.setTanggalevaluasi(evaluasi.getTanggalevaluasi());
+                    resultDto.setHasilevaluasi(evaluasi.getHasilevaluasi());
+                    resultDto.setPerluditingkatkan(evaluasi.getPerluditingkatkan());
+                    return resultDto;
+                })
+                .collect(Collectors.toList());
+
+        return new PageImpl<>(resultList, evaluasiPage.getPageable(), evaluasiPage.getTotalElements());
+
+    }
 
     public Page<UserEvaResultDto> showAllEvaluationWithPaginationAscTanggal(int offset, int pageSize) {
         log.info("Inside showAllEvaluationWithPaginationAscTaggal");
@@ -153,8 +266,9 @@ public class EvaluasiService {
                     resultDto.setNama(karyawan.getNama());
                     resultDto.setDivisi(karyawan.getDivisi());
                     resultDto.setJabatan(karyawan.getJabatan());
-                    resultDto.setCadangan1(karyawan.getCadangan1());
-                    resultDto.setCadangan2(karyawan.getCadangan2());
+                    resultDto.setTanggalmasuk(karyawan.getTanggalmasuk());
+                    resultDto.setMasakerja(karyawan.getMasakerja());
+                    resultDto.setTingkatan(karyawan.getTingkatan());
                     resultDto.setKodeevaluasi(evaluasi.getKodeevaluasi());
                     resultDto.setTanggalevaluasi(evaluasi.getTanggalevaluasi());
                     resultDto.setHasilevaluasi(evaluasi.getHasilevaluasi());
@@ -180,8 +294,9 @@ public class EvaluasiService {
                     resultDto.setNama(karyawan.getNama());
                     resultDto.setDivisi(karyawan.getDivisi());
                     resultDto.setJabatan(karyawan.getJabatan());
-                    resultDto.setCadangan1(karyawan.getCadangan1());
-                    resultDto.setCadangan2(karyawan.getCadangan2());
+                    resultDto.setTanggalmasuk(karyawan.getTanggalmasuk());
+                    resultDto.setMasakerja(karyawan.getMasakerja());
+                    resultDto.setTingkatan(karyawan.getTingkatan());
                     resultDto.setKodeevaluasi(evaluasi.getKodeevaluasi());
                     resultDto.setTanggalevaluasi(evaluasi.getTanggalevaluasi());
                     resultDto.setHasilevaluasi(evaluasi.getHasilevaluasi());
@@ -214,4 +329,30 @@ public class EvaluasiService {
 
         return  evaluasiDto;
     }
+
+    public UserEvaResultDto findByIdKar(Long id) throws AllException {
+        log.info("inside findbyidkar");
+        Evaluasi evaluasi = evaluasiRepository.findByIdkar(id)
+                .orElseThrow(() -> new AllException("Hasil Evaluasi with idkar " + id + " not found"));
+
+        UserEvaResultDto resultDto = new UserEvaResultDto();
+        Karyawan karyawan = evaluasi.getKaryawan();
+        resultDto.setIdkar(karyawan.getIdkar());
+        resultDto.setNik(karyawan.getNik());
+        resultDto.setNama(karyawan.getNama());
+        resultDto.setDivisi(karyawan.getDivisi());
+        resultDto.setJabatan(karyawan.getJabatan());
+        resultDto.setTanggalmasuk(karyawan.getTanggalmasuk());
+        resultDto.setMasakerja(karyawan.getMasakerja());
+        resultDto.setTingkatan(karyawan.getTingkatan());
+        resultDto.setKodeevaluasi(evaluasi.getKodeevaluasi());
+        resultDto.setTanggalevaluasi(evaluasi.getTanggalevaluasi());
+        resultDto.setHasilevaluasi(evaluasi.getHasilevaluasi());
+        resultDto.setPerluditingkatkan(evaluasi.getPerluditingkatkan());
+
+        return resultDto;
+         }
+
+
 }
+

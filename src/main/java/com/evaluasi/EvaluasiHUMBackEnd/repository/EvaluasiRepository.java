@@ -1,6 +1,9 @@
 package com.evaluasi.EvaluasiHUMBackEnd.repository;
 
 import com.evaluasi.EvaluasiHUMBackEnd.entity.Evaluasi;
+import com.evaluasi.EvaluasiHUMBackEnd.entity.Karyawan;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -12,6 +15,8 @@ import java.util.Optional;
 public interface EvaluasiRepository extends JpaRepository<Evaluasi,Long> {
 
     Evaluasi findByKodeevaluasi(String kodeevaluasi);
+    @Query("SELECT p FROM Evaluasi p WHERE p.hasilevaluasi = :hasilevaluasi")
+    Page<Evaluasi> findByHasilEvaluasi(String hasilevaluasi, Pageable pageable);
 
     @Query("SELECT u FROM Evaluasi u WHERE u.karyawan.idkar = :idkar")
     Optional<Evaluasi> findByIdkar(@Param("idkar") Long idkar);

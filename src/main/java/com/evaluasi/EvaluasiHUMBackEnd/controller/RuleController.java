@@ -1,10 +1,13 @@
 package com.evaluasi.EvaluasiHUMBackEnd.controller;
 
 
+import com.evaluasi.EvaluasiHUMBackEnd.dto.PertanyaanDto;
 import com.evaluasi.EvaluasiHUMBackEnd.dto.RuleDto;
 import com.evaluasi.EvaluasiHUMBackEnd.exception.AllException;
 import com.evaluasi.EvaluasiHUMBackEnd.service.RuleService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -55,5 +58,40 @@ public class RuleController {
         return ruleService.findByIdRule(id);
     }
 
+    @GetMapping("/rulepagination/{offset}/{pageSize}")
+    public ResponseEntity<List<RuleDto>> showAllRulePagination(@PathVariable int offset, @PathVariable int pageSize) {
+        Page<RuleDto> ruleDtoPage = ruleService.showAllRulePagination(offset, pageSize);
 
+        List<RuleDto> ruleDtoList = ruleDtoPage.getContent();
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("X-Total-Count", String.valueOf(ruleDtoPage.getTotalElements()));
+
+        return new ResponseEntity<>(ruleDtoList, headers, HttpStatus.OK);
+    }
+    @GetMapping("/rulepaginationbyjabatan/{jabatan}/{offset}/{pageSize}")
+    public ResponseEntity<Page<RuleDto>> showAllRulePaginationByJabatan(
+            @PathVariable String jabatan,@PathVariable int offset, @PathVariable int pageSize) {
+        Page<RuleDto> ruleDtoPage = ruleService.showAllRulePaginationByJabatan(jabatan, offset, pageSize);
+        return ResponseEntity.ok(ruleDtoPage);
+    }
+    @GetMapping("/rulepaginationascjabatan/{offset}/{pageSize}")
+    public ResponseEntity<List<RuleDto>> showAllRulePaginationAscJabatan(@PathVariable int offset, @PathVariable int pageSize) {
+        Page<RuleDto> ruleDtoPage = ruleService.showAllRulePaginationAscJabatan(offset, pageSize);
+
+        List<RuleDto> ruleDtoList = ruleDtoPage.getContent();
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("X-Total-Count", String.valueOf(ruleDtoPage.getTotalElements()));
+
+        return new ResponseEntity<>(ruleDtoList, headers, HttpStatus.OK);
+    }
+    @GetMapping("/rulepaginationdescjabatan/{offset}/{pageSize}")
+    public ResponseEntity<List<RuleDto>> showAllRulePaginationDescJabatan(@PathVariable int offset, @PathVariable int pageSize) {
+        Page<RuleDto> ruleDtoPage = ruleService.showAllRulePaginationDescJabatan(offset, pageSize);
+
+        List<RuleDto> ruleDtoList = ruleDtoPage.getContent();
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("X-Total-Count", String.valueOf(ruleDtoPage.getTotalElements()));
+
+        return new ResponseEntity<>(ruleDtoList, headers, HttpStatus.OK);
+    }
 }

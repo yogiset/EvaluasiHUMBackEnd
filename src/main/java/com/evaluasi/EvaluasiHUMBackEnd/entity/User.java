@@ -13,7 +13,7 @@ import java.time.Instant;
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "userr")
+@Table(name = "users")
 public class User {
     @Id
     @SequenceGenerator(name = "userr_sequence",sequenceName = "userr_sequence",allocationSize = 1)

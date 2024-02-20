@@ -7,9 +7,9 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class RuleDto {
-    private Long idrule;
-    private String koderule;
-    private String rule;
-    private String jabatan;
+public class JawabanDto {
+    private Long idja;
+    private String jawaban;
+    private Integer bobot;
+    private Long idper;
 }
