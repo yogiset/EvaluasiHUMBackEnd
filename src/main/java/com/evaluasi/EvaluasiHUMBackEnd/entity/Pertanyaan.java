@@ -33,9 +33,6 @@ public class Pertanyaan {
     )
     private Rule rule;
 
-//    @OneToOne(mappedBy = "pertanyaan")
-//    private Jawaban jawaban;
-
     @OneToMany(mappedBy = "pertanyaan", cascade = CascadeType.ALL)
     private List<Jawaban> jawabanList;
 }

@@ -1,11 +1,10 @@
 package com.evaluasi.EvaluasiHUMBackEnd.service;
 
+import com.evaluasi.EvaluasiHUMBackEnd.dto.JawabanDto;
 import com.evaluasi.EvaluasiHUMBackEnd.dto.PertanyaanDto;
+import com.evaluasi.EvaluasiHUMBackEnd.dto.PertanyaanJawabanDto;
 import com.evaluasi.EvaluasiHUMBackEnd.dto.UserEvaResultDto;
-import com.evaluasi.EvaluasiHUMBackEnd.entity.Evaluasi;
-import com.evaluasi.EvaluasiHUMBackEnd.entity.Karyawan;
-import com.evaluasi.EvaluasiHUMBackEnd.entity.Pertanyaan;
-import com.evaluasi.EvaluasiHUMBackEnd.entity.Rule;
+import com.evaluasi.EvaluasiHUMBackEnd.entity.*;
 import com.evaluasi.EvaluasiHUMBackEnd.exception.AllException;
 import com.evaluasi.EvaluasiHUMBackEnd.repository.KaryawanRepository;
 import com.evaluasi.EvaluasiHUMBackEnd.repository.PertanyaanRepository;
@@ -20,6 +19,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -214,6 +214,161 @@ public class PertanyaanService {
         return new PageImpl<>(resultList, pertanyaanPage.getPageable(), pertanyaanPage.getTotalElements());
     }
 
+    public Page<PertanyaanJawabanDto> showAllPertanyaanJawabanPagination(int offset, int pageSize) {
+        log.info("Inside showAllPertanyaanJawabanPagination");
+
+        Page<Pertanyaan> pertanyaanPage = pertanyaanRepository.findAll(PageRequest.of(offset, pageSize));
+
+        Page<PertanyaanJawabanDto> pertanyaanJawabanDtoPage = pertanyaanPage.map(pertanyaan -> {
+            PertanyaanJawabanDto dto = new PertanyaanJawabanDto();
+            dto.setIdper(pertanyaan.getIdper());
+            dto.setKodepertanyaan(pertanyaan.getKodepertanyaan());
+            dto.setKoderule(pertanyaan.getRule().getKoderule());
+            dto.setRule(pertanyaan.getRule().getRule());
+            dto.setPertanyaan(pertanyaan.getPertanyaan());
+            dto.setJabatan(pertanyaan.getJabatan());
+
+            List<JawabanDto> jawabanDtoList = pertanyaan.getJawabanList().stream()
+                    .map(jawaban -> {
+                        JawabanDto jawabanDto = new JawabanDto();
+                        jawabanDto.setIdja(jawaban.getIdja());
+                        jawabanDto.setJawaban(jawaban.getJawaban());
+                        jawabanDto.setBobot(jawaban.getBobot());
+                        jawabanDto.setIdper(jawaban.getPertanyaan().getIdper());
+                        return jawabanDto;
+                    })
+                    .collect(Collectors.toList());
+
+            dto.setJawabanList(jawabanDtoList);
+            return dto;
+        });
+
+        return pertanyaanJawabanDtoPage;
+    }
+
+    public Page<PertanyaanJawabanDto> showAllPertanyaanJawabanPaginationAscJabatan(int offset, int pageSize) {
+        log.info("Inside showAllPertanyaanJawabanPaginationAscJabatan");
+
+        Page<Pertanyaan> pertanyaanPage = pertanyaanRepository.findAll(PageRequest.of(offset, pageSize,Sort.by("jabatan").ascending()));
+
+        Page<PertanyaanJawabanDto> pertanyaanJawabanDtoPage = pertanyaanPage.map(pertanyaan -> {
+            PertanyaanJawabanDto dto = new PertanyaanJawabanDto();
+            dto.setIdper(pertanyaan.getIdper());
+            dto.setKodepertanyaan(pertanyaan.getKodepertanyaan());
+            dto.setKoderule(pertanyaan.getRule().getKoderule());
+            dto.setRule(pertanyaan.getRule().getRule());
+            dto.setPertanyaan(pertanyaan.getPertanyaan());
+            dto.setJabatan(pertanyaan.getJabatan());
+
+            List<JawabanDto> jawabanDtoList = pertanyaan.getJawabanList().stream()
+                    .map(jawaban -> {
+                        JawabanDto jawabanDto = new JawabanDto();
+                        jawabanDto.setIdja(jawaban.getIdja());
+                        jawabanDto.setJawaban(jawaban.getJawaban());
+                        jawabanDto.setBobot(jawaban.getBobot());
+                        jawabanDto.setIdper(jawaban.getPertanyaan().getIdper());
+                        return jawabanDto;
+                    })
+                    .collect(Collectors.toList());
+
+            dto.setJawabanList(jawabanDtoList);
+            return dto;
+        });
+
+        return pertanyaanJawabanDtoPage;
+    }
+
+    public Page<PertanyaanJawabanDto> showAllPertanyaanJawabanPaginationDescJabatan(int offset, int pageSize) {
+        log.info("Inside showAllPertanyaanJawabanPaginationDescJabatan");
+
+        Page<Pertanyaan> pertanyaanPage = pertanyaanRepository.findAll(PageRequest.of(offset, pageSize,Sort.by("jabatan").descending()));
+
+        Page<PertanyaanJawabanDto> pertanyaanJawabanDtoPage = pertanyaanPage.map(pertanyaan -> {
+            PertanyaanJawabanDto dto = new PertanyaanJawabanDto();
+            dto.setIdper(pertanyaan.getIdper());
+            dto.setKodepertanyaan(pertanyaan.getKodepertanyaan());
+            dto.setKoderule(pertanyaan.getRule().getKoderule());
+            dto.setRule(pertanyaan.getRule().getRule());
+            dto.setPertanyaan(pertanyaan.getPertanyaan());
+            dto.setJabatan(pertanyaan.getJabatan());
+
+            List<JawabanDto> jawabanDtoList = pertanyaan.getJawabanList().stream()
+                    .map(jawaban -> {
+                        JawabanDto jawabanDto = new JawabanDto();
+                        jawabanDto.setIdja(jawaban.getIdja());
+                        jawabanDto.setJawaban(jawaban.getJawaban());
+                        jawabanDto.setBobot(jawaban.getBobot());
+                        jawabanDto.setIdper(jawaban.getPertanyaan().getIdper());
+                        return jawabanDto;
+                    })
+                    .collect(Collectors.toList());
+
+            dto.setJawabanList(jawabanDtoList);
+            return dto;
+        });
+
+        return pertanyaanJawabanDtoPage;
+    }
+
+    public Page<PertanyaanJawabanDto> showAllPertanyaanJawabanPaginationByJabatan(String jabatan, int offset, int pageSize) {
+        log.info("Inside showAllPertanyaanJawabanPaginationByJabatan");
+
+        Page<Pertanyaan> pertanyaanPage = pertanyaanRepository.findByJabatan(jabatan,PageRequest.of(offset,pageSize));
+
+        Page<PertanyaanJawabanDto> pertanyaanJawabanDtoPage = pertanyaanPage.map(pertanyaan -> {
+            PertanyaanJawabanDto dto = new PertanyaanJawabanDto();
+            dto.setIdper(pertanyaan.getIdper());
+            dto.setKodepertanyaan(pertanyaan.getKodepertanyaan());
+            dto.setKoderule(pertanyaan.getRule().getKoderule());
+            dto.setRule(pertanyaan.getRule().getRule());
+            dto.setPertanyaan(pertanyaan.getPertanyaan());
+            dto.setJabatan(pertanyaan.getJabatan());
+
+            List<JawabanDto> jawabanDtoList = pertanyaan.getJawabanList().stream()
+                    .map(jawaban -> {
+                        JawabanDto jawabanDto = new JawabanDto();
+                        jawabanDto.setIdja(jawaban.getIdja());
+                        jawabanDto.setJawaban(jawaban.getJawaban());
+                        jawabanDto.setBobot(jawaban.getBobot());
+                        jawabanDto.setIdper(jawaban.getPertanyaan().getIdper());
+                        return jawabanDto;
+                    })
+                    .collect(Collectors.toList());
+
+            dto.setJawabanList(jawabanDtoList);
+            return dto;
+        });
+
+        return pertanyaanJawabanDtoPage;
+    }
+
+    public PertanyaanJawabanDto findByIdPert(Long id) throws AllException {
+        Pertanyaan pertanyaan = pertanyaanRepository.findById(id)
+                .orElseThrow(() -> new AllException("Pertanyaan not found with ID: " + id));
 
 
+        PertanyaanJawabanDto dto = new PertanyaanJawabanDto();
+        dto.setIdper(pertanyaan.getIdper());
+        dto.setKodepertanyaan(pertanyaan.getKodepertanyaan());
+        dto.setKoderule(pertanyaan.getRule().getKoderule());
+        dto.setRule(pertanyaan.getRule().getRule());
+        dto.setPertanyaan(pertanyaan.getPertanyaan());
+        dto.setJabatan(pertanyaan.getJabatan());
+
+
+        List<JawabanDto> jawabanDtoList = pertanyaan.getJawabanList().stream()
+                .map(jawaban -> {
+                    JawabanDto jawabanDto = new JawabanDto();
+                    jawabanDto.setIdja(jawaban.getIdja());
+                    jawabanDto.setJawaban(jawaban.getJawaban());
+                    jawabanDto.setBobot(jawaban.getBobot());
+                    jawabanDto.setIdper(jawaban.getPertanyaan().getIdper());
+                    return jawabanDto;
+                })
+                .collect(Collectors.toList());
+
+        dto.setJawabanList(jawabanDtoList);
+
+        return dto;
+    }
 }

@@ -42,7 +42,7 @@ public class UserController {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
-
+    
     @DeleteMapping(path = "/hapususer/{id}")
     public ResponseEntity<Object>hapusUser(@PathVariable("id")Long id) {
         try {
@@ -62,7 +62,7 @@ public class UserController {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
-
+    
     @GetMapping("/findById/{id}")
     public UserDto fetchUserByIduser(@PathVariable("id") Long id) throws AllException {
         return userService.fetchUserDtoByIduser(id);

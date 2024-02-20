@@ -20,16 +20,6 @@ public class Jawaban {
     private String jawaban;
     private Integer bobot;
 
-//    @OneToOne(
-//            cascade = CascadeType.ALL,
-//            fetch = FetchType.LAZY
-//    )
-//    @JoinColumn(
-//            name = "kodepertanyaan",
-//            referencedColumnName = "kodepertanyaan"
-//    )
-//    private Pertanyaan pertanyaan;
-
     @ManyToOne(cascade = CascadeType.PERSIST)
     @JoinColumn(name = "idper", nullable = false)
     private Pertanyaan pertanyaan;
