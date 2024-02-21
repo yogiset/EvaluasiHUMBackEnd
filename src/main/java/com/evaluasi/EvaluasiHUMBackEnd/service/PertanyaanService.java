@@ -1,16 +1,15 @@
 package com.evaluasi.EvaluasiHUMBackEnd.service;
 
-import com.evaluasi.EvaluasiHUMBackEnd.dto.JawabanDto;
-import com.evaluasi.EvaluasiHUMBackEnd.dto.PertanyaanDto;
-import com.evaluasi.EvaluasiHUMBackEnd.dto.PertanyaanJawabanDto;
-import com.evaluasi.EvaluasiHUMBackEnd.dto.UserEvaResultDto;
+import com.evaluasi.EvaluasiHUMBackEnd.dto.*;
 import com.evaluasi.EvaluasiHUMBackEnd.entity.*;
 import com.evaluasi.EvaluasiHUMBackEnd.exception.AllException;
+import com.evaluasi.EvaluasiHUMBackEnd.repository.JawabanRepository;
 import com.evaluasi.EvaluasiHUMBackEnd.repository.KaryawanRepository;
 import com.evaluasi.EvaluasiHUMBackEnd.repository.PertanyaanRepository;
 import com.evaluasi.EvaluasiHUMBackEnd.repository.RuleRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.catalina.filters.RemoteCIDRFilter;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -30,6 +29,7 @@ import java.util.stream.Collectors;
 public class PertanyaanService {
     private final PertanyaanRepository pertanyaanRepository;
     private final KaryawanRepository karyawanRepository;
+    private final JawabanRepository jawabanRepository;
     private final RuleRepository ruleRepository;
 
     public ResponseEntity<Object> addPertanyaan(PertanyaanDto pertanyaanDto) {
@@ -343,6 +343,7 @@ public class PertanyaanService {
     }
 
     public PertanyaanJawabanDto findByIdPert(Long id) throws AllException {
+        log.info("Inside findByIdPert");
         Pertanyaan pertanyaan = pertanyaanRepository.findById(id)
                 .orElseThrow(() -> new AllException("Pertanyaan not found with ID: " + id));
 
@@ -370,5 +371,94 @@ public class PertanyaanService {
         dto.setJawabanList(jawabanDtoList);
 
         return dto;
+    }
+
+    public ResponseEntity<Object> addPertanyaanJawabanRule(PertanyaanJawabanDto pertanyaanJawabanDto) {
+        try {
+            log.info("Inside addPertanyaanJawabanRule");
+                Rule rules = new Rule();
+                rules.setKoderule(pertanyaanJawabanDto.getKoderule());
+                rules.setRule(pertanyaanJawabanDto.getRule());
+                rules.setJabatan(pertanyaanJawabanDto.getJabatan());
+                Rule savedRule =  ruleRepository.save(rules);
+
+            Pertanyaan pertanyaan = new Pertanyaan();
+            pertanyaan.setKodepertanyaan(pertanyaanJawabanDto.getKodepertanyaan());
+            pertanyaan.setPertanyaan(pertanyaanJawabanDto.getPertanyaan());
+            pertanyaan.setJabatan(pertanyaanJawabanDto.getJabatan());
+            pertanyaan.setRule(savedRule);
+            Pertanyaan savedPertanyaan = pertanyaanRepository.save(pertanyaan);
+
+            for (JawabanDto jawabanDto : pertanyaanJawabanDto.getJawabanList()) {
+                Jawaban jawaban = new Jawaban();
+                        jawaban.setJawaban(jawabanDto.getJawaban());
+                        jawaban.setBobot(jawabanDto.getBobot());
+                        jawaban.setPertanyaan(savedPertanyaan);
+                jawabanRepository.save(jawaban);
+            }
+
+            return ResponseEntity.ok("Rule,Pertanyaan and Jawaban added successfully.");
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("Failed to add Rule,Pertanyaan and Jawaban: " + e.getMessage());
+        }
+    }
+
+    public ResponseEntity<Object> editPertanyaanPertanyaanJawabanRule(Long id, PertanyaanJawabanDto pertanyaanJawabanDto) {
+        try {
+            log.info("Inside editPertanyaanJawabanRule");
+
+            Optional<Rule> optionalRule = ruleRepository.findById(id);
+            if (optionalRule.isPresent()) {
+                Rule rule = optionalRule.get();
+                rule.setRule(pertanyaanJawabanDto.getRule());
+                rule.setJabatan(pertanyaanJawabanDto.getJabatan());
+                ruleRepository.save(rule);
+            } else {
+                return ResponseEntity.notFound().build();
+            }
+
+
+            Optional<Pertanyaan> optionalPertanyaan = pertanyaanRepository.findById(id);
+            if (optionalPertanyaan.isPresent()) {
+                Pertanyaan pertanyaan = optionalPertanyaan.get();
+                pertanyaan.setPertanyaan(pertanyaanJawabanDto.getPertanyaan());
+                pertanyaan.setJabatan(pertanyaanJawabanDto.getJabatan());
+                pertanyaanRepository.save(pertanyaan);
+            } else {
+                return ResponseEntity.notFound().build();
+            }
+
+            for (JawabanDto jawabanDto : pertanyaanJawabanDto.getJawabanList()) {
+                Optional<Jawaban> optionalJawaban = jawabanRepository.findById(jawabanDto.getIdja());
+                if (optionalJawaban.isPresent()) {
+                    Jawaban jawaban = optionalJawaban.get();
+                    jawaban.setJawaban(jawabanDto.getJawaban());
+                    jawaban.setBobot(jawabanDto.getBobot());
+                    jawabanRepository.save(jawaban);
+                } else {
+                    return ResponseEntity.notFound().build();
+                }
+            }
+
+            return ResponseEntity.ok("Rule, Pertanyaan, and Jawaban edited successfully.");
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("Failed to edit Rule, Pertanyaan, and Jawaban: " + e.getMessage());
+        }
+    }
+
+        public ResponseEntity<Object> deleteAll(Long id) {
+            try {
+                Optional<Pertanyaan> optionalPertanyaan = pertanyaanRepository.findById(id);
+
+                if (optionalPertanyaan.isPresent()) {
+                    pertanyaanRepository.deleteById(id);
+                    return ResponseEntity.ok("Successfully deleted Rule,Pertanyaan, and jawaban");
+                } else {
+                    return ResponseEntity.status(404).body("not found");
+                }
+            } catch (Exception e) {
+                return ResponseEntity.badRequest().body("Failed to delete Rule, Pertanyaan, and Jawaban: " + e.getMessage());
+            }
+
     }
 }
