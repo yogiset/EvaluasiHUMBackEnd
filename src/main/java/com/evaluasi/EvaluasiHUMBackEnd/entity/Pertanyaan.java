@@ -24,7 +24,7 @@ public class Pertanyaan {
     private String jabatan;
 
     @OneToOne(
-            cascade = CascadeType.PERSIST,
+            cascade = CascadeType.ALL,
             fetch = FetchType.LAZY
     )
     @JoinColumn(

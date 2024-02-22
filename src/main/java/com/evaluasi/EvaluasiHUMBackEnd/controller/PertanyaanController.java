@@ -2,6 +2,7 @@ package com.evaluasi.EvaluasiHUMBackEnd.controller;
 
 import com.evaluasi.EvaluasiHUMBackEnd.dto.PertanyaanDto;
 import com.evaluasi.EvaluasiHUMBackEnd.dto.PertanyaanJawabanDto;
+import com.evaluasi.EvaluasiHUMBackEnd.dto.RuleDto;
 import com.evaluasi.EvaluasiHUMBackEnd.dto.UserEvaResultDto;
 import com.evaluasi.EvaluasiHUMBackEnd.entity.Jawaban;
 import com.evaluasi.EvaluasiHUMBackEnd.entity.Pertanyaan;
@@ -158,6 +159,35 @@ public class PertanyaanController {
     @GetMapping("/findbyidperjaw/{id}")
     public PertanyaanJawabanDto findByIdpert(@PathVariable Long id) throws AllException {
         return pertanyaanService.findByIdPert(id);
+    }
+
+    @PostMapping(path = "/addall")
+    public ResponseEntity<Object> addPertanyaanJawabanRule(@RequestBody PertanyaanJawabanDto pertanyaanJawabanDto) {
+        try {
+            return pertanyaanService.addPertanyaanJawabanRule(pertanyaanJawabanDto);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+    @PutMapping(path = "/editall/{id}")
+    public ResponseEntity<Object>editPertanyaanJawabanRule(@PathVariable("id")Long id,@RequestBody PertanyaanJawabanDto pertanyaanJawabanDto) {
+        try {
+            return pertanyaanService.editPertanyaanPertanyaanJawabanRule(id,pertanyaanJawabanDto);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @DeleteMapping(path = "/deleteall/{id}")
+    public ResponseEntity<Object>deleteAll(@PathVariable("id")Long id) {
+        try {
+            return pertanyaanService.deleteAll(id);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
 
