@@ -4,12 +4,10 @@ import com.evaluasi.EvaluasiHUMBackEnd.dto.*;
 import com.evaluasi.EvaluasiHUMBackEnd.entity.*;
 import com.evaluasi.EvaluasiHUMBackEnd.exception.AllException;
 import com.evaluasi.EvaluasiHUMBackEnd.repository.JawabanRepository;
-import com.evaluasi.EvaluasiHUMBackEnd.repository.KaryawanRepository;
 import com.evaluasi.EvaluasiHUMBackEnd.repository.PertanyaanRepository;
 import com.evaluasi.EvaluasiHUMBackEnd.repository.RuleRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.catalina.filters.RemoteCIDRFilter;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -18,7 +16,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -29,9 +26,34 @@ import java.util.stream.Collectors;
 @Slf4j
 public class PertanyaanService {
     private final PertanyaanRepository pertanyaanRepository;
-    private final KaryawanRepository karyawanRepository;
     private final JawabanRepository jawabanRepository;
     private final RuleRepository ruleRepository;
+
+    public Page<PertanyaanDto> showAllPertanyaan(String jabatan, String order, int offset, int pageSize) {
+        log.info("Inside showAllPertanyaanPaginationByJabatan");
+        Page<Pertanyaan> pertanyaanPage;
+
+        if (jabatan == null) {
+            pertanyaanPage = pertanyaanRepository.findAll(PageRequest.of(offset - 1, pageSize,  "desc".equals(order) ? Sort.by("idper").descending() : Sort.by("idper").ascending()));
+        } else {
+            pertanyaanPage = pertanyaanRepository.findByJabatan(jabatan,PageRequest.of(offset - 1,pageSize, "desc".equals(order) ? Sort.by("idper").descending() : Sort.by("idper").ascending()));
+        }
+
+        List<PertanyaanDto> resultList = pertanyaanPage.getContent().stream()
+                .map(pertanyaan -> {
+                    PertanyaanDto pertanyaanDto = new PertanyaanDto();
+                    Rule rule = pertanyaan.getRule();
+                    pertanyaanDto.setIdper(pertanyaan.getIdper());
+                    pertanyaanDto.setKodepertanyaan(pertanyaan.getKodepertanyaan());
+                    pertanyaanDto.setPertanyaan(pertanyaan.getPertanyaan());
+                    pertanyaanDto.setJabatan(pertanyaan.getJabatan());
+                    pertanyaanDto.setKoderule(rule.getKoderule());
+                    return pertanyaanDto;
+                })
+                .collect(Collectors.toList());
+
+        return new PageImpl<>(resultList, pertanyaanPage.getPageable(), pertanyaanPage.getTotalElements());
+    }
 
     public ResponseEntity<Object> addPertanyaan(PertanyaanDto pertanyaanDto) {
         try{
@@ -54,23 +76,6 @@ public class PertanyaanService {
             return ResponseEntity.status(500).body("Error creating pertanyaan");
         }
 
-    }
-
-    public List<PertanyaanDto> showAll() {
-        log.info("Inside showall");
-        List<Pertanyaan>pertanyaanList = pertanyaanRepository.findAll();
-
-        return pertanyaanList.stream()
-                .map(tanya -> {
-                    PertanyaanDto pertanyaanDto = new PertanyaanDto();
-                    pertanyaanDto.setIdper(tanya.getIdper());
-                    pertanyaanDto.setKodepertanyaan(tanya.getKodepertanyaan());
-                    pertanyaanDto.setPertanyaan(tanya.getPertanyaan());
-                    pertanyaanDto.setJabatan(tanya.getJabatan());
-                    pertanyaanDto.setKoderule(tanya.getRule().getKoderule());
-                    return pertanyaanDto;
-                })
-                .collect(Collectors.toList());
     }
 
     public ResponseEntity<Object> editPertanyaan(Long id, PertanyaanDto pertanyaanDto) {
@@ -120,6 +125,7 @@ public class PertanyaanService {
 
         return mapPertanyaanToPertanyaanDto(pertanyaan);
     }
+
     public PertanyaanDto mapPertanyaanToPertanyaanDto(Pertanyaan pertanyaan){
         PertanyaanDto pertanyaanDto = new PertanyaanDto();
         pertanyaanDto.setIdper(pertanyaan.getIdper());
@@ -133,96 +139,19 @@ public class PertanyaanService {
         return pertanyaanDto;
     }
 
-    public Page<PertanyaanDto> showAllPertanyaanPagination(int offset, int pageSize) {
-        log.info("Inside showAllPertanyaanPagination");
+    public Page<PertanyaanJawabanDto> showAllPertanyaanJawaban(String jabatan, String order, int offset, int pageSize) {
+        log.info("Inside showAllPertanyaanJawaban");
 
-        Page<Pertanyaan> pertanyaanPage = pertanyaanRepository.findAll(PageRequest.of(offset, pageSize));
+        Page<Pertanyaan> pertanyaanPage;
 
-        List<PertanyaanDto> resultList = pertanyaanPage.getContent().stream()
-                .map(pertanyaan -> {
-                    PertanyaanDto pertanyaanDto = new PertanyaanDto();
-                    Rule rule = pertanyaan.getRule();
-                    pertanyaanDto.setIdper(pertanyaan.getIdper());
-                    pertanyaanDto.setKodepertanyaan(pertanyaan.getKodepertanyaan());
-                    pertanyaanDto.setPertanyaan(pertanyaan.getPertanyaan());
-                    pertanyaanDto.setJabatan(pertanyaan.getJabatan());
-                    pertanyaanDto.setKoderule(rule.getKoderule());
-                    return pertanyaanDto;
-                })
-                .collect(Collectors.toList());
+        if (jabatan == null) {
+            pertanyaanPage = pertanyaanRepository.findAll(PageRequest.of(offset - 1, pageSize,  "desc".equals(order) ? Sort.by("idper").descending() : Sort.by("idper").ascending()));
+        } else {
+            pertanyaanPage = pertanyaanRepository.findByJabatan(jabatan,PageRequest.of(offset - 1,pageSize, "desc".equals(order) ? Sort.by("idper").descending() : Sort.by("idper").ascending()));
+        }
 
-        return new PageImpl<>(resultList, pertanyaanPage.getPageable(), pertanyaanPage.getTotalElements());
-    }
-
-    public Page<PertanyaanDto> showAllPertanyaanPaginationByJabatan(String jabatan, int offset, int pageSize) {
-        log.info("Inside showAllPertanyaanPaginationByJabatan");
-        Page<Pertanyaan> pertanyaanPage = pertanyaanRepository.findByJabatan(jabatan,PageRequest.of(offset, pageSize));
-
-        List<PertanyaanDto> resultList = pertanyaanPage.getContent().stream()
-                .map(pertanyaan -> {
-                    PertanyaanDto pertanyaanDto = new PertanyaanDto();
-                    Rule rule = pertanyaan.getRule();
-                    pertanyaanDto.setIdper(pertanyaan.getIdper());
-                    pertanyaanDto.setKodepertanyaan(pertanyaan.getKodepertanyaan());
-                    pertanyaanDto.setPertanyaan(pertanyaan.getPertanyaan());
-                    pertanyaanDto.setJabatan(pertanyaan.getJabatan());
-                    pertanyaanDto.setKoderule(rule.getKoderule());
-                    return pertanyaanDto;
-                })
-                .collect(Collectors.toList());
-
-        return new PageImpl<>(resultList, pertanyaanPage.getPageable(), pertanyaanPage.getTotalElements());
-    }
-
-    public Page<PertanyaanDto> showAllPertanyaanPaginationAscJabatan(int offset, int pageSize) {
-        log.info("Inside showAllJawabanPaginationAscJabatan");
-
-        Page<Pertanyaan> pertanyaanPage = pertanyaanRepository.findAll(PageRequest.of(offset, pageSize, Sort.by("jabatan").ascending()));
-
-        List<PertanyaanDto> resultList = pertanyaanPage.getContent().stream()
-                .map(pertanyaan -> {
-                    PertanyaanDto pertanyaanDto = new PertanyaanDto();
-                    Rule rule = pertanyaan.getRule();
-                    pertanyaanDto.setIdper(pertanyaan.getIdper());
-                    pertanyaanDto.setKodepertanyaan(pertanyaan.getKodepertanyaan());
-                    pertanyaanDto.setPertanyaan(pertanyaan.getPertanyaan());
-                    pertanyaanDto.setJabatan(pertanyaan.getJabatan());
-                    pertanyaanDto.setKoderule(rule.getKoderule());
-                    return pertanyaanDto;
-                })
-                .collect(Collectors.toList());
-
-        return new PageImpl<>(resultList, pertanyaanPage.getPageable(), pertanyaanPage.getTotalElements());
-    }
-
-    public Page<PertanyaanDto> showAllPertanyaanPaginationDescJabatan(int offset, int pageSize) {
-        log.info("Inside showAllJawabanPaginationDescJabatan");
-
-        Page<Pertanyaan> pertanyaanPage = pertanyaanRepository.findAll(PageRequest.of(offset, pageSize, Sort.by("jabatan").descending()));
-
-        List<PertanyaanDto> resultList = pertanyaanPage.getContent().stream()
-                .map(pertanyaan -> {
-                    PertanyaanDto pertanyaanDto = new PertanyaanDto();
-                    Rule rule = pertanyaan.getRule();
-                    pertanyaanDto.setIdper(pertanyaan.getIdper());
-                    pertanyaanDto.setKodepertanyaan(pertanyaan.getKodepertanyaan());
-                    pertanyaanDto.setPertanyaan(pertanyaan.getPertanyaan());
-                    pertanyaanDto.setJabatan(pertanyaan.getJabatan());
-                    pertanyaanDto.setKoderule(rule.getKoderule());
-                    return pertanyaanDto;
-                })
-                .collect(Collectors.toList());
-
-        return new PageImpl<>(resultList, pertanyaanPage.getPageable(), pertanyaanPage.getTotalElements());
-    }
-
-    public Page<PertanyaanJawabanDto> showAllPertanyaanJawabanPagination(int offset, int pageSize) {
-        log.info("Inside showAllPertanyaanJawabanPagination");
-
-        Page<Pertanyaan> pertanyaanPage = pertanyaanRepository.findAll(PageRequest.of(offset, pageSize));
-
-        Page<PertanyaanJawabanDto> pertanyaanJawabanDtoPage = pertanyaanPage.map(pertanyaan -> {
-            PertanyaanJawabanDto dto = new PertanyaanJawabanDto();
+            Page<PertanyaanJawabanDto> pertanyaanJawabanDtoPage = pertanyaanPage.map(pertanyaan -> {
+                PertanyaanJawabanDto dto = new PertanyaanJawabanDto();
             dto.setIdper(pertanyaan.getIdper());
             dto.setKodepertanyaan(pertanyaan.getKodepertanyaan());
             dto.setKoderule(pertanyaan.getRule().getKoderule());
@@ -242,105 +171,10 @@ public class PertanyaanService {
                     .collect(Collectors.toList());
 
             dto.setJawabanList(jawabanDtoList);
+
             return dto;
         });
-
-        return pertanyaanJawabanDtoPage;
-    }
-
-    public Page<PertanyaanJawabanDto> showAllPertanyaanJawabanPaginationAscJabatan(int offset, int pageSize) {
-        log.info("Inside showAllPertanyaanJawabanPaginationAscJabatan");
-
-        Page<Pertanyaan> pertanyaanPage = pertanyaanRepository.findAll(PageRequest.of(offset, pageSize,Sort.by("jabatan").ascending()));
-
-        Page<PertanyaanJawabanDto> pertanyaanJawabanDtoPage = pertanyaanPage.map(pertanyaan -> {
-            PertanyaanJawabanDto dto = new PertanyaanJawabanDto();
-            dto.setIdper(pertanyaan.getIdper());
-            dto.setKodepertanyaan(pertanyaan.getKodepertanyaan());
-            dto.setKoderule(pertanyaan.getRule().getKoderule());
-            dto.setRule(pertanyaan.getRule().getRule());
-            dto.setPertanyaan(pertanyaan.getPertanyaan());
-            dto.setJabatan(pertanyaan.getJabatan());
-
-            List<JawabanDto> jawabanDtoList = pertanyaan.getJawabanList().stream()
-                    .map(jawaban -> {
-                        JawabanDto jawabanDto = new JawabanDto();
-                        jawabanDto.setIdja(jawaban.getIdja());
-                        jawabanDto.setJawaban(jawaban.getJawaban());
-                        jawabanDto.setBobot(jawaban.getBobot());
-                        jawabanDto.setIdper(jawaban.getPertanyaan().getIdper());
-                        return jawabanDto;
-                    })
-                    .collect(Collectors.toList());
-
-            dto.setJawabanList(jawabanDtoList);
-            return dto;
-        });
-
-        return pertanyaanJawabanDtoPage;
-    }
-
-    public Page<PertanyaanJawabanDto> showAllPertanyaanJawabanPaginationDescJabatan(int offset, int pageSize) {
-        log.info("Inside showAllPertanyaanJawabanPaginationDescJabatan");
-
-        Page<Pertanyaan> pertanyaanPage = pertanyaanRepository.findAll(PageRequest.of(offset, pageSize,Sort.by("jabatan").descending()));
-
-        Page<PertanyaanJawabanDto> pertanyaanJawabanDtoPage = pertanyaanPage.map(pertanyaan -> {
-            PertanyaanJawabanDto dto = new PertanyaanJawabanDto();
-            dto.setIdper(pertanyaan.getIdper());
-            dto.setKodepertanyaan(pertanyaan.getKodepertanyaan());
-            dto.setKoderule(pertanyaan.getRule().getKoderule());
-            dto.setRule(pertanyaan.getRule().getRule());
-            dto.setPertanyaan(pertanyaan.getPertanyaan());
-            dto.setJabatan(pertanyaan.getJabatan());
-
-            List<JawabanDto> jawabanDtoList = pertanyaan.getJawabanList().stream()
-                    .map(jawaban -> {
-                        JawabanDto jawabanDto = new JawabanDto();
-                        jawabanDto.setIdja(jawaban.getIdja());
-                        jawabanDto.setJawaban(jawaban.getJawaban());
-                        jawabanDto.setBobot(jawaban.getBobot());
-                        jawabanDto.setIdper(jawaban.getPertanyaan().getIdper());
-                        return jawabanDto;
-                    })
-                    .collect(Collectors.toList());
-
-            dto.setJawabanList(jawabanDtoList);
-            return dto;
-        });
-
-        return pertanyaanJawabanDtoPage;
-    }
-
-    public Page<PertanyaanJawabanDto> showAllPertanyaanJawabanPaginationByJabatan(String jabatan, int offset, int pageSize) {
-        log.info("Inside showAllPertanyaanJawabanPaginationByJabatan");
-
-        Page<Pertanyaan> pertanyaanPage = pertanyaanRepository.findByJabatan(jabatan,PageRequest.of(offset,pageSize));
-
-        Page<PertanyaanJawabanDto> pertanyaanJawabanDtoPage = pertanyaanPage.map(pertanyaan -> {
-            PertanyaanJawabanDto dto = new PertanyaanJawabanDto();
-            dto.setIdper(pertanyaan.getIdper());
-            dto.setKodepertanyaan(pertanyaan.getKodepertanyaan());
-            dto.setKoderule(pertanyaan.getRule().getKoderule());
-            dto.setRule(pertanyaan.getRule().getRule());
-            dto.setPertanyaan(pertanyaan.getPertanyaan());
-            dto.setJabatan(pertanyaan.getJabatan());
-
-            List<JawabanDto> jawabanDtoList = pertanyaan.getJawabanList().stream()
-                    .map(jawaban -> {
-                        JawabanDto jawabanDto = new JawabanDto();
-                        jawabanDto.setIdja(jawaban.getIdja());
-                        jawabanDto.setJawaban(jawaban.getJawaban());
-                        jawabanDto.setBobot(jawaban.getBobot());
-                        jawabanDto.setIdper(jawaban.getPertanyaan().getIdper());
-                        return jawabanDto;
-                    })
-                    .collect(Collectors.toList());
-
-            dto.setJawabanList(jawabanDtoList);
-            return dto;
-        });
-
+        
         return pertanyaanJawabanDtoPage;
     }
 
