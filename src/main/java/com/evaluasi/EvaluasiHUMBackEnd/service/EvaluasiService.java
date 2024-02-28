@@ -17,6 +17,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -53,29 +54,18 @@ public class EvaluasiService {
 
     }
 
-    public List<EvaluasiDto> showAll() {
-        log.info("Inside Show All");
-        List<Evaluasi> evaluasiList = evaluasiRepository.findAll();
+    public Page<EvaluasiDto> showAllAndPaginationEvaluasi(String hasilevaluasi, LocalDate tanggalevaluasi, String order, int offset, int pageSize) {
+        log.info("Inside showAllAndPaginationEvaluasi");
+        Page<Evaluasi>evaluasiPage;
+        if (hasilevaluasi == null || tanggalevaluasi == null) {
+            evaluasiPage = evaluasiRepository.findAll(PageRequest.of(offset - 1, pageSize,  "desc".equals(order) ? Sort.by("ideva").descending() : Sort.by("ideva").ascending()));
+        }else if(tanggalevaluasi != null){
+            evaluasiPage = evaluasiRepository.findByTanggalEvaluasi(tanggalevaluasi,PageRequest.of(offset - 1,pageSize, "desc".equals(order) ? Sort.by("ideva").descending() : Sort.by("ideva").ascending()));
+        } else {
+            evaluasiPage = evaluasiRepository.findByHasilEvaluasi(hasilevaluasi,PageRequest.of(offset - 1,pageSize, "desc".equals(order) ? Sort.by("ideva").descending() : Sort.by("ideva").ascending()));
+        }
 
-        return evaluasiList.stream()
-                .map(evaluasi -> {
-                    EvaluasiDto evaluasiDto = new EvaluasiDto();
-                    evaluasiDto.setIdeva(evaluasi.getIdeva());
-                    evaluasiDto.setKodeevaluasi(evaluasi.getKodeevaluasi());
-                    evaluasiDto.setTanggalevaluasi(evaluasi.getTanggalevaluasi());
-                    evaluasiDto.setHasilevaluasi(evaluasi.getHasilevaluasi());
-                    evaluasiDto.setPerluditingkatkan(evaluasi.getPerluditingkatkan());
-                    evaluasiDto.setNik(evaluasi.getKaryawan().getNik());
-                    return evaluasiDto;
-                })
-                .collect(Collectors.toList());
-
-    }
-    public Page<EvaluasiDto> showAllEvaWithPagination(int offset, int pageSize) {
-        log.info("Inside showAllEvaWithPagination");
-        Page<Evaluasi> evaluasiPage = evaluasiRepository.findAll(PageRequest.of(offset, pageSize));
-
-        List<EvaluasiDto> resultList = evaluasiPage.getContent().stream()
+                List<EvaluasiDto> resultList = evaluasiPage.getContent().stream()
                 .map(evaluasi -> {
                     EvaluasiDto evaluasiDto = new EvaluasiDto();
                     Karyawan karyawan = evaluasi.getKaryawan();
@@ -89,66 +79,7 @@ public class EvaluasiService {
                 .collect(Collectors.toList());
 
         return new PageImpl<>(resultList, evaluasiPage.getPageable(), evaluasiPage.getTotalElements());
-    }
 
-    public Page<EvaluasiDto> showAllEvaPaginationByHasil(String hasilevaluasi, int offset, int pageSize) {
-        log.info("Inside showAllEvaWithPaginationByHasil");
-        Page<Evaluasi> evaluasiPage = evaluasiRepository.findByHasilEvaluasi(hasilevaluasi,PageRequest.of(offset, pageSize));
-
-        List<EvaluasiDto> resultList = evaluasiPage.getContent().stream()
-                .map(evaluasi -> {
-                    EvaluasiDto evaluasiDto = new EvaluasiDto();
-                    Karyawan karyawan = evaluasi.getKaryawan();
-                    evaluasiDto.setNik(karyawan.getNik());
-                    evaluasiDto.setKodeevaluasi(evaluasi.getKodeevaluasi());
-                    evaluasiDto.setTanggalevaluasi(evaluasi.getTanggalevaluasi());
-                    evaluasiDto.setHasilevaluasi(evaluasi.getHasilevaluasi());
-                    evaluasiDto.setPerluditingkatkan(evaluasi.getPerluditingkatkan());
-                    return evaluasiDto;
-                })
-                .collect(Collectors.toList());
-
-        return new PageImpl<>(resultList, evaluasiPage.getPageable(), evaluasiPage.getTotalElements());
-    }
-
-    public Page<EvaluasiDto> showAllEvaWithPaginationAscTanggal(int offset, int pageSize) {
-        log.info("Inside showAllEvaWithPaginationAscTanggal");
-        Page<Evaluasi> evaluasiPage = evaluasiRepository.findAll(PageRequest.of(offset, pageSize,Sort.by("tanggalevaluasi").ascending()));
-
-        List<EvaluasiDto> resultList = evaluasiPage.getContent().stream()
-                .map(evaluasi -> {
-                    EvaluasiDto evaluasiDto = new EvaluasiDto();
-                    Karyawan karyawan = evaluasi.getKaryawan();
-                    evaluasiDto.setNik(karyawan.getNik());
-                    evaluasiDto.setKodeevaluasi(evaluasi.getKodeevaluasi());
-                    evaluasiDto.setTanggalevaluasi(evaluasi.getTanggalevaluasi());
-                    evaluasiDto.setHasilevaluasi(evaluasi.getHasilevaluasi());
-                    evaluasiDto.setPerluditingkatkan(evaluasi.getPerluditingkatkan());
-                    return evaluasiDto;
-                })
-                .collect(Collectors.toList());
-
-        return new PageImpl<>(resultList, evaluasiPage.getPageable(), evaluasiPage.getTotalElements());
-    }
-
-    public Page<EvaluasiDto> showAllEvaWithPaginationDescTanggal(int offset, int pageSize) {
-        log.info("Inside showAllEvaWithPaginationDescTanggal");
-        Page<Evaluasi> evaluasiPage = evaluasiRepository.findAll(PageRequest.of(offset, pageSize,Sort.by("tanggalevaluasi").descending()));
-
-        List<EvaluasiDto> resultList = evaluasiPage.getContent().stream()
-                .map(evaluasi -> {
-                    EvaluasiDto evaluasiDto = new EvaluasiDto();
-                    Karyawan karyawan = evaluasi.getKaryawan();
-                    evaluasiDto.setNik(karyawan.getNik());
-                    evaluasiDto.setKodeevaluasi(evaluasi.getKodeevaluasi());
-                    evaluasiDto.setTanggalevaluasi(evaluasi.getTanggalevaluasi());
-                    evaluasiDto.setHasilevaluasi(evaluasi.getHasilevaluasi());
-                    evaluasiDto.setPerluditingkatkan(evaluasi.getPerluditingkatkan());
-                    return evaluasiDto;
-                })
-                .collect(Collectors.toList());
-
-        return new PageImpl<>(resultList, evaluasiPage.getPageable(), evaluasiPage.getTotalElements());
     }
 
 
@@ -195,40 +126,17 @@ public class EvaluasiService {
         }
     }
 
-
-    public Page<UserEvaResultDto> showAllEvaluationWithPagination(int offset, int pageSize) {
-        log.info("Inside showAllEvaluationWithPagination");
-
-        Page<Evaluasi> evaluasiPage = evaluasiRepository.findAll(PageRequest.of(offset, pageSize));
-
-        List<UserEvaResultDto> resultList = evaluasiPage.getContent().stream()
-                .map(evaluasi -> {
-                    UserEvaResultDto resultDto = new UserEvaResultDto();
-                    Karyawan karyawan = evaluasi.getKaryawan();
-                    resultDto.setIdkar(karyawan.getIdkar());
-                    resultDto.setNik(karyawan.getNik());
-                    resultDto.setNama(karyawan.getNama());
-                    resultDto.setDivisi(karyawan.getDivisi());
-                    resultDto.setJabatan(karyawan.getJabatan());
-                    resultDto.setTanggalmasuk(karyawan.getTanggalmasuk());
-                    resultDto.setMasakerja(karyawan.getMasakerja());
-                    resultDto.setTingkatan(karyawan.getTingkatan());
-                    resultDto.setKodeevaluasi(evaluasi.getKodeevaluasi());
-                    resultDto.setTanggalevaluasi(evaluasi.getTanggalevaluasi());
-                    resultDto.setHasilevaluasi(evaluasi.getHasilevaluasi());
-                    resultDto.setPerluditingkatkan(evaluasi.getPerluditingkatkan());
-                    return resultDto;
-                })
-                .collect(Collectors.toList());
-
-        return new PageImpl<>(resultList, evaluasiPage.getPageable(), evaluasiPage.getTotalElements());
-    }
-    public Page<UserEvaResultDto> showAllEvaluasiPaginationByHasil(String hasilevaluasi, int offset, int pageSize) {
-        log.info("Inside showAllEvaluationWithPaginationByHasil");
-
-        Page<Evaluasi> evaluasiPage = evaluasiRepository.findByHasilEvaluasi(hasilevaluasi,PageRequest.of(offset, pageSize));
-
-        List<UserEvaResultDto> resultList = evaluasiPage.getContent().stream()
+    public Page<UserEvaResultDto> showAllAndPaginationHasilEvaluasiKaryawan(String hasilevaluasi, LocalDate tanggalevaluasi, String order, int offset, int pageSize) {
+        log.info("Inside showAllAndPaginationHasilEvaluasiKaryawan");
+        Page<Evaluasi>evaluasiPage;
+        if (hasilevaluasi == null || tanggalevaluasi == null) {
+            evaluasiPage = evaluasiRepository.findAll(PageRequest.of(offset - 1, pageSize,  "desc".equals(order) ? Sort.by("ideva").descending() : Sort.by("ideva").ascending()));
+        }else if(tanggalevaluasi != null){
+            evaluasiPage = evaluasiRepository.findByTanggalEvaluasi(tanggalevaluasi,PageRequest.of(offset - 1,pageSize, "desc".equals(order) ? Sort.by("ideva").descending() : Sort.by("ideva").ascending()));
+        } else {
+            evaluasiPage = evaluasiRepository.findByHasilEvaluasi(hasilevaluasi,PageRequest.of(offset - 1,pageSize, "desc".equals(order) ? Sort.by("ideva").descending() : Sort.by("ideva").ascending()));
+        }
+                List<UserEvaResultDto> resultList = evaluasiPage.getContent().stream()
                 .map(evaluasi -> {
                     UserEvaResultDto resultDto = new UserEvaResultDto();
                     Karyawan karyawan = evaluasi.getKaryawan();
@@ -250,62 +158,7 @@ public class EvaluasiService {
 
         return new PageImpl<>(resultList, evaluasiPage.getPageable(), evaluasiPage.getTotalElements());
 
-    }
 
-    public Page<UserEvaResultDto> showAllEvaluationWithPaginationAscTanggal(int offset, int pageSize) {
-        log.info("Inside showAllEvaluationWithPaginationAscTaggal");
-
-        Page<Evaluasi> evaluasiPage = evaluasiRepository.findAll(PageRequest.of(offset, pageSize, Sort.by("tanggalevaluasi").ascending()));
-
-        List<UserEvaResultDto> resultList = evaluasiPage.getContent().stream()
-                .map(evaluasi -> {
-                    UserEvaResultDto resultDto = new UserEvaResultDto();
-                    Karyawan karyawan = evaluasi.getKaryawan();
-                    resultDto.setIdkar(karyawan.getIdkar());
-                    resultDto.setNik(karyawan.getNik());
-                    resultDto.setNama(karyawan.getNama());
-                    resultDto.setDivisi(karyawan.getDivisi());
-                    resultDto.setJabatan(karyawan.getJabatan());
-                    resultDto.setTanggalmasuk(karyawan.getTanggalmasuk());
-                    resultDto.setMasakerja(karyawan.getMasakerja());
-                    resultDto.setTingkatan(karyawan.getTingkatan());
-                    resultDto.setKodeevaluasi(evaluasi.getKodeevaluasi());
-                    resultDto.setTanggalevaluasi(evaluasi.getTanggalevaluasi());
-                    resultDto.setHasilevaluasi(evaluasi.getHasilevaluasi());
-                    resultDto.setPerluditingkatkan(evaluasi.getPerluditingkatkan());
-                    return resultDto;
-                })
-                .collect(Collectors.toList());
-
-        return new PageImpl<>(resultList, evaluasiPage.getPageable(), evaluasiPage.getTotalElements());
-    }
-
-    public Page<UserEvaResultDto> showAllEvaluationWithPaginationDescTanggal(int offset, int pageSize) {
-        log.info("Inside showAllEvaluationWithPaginationDescTanggal");
-
-        Page<Evaluasi> evaluasiPage = evaluasiRepository.findAll(PageRequest.of(offset, pageSize,Sort.by("tanggalevaluasi").descending()));
-
-        List<UserEvaResultDto> resultList = evaluasiPage.getContent().stream()
-                .map(evaluasi -> {
-                    UserEvaResultDto resultDto = new UserEvaResultDto();
-                    Karyawan karyawan = evaluasi.getKaryawan();
-                    resultDto.setIdkar(karyawan.getIdkar());
-                    resultDto.setNik(karyawan.getNik());
-                    resultDto.setNama(karyawan.getNama());
-                    resultDto.setDivisi(karyawan.getDivisi());
-                    resultDto.setJabatan(karyawan.getJabatan());
-                    resultDto.setTanggalmasuk(karyawan.getTanggalmasuk());
-                    resultDto.setMasakerja(karyawan.getMasakerja());
-                    resultDto.setTingkatan(karyawan.getTingkatan());
-                    resultDto.setKodeevaluasi(evaluasi.getKodeevaluasi());
-                    resultDto.setTanggalevaluasi(evaluasi.getTanggalevaluasi());
-                    resultDto.setHasilevaluasi(evaluasi.getHasilevaluasi());
-                    resultDto.setPerluditingkatkan(evaluasi.getPerluditingkatkan());
-                    return resultDto;
-                })
-                .collect(Collectors.toList());
-
-        return new PageImpl<>(resultList, evaluasiPage.getPageable(), evaluasiPage.getTotalElements());
     }
 
     public EvaluasiDto findByIdEva(Long id) throws AllException {
@@ -352,7 +205,6 @@ public class EvaluasiService {
 
         return resultDto;
          }
-
 
 }
 

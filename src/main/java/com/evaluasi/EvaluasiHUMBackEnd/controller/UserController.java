@@ -28,11 +28,6 @@ public class UserController {
         return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
-    @GetMapping(path = "/all")
-    public List<UserDto> showAlluser(){
-        return userService.showall();
-    }
-
     @PutMapping(path = "/edituser/{id}")
     public ResponseEntity<Object>editUser(@PathVariable("id")Long id,@RequestBody UserDto userDto) {
         try {
@@ -67,16 +62,6 @@ public class UserController {
     public UserDto fetchUserByIduser(@PathVariable("id") Long id) throws AllException {
         return userService.fetchUserDtoByIduser(id);
     }
-
-    @GetMapping("/userresult")
-    public ResponseEntity<UserEvaResultDto> getUserInfoByUsername(@RequestParam String username,UserEvaResultDto userEvaResultDtoo,AuthResponse authResponse) {
-        try {
-            UserEvaResultDto userEvaResultDto = userService.getUserEvaResultByUsername(username,userEvaResultDtoo,authResponse);
-            return new ResponseEntity<>(userEvaResultDto, HttpStatus.OK);
-        } catch (UsernameNotFoundException e) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
-    }
     @PostMapping("/changepassword")
     public ResponseEntity<Object>changePassword(@RequestBody ChangePassword changePassword){
         try {
@@ -99,35 +84,27 @@ public class UserController {
     public UserDto fetchUserByUsername(@PathVariable("username") String username) throws AllException {
         return userService.fetchUserDtoByUsername(username);
     }
-    @GetMapping("/userpagination/{offset}/{pageSize}")
-    public ResponseEntity<List<UserDto>> showAllUserPagination(@PathVariable int offset, @PathVariable int pageSize) {
-        Page<UserDto> userDtoPage = userService.showAllUserPagination(offset, pageSize);
-
-        List<UserDto> userDtoList = userDtoPage.getContent();
-        HttpHeaders headers = new HttpHeaders();
-        headers.add("X-Total-Count", String.valueOf(userDtoPage.getTotalElements()));
-
-        return new ResponseEntity<>(userDtoList, headers, HttpStatus.OK);
-    }
-    @GetMapping("/userpaginationascusername/{offset}/{pageSize}")
-    public ResponseEntity<List<UserDto>> showAllUserPaginationAscUsername(@PathVariable int offset, @PathVariable int pageSize) {
-        Page<UserDto> userDtoPage = userService.showAllUserPaginationAscUsername(offset, pageSize);
-
-        List<UserDto> userDtoList = userDtoPage.getContent();
-        HttpHeaders headers = new HttpHeaders();
-        headers.add("X-Total-Count", String.valueOf(userDtoPage.getTotalElements()));
-
-        return new ResponseEntity<>(userDtoList, headers, HttpStatus.OK);
-    }
-    @GetMapping("/userpaginationdescusername/{offset}/{pageSize}")
-    public ResponseEntity<List<UserDto>> showAllUserPaginationDescUsername(@PathVariable int offset, @PathVariable int pageSize) {
-        Page<UserDto> userDtoPage = userService.showAllUserPaginationDescUsername(offset, pageSize);
-
-        List<UserDto> userDtoList = userDtoPage.getContent();
-        HttpHeaders headers = new HttpHeaders();
-        headers.add("X-Total-Count", String.valueOf(userDtoPage.getTotalElements()));
-
-        return new ResponseEntity<>(userDtoList, headers, HttpStatus.OK);
+    // REQ => <url>/user/showall?role=USER&page=1&limit=10
+    // OR => <url>/user/showall
+    @GetMapping("/showall")
+    @ResponseBody
+    public ResponseEntity<Page<UserDto>> showAllAndPaginationUser(
+            @RequestParam(required = false) String role, // => optional
+            @RequestParam(defaultValue = "desc") String order, // => optional
+            @RequestParam(name = "page", defaultValue = "1") int offset, // => optional
+            @RequestParam(name = "limit", defaultValue = "10") int pageSize // => optional
+    ) {
+        Page<UserDto> userDtoPage = userService.showAllAndPaginationUser(role, order, offset, pageSize);
+        return ResponseEntity.ok(userDtoPage);
     }
 
+    @GetMapping("/userresult")
+    public ResponseEntity<UserEvaResultDto> getUserInfoByUsername(@RequestParam String username,UserEvaResultDto userEvaResultDtoo,AuthResponse authResponse) {
+        try {
+            UserEvaResultDto userEvaResultDto = userService.getUserEvaResultByUsername(username,userEvaResultDtoo,authResponse);
+            return new ResponseEntity<>(userEvaResultDto, HttpStatus.OK);
+        } catch (UsernameNotFoundException e) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+    }
 }

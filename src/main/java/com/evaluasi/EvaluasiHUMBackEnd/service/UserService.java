@@ -70,28 +70,6 @@ public class UserService {
         }
     }
 
-    public List<UserDto> showall() {
-        log.info("Inside Show User");
-
-        List<User> userList = userRepository.findAll();
-
-        return userList.stream()
-                .map(user -> {
-                    UserDto userDto = new UserDto();
-                    userDto.setIduser(user.getIduser());
-                    userDto.setKodeuser(user.getKodeuser());
-                    userDto.setUsername(user.getUsername());
-                    userDto.setPassword(user.getPassword());
-                    userDto.setRole(user.getRole());
-                    userDto.setStatus(user.getStatus());
-                    userDto.setCreated(user.getCreated());
-                    userDto.setNik(user.getKaryawan().getNik());
-                    userDto.setIdkar(user.getKaryawan().getIdkar());
-                    return userDto;
-                })
-                .collect(Collectors.toList());
-    }
-
     public ResponseEntity<Object> editUser(Long id, UserDto userDto) {
         try {
             log.info("Inside edit user");
@@ -301,12 +279,15 @@ public class UserService {
         return mapUserToUserDto(user);
     }
 
-    public Page<UserDto> showAllUserPagination(int offset, int pageSize) {
-        log.info("Inside showAllUserPagination");
-
-        Page<User> userPage = userRepository.findAll(PageRequest.of(offset, pageSize));
-
-        List<UserDto> resultList = userPage.getContent().stream()
+    public Page<UserDto> showAllAndPaginationUser(String role, String order, int offset, int pageSize) {
+        log.info("Inside showAllAndPaginationUser");
+        Page<User>userPage;
+        if (role == null) {
+            userPage = userRepository.findAll(PageRequest.of(offset - 1, pageSize,  "desc".equals(order) ? Sort.by("iduser").descending() : Sort.by("iduser").ascending()));
+        } else {
+            userPage = userRepository.findByRole(role,PageRequest.of(offset - 1,pageSize, "desc".equals(order) ? Sort.by("iduser").descending() : Sort.by("iduser").ascending()));
+        }
+                List<UserDto> resultList = userPage.getContent().stream()
                 .map(user -> {
                     UserDto userDto = new UserDto();
                     Karyawan karyawan = user.getKaryawan();
@@ -324,57 +305,10 @@ public class UserService {
                 .collect(Collectors.toList());
 
         return new PageImpl<>(resultList, userPage.getPageable(), userPage.getTotalElements());
+
     }
 
-    public Page<UserDto> showAllUserPaginationAscUsername(int offset, int pageSize) {
-        log.info("Inside showAllUserPagination");
 
-        Page<User> userPage = userRepository.findAll(PageRequest.of(offset, pageSize, Sort.by("username").ascending()));
-
-        List<UserDto> resultList = userPage.getContent().stream()
-                .map(user -> {
-                    UserDto userDto = new UserDto();
-                    Karyawan karyawan = user.getKaryawan();
-                    userDto.setIduser(user.getIduser());
-                    userDto.setKodeuser(user.getKodeuser());
-                    userDto.setUsername(user.getUsername());
-                    userDto.setPassword(user.getPassword());
-                    userDto.setRole(user.getRole());
-                    userDto.setStatus(user.getStatus());
-                    userDto.setCreated(user.getCreated());
-                    userDto.setIdkar(karyawan.getIdkar());
-                    userDto.setNik(karyawan.getNik());
-                    return userDto;
-                })
-                .collect(Collectors.toList());
-
-        return new PageImpl<>(resultList, userPage.getPageable(), userPage.getTotalElements());
-    }
-
-    public Page<UserDto> showAllUserPaginationDescUsername(int offset, int pageSize) {
-        log.info("Inside showAllUserPagination");
-
-        Page<User> userPage = userRepository.findAll(PageRequest.of(offset, pageSize,Sort.by("username").descending()));
-
-        List<UserDto> resultList = userPage.getContent().stream()
-                .map(user -> {
-                    UserDto userDto = new UserDto();
-                    Karyawan karyawan = user.getKaryawan();
-                    userDto.setIduser(user.getIduser());
-                    userDto.setKodeuser(user.getKodeuser());
-                    userDto.setUsername(user.getUsername());
-                    userDto.setPassword(user.getPassword());
-                    userDto.setRole(user.getRole());
-                    userDto.setStatus(user.getStatus());
-                    userDto.setCreated(user.getCreated());
-                    userDto.setIdkar(karyawan.getIdkar());
-                    userDto.setNik(karyawan.getNik());
-                    return userDto;
-                })
-                .collect(Collectors.toList());
-
-        return new PageImpl<>(resultList, userPage.getPageable(), userPage.getTotalElements());
-    }
 
 }
 

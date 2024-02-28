@@ -2,6 +2,7 @@ package com.evaluasi.EvaluasiHUMBackEnd.controller;
 
 import com.evaluasi.EvaluasiHUMBackEnd.dto.EvaluasiDto;
 import com.evaluasi.EvaluasiHUMBackEnd.dto.KaryawanDto;
+import com.evaluasi.EvaluasiHUMBackEnd.dto.UserDto;
 import com.evaluasi.EvaluasiHUMBackEnd.dto.UserEvaResultDto;
 import com.evaluasi.EvaluasiHUMBackEnd.exception.AllException;
 import com.evaluasi.EvaluasiHUMBackEnd.service.EvaluasiService;
@@ -12,6 +13,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @RestController
@@ -28,11 +30,6 @@ public class EvaluasiController {
             ex.printStackTrace();
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
-    }
-
-    @GetMapping(path = "/all")
-    public List<EvaluasiDto> showAllEvaluasi(){
-        return evaluasiService.showAll();
     }
 
     @PutMapping(path = "/editevaluasi/{id}")
@@ -53,43 +50,22 @@ public class EvaluasiController {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
-    @GetMapping("/evaluasipagination/{offset}/{pageSize}")
-    public ResponseEntity<List<EvaluasiDto>> showAllEvaPagination(@PathVariable int offset, @PathVariable int pageSize) {
-        Page<EvaluasiDto> evaluasiDtoPage = evaluasiService.showAllEvaWithPagination(offset, pageSize);
-
-        List<EvaluasiDto> evaluasiDtoList = evaluasiDtoPage.getContent();
         HttpHeaders headers = new HttpHeaders();
-        headers.add("X-Total-Count", String.valueOf(evaluasiDtoPage.getTotalElements()));
-
-        return new ResponseEntity<>(evaluasiDtoList, headers, HttpStatus.OK);
-    }
-    @GetMapping("/evaluasipaginationbyhasil/{hasilevaluasi}/{offset}/{pageSize}")
-    public ResponseEntity<Page<EvaluasiDto>> showAllEvaPaginationByHasil(
-            @PathVariable String hasilevaluasi,@PathVariable int offset, @PathVariable int pageSize) {
-        Page<EvaluasiDto> evaluasiDtoPage = evaluasiService.showAllEvaPaginationByHasil(hasilevaluasi, offset, pageSize);
+    // REQ => <url>/evaluasi/showall?hasil=baik&page=1&limit=10
+    // OR => <url>/evaluasi/showall?tanggal=2021-11-10&page=1&limit=10
+    // OR => <url>/evaluasi/showall
+    @GetMapping("/showall")
+    @ResponseBody
+    public ResponseEntity<Page<EvaluasiDto>> showAllAndPaginationEvaluasi(
+            @RequestParam(name = "hasil",required = false) String hasilevaluasi, // => optional
+            @RequestParam(name = "tanggal",required = false) LocalDate tanggalevaluasi,// => optional
+            @RequestParam(defaultValue = "desc") String order, // => optional
+            @RequestParam(name = "page", defaultValue = "1") int offset, // => optional
+            @RequestParam(name = "limit", defaultValue = "10") int pageSize // => optional
+    ) {
+        Page<EvaluasiDto> evaluasiDtoPage = evaluasiService.showAllAndPaginationEvaluasi(hasilevaluasi,tanggalevaluasi, order, offset, pageSize);
         return ResponseEntity.ok(evaluasiDtoPage);
     }
-    @GetMapping("/evaluasipaginationasctanggal/{offset}/{pageSize}")
-    public ResponseEntity<List<EvaluasiDto>> showAllEvaPaginationAscTanggal(@PathVariable int offset, @PathVariable int pageSize) {
-        Page<EvaluasiDto> evaluasiDtoPage = evaluasiService.showAllEvaWithPaginationAscTanggal(offset, pageSize);
-
-        List<EvaluasiDto> evaluasiDtoList = evaluasiDtoPage.getContent();
-        HttpHeaders headers = new HttpHeaders();
-        headers.add("X-Total-Count", String.valueOf(evaluasiDtoPage.getTotalElements()));
-
-        return new ResponseEntity<>(evaluasiDtoList, headers, HttpStatus.OK);
-    }
-    @GetMapping("/evaluasipaginationdesctanggal/{offset}/{pageSize}")
-    public ResponseEntity<List<EvaluasiDto>> showAllEvaPaginationDescTanggal(@PathVariable int offset, @PathVariable int pageSize) {
-        Page<EvaluasiDto> evaluasiDtoPage = evaluasiService.showAllEvaWithPaginationDescTanggal(offset, pageSize);
-
-        List<EvaluasiDto> evaluasiDtoList = evaluasiDtoPage.getContent();
-        HttpHeaders headers = new HttpHeaders();
-        headers.add("X-Total-Count", String.valueOf(evaluasiDtoPage.getTotalElements()));
-
-        return new ResponseEntity<>(evaluasiDtoList, headers, HttpStatus.OK);
-    }
-
 
     @GetMapping("/findbyid/{id}")
     public EvaluasiDto findById(@PathVariable Long id) throws AllException {
@@ -101,42 +77,59 @@ public class EvaluasiController {
         return evaluasiService.findByIdKar(id);
     }
 
-    @GetMapping("/hasilevaluasipagination/{offset}/{pageSize}")
-    public ResponseEntity<List<UserEvaResultDto>> showAllEvaluationPagination(@PathVariable int offset, @PathVariable int pageSize) {
-        Page<UserEvaResultDto> userEvaResultDtoPage = evaluasiService.showAllEvaluationWithPagination(offset, pageSize);
-
-        List<UserEvaResultDto> userEvaResultDtoList = userEvaResultDtoPage.getContent();
-        HttpHeaders headers = new HttpHeaders();
-        headers.add("X-Total-Count", String.valueOf(userEvaResultDtoPage.getTotalElements()));
-
-        return new ResponseEntity<>(userEvaResultDtoList, headers, HttpStatus.OK);
-    }
-    @GetMapping("/hasilevaluasipaginationbyhasil/{hasilevaluasi}/{offset}/{pageSize}")
-    public ResponseEntity<Page<UserEvaResultDto>> showAllEvaluasiPaginationByHasil(
-            @PathVariable String hasilevaluasi,@PathVariable int offset, @PathVariable int pageSize) {
-        Page<UserEvaResultDto> userEvaResultDtoPage = evaluasiService.showAllEvaluasiPaginationByHasil(hasilevaluasi, offset, pageSize);
+    // REQ => <url>/evaluasi/showallevaluasikaryawan?hasil=baik&page=1&limit=10
+    // OR => <url>/evaluasi/showallevaluasikaryawan?tanggal=2021-11-10&page=1&limit=10
+    // OR => <url>/evaluasi/showallevaluasikaryawan
+    @GetMapping("/showallevaluasikaryawan")
+    @ResponseBody
+    public ResponseEntity<Page<UserEvaResultDto>> showAllAndPaginationHasilEvaluasiKaryawan(
+            @RequestParam(name = "hasil",required = false) String hasilevaluasi, // => optional
+            @RequestParam(name = "tanggal",required = false) LocalDate tanggalevaluasi,// => optional
+            @RequestParam(defaultValue = "desc") String order, // => optional
+            @RequestParam(name = "page", defaultValue = "1") int offset, // => optional
+            @RequestParam(name = "limit", defaultValue = "10") int pageSize // => optional
+    ) {
+        Page<UserEvaResultDto> userEvaResultDtoPage = evaluasiService.showAllAndPaginationHasilEvaluasiKaryawan(hasilevaluasi,tanggalevaluasi, order, offset, pageSize);
         return ResponseEntity.ok(userEvaResultDtoPage);
     }
-    @GetMapping("/hasilevaluasipaginationasctanggal/{offset}/{pageSize}")
-    public ResponseEntity<List<UserEvaResultDto>> showAllEvaluationPaginationAscTanggal(@PathVariable int offset, @PathVariable int pageSize) {
-        Page<UserEvaResultDto> userEvaResultDtoPage = evaluasiService.showAllEvaluationWithPaginationAscTanggal(offset, pageSize);
 
-        List<UserEvaResultDto> userEvaResultDtoList = userEvaResultDtoPage.getContent();
-        HttpHeaders headers = new HttpHeaders();
-        headers.add("X-Total-Count", String.valueOf(userEvaResultDtoPage.getTotalElements()));
 
-        return new ResponseEntity<>(userEvaResultDtoList, headers, HttpStatus.OK);
-    }
-    @GetMapping("/hasilevaluasipaginationdesctanggal/{offset}/{pageSize}")
-    public ResponseEntity<List<UserEvaResultDto>> showAllEvaluationPaginationDescTanggal(@PathVariable int offset, @PathVariable int pageSize) {
-        Page<UserEvaResultDto> userEvaResultDtoPage = evaluasiService.showAllEvaluationWithPaginationDescTanggal(offset, pageSize);
-
-        List<UserEvaResultDto> userEvaResultDtoList = userEvaResultDtoPage.getContent();
-        HttpHeaders headers = new HttpHeaders();
-        headers.add("X-Total-Count", String.valueOf(userEvaResultDtoPage.getTotalElements()));
-
-        return new ResponseEntity<>(userEvaResultDtoList, headers, HttpStatus.OK);
-    }
+//    @GetMapping("/hasilevaluasipagination/{offset}/{pageSize}")
+//    public ResponseEntity<List<UserEvaResultDto>> showAllEvaluationPagination(@PathVariable int offset, @PathVariable int pageSize) {
+//        Page<UserEvaResultDto> userEvaResultDtoPage = evaluasiService.showAllEvaluationWithPagination(offset, pageSize);
+//
+//        List<UserEvaResultDto> userEvaResultDtoList = userEvaResultDtoPage.getContent();
+//        HttpHeaders headers = new HttpHeaders();
+//        headers.add("X-Total-Count", String.valueOf(userEvaResultDtoPage.getTotalElements()));
+//
+//        return new ResponseEntity<>(userEvaResultDtoList, headers, HttpStatus.OK);
+//    }
+//    @GetMapping("/hasilevaluasipaginationbyhasil/{hasilevaluasi}/{offset}/{pageSize}")
+//    public ResponseEntity<Page<UserEvaResultDto>> showAllEvaluasiPaginationByHasil(
+//            @PathVariable String hasilevaluasi,@PathVariable int offset, @PathVariable int pageSize) {
+//        Page<UserEvaResultDto> userEvaResultDtoPage = evaluasiService.showAllEvaluasiPaginationByHasil(hasilevaluasi, offset, pageSize);
+//        return ResponseEntity.ok(userEvaResultDtoPage);
+//    }
+//    @GetMapping("/hasilevaluasipaginationasctanggal/{offset}/{pageSize}")
+//    public ResponseEntity<List<UserEvaResultDto>> showAllEvaluationPaginationAscTanggal(@PathVariable int offset, @PathVariable int pageSize) {
+//        Page<UserEvaResultDto> userEvaResultDtoPage = evaluasiService.showAllEvaluationWithPaginationAscTanggal(offset, pageSize);
+//
+//        List<UserEvaResultDto> userEvaResultDtoList = userEvaResultDtoPage.getContent();
+//        HttpHeaders headers = new HttpHeaders();
+//        headers.add("X-Total-Count", String.valueOf(userEvaResultDtoPage.getTotalElements()));
+//
+//        return new ResponseEntity<>(userEvaResultDtoList, headers, HttpStatus.OK);
+//    }
+//    @GetMapping("/hasilevaluasipaginationdesctanggal/{offset}/{pageSize}")
+//    public ResponseEntity<List<UserEvaResultDto>> showAllEvaluationPaginationDescTanggal(@PathVariable int offset, @PathVariable int pageSize) {
+//        Page<UserEvaResultDto> userEvaResultDtoPage = evaluasiService.showAllEvaluationWithPaginationDescTanggal(offset, pageSize);
+//
+//        List<UserEvaResultDto> userEvaResultDtoList = userEvaResultDtoPage.getContent();
+//        HttpHeaders headers = new HttpHeaders();
+//        headers.add("X-Total-Count", String.valueOf(userEvaResultDtoPage.getTotalElements()));
+//
+//        return new ResponseEntity<>(userEvaResultDtoList, headers, HttpStatus.OK);
+//    }
 
 
 

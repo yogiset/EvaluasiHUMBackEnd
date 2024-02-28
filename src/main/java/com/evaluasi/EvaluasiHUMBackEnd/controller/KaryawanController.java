@@ -2,6 +2,7 @@ package com.evaluasi.EvaluasiHUMBackEnd.controller;
 
 
 import com.evaluasi.EvaluasiHUMBackEnd.dto.KaryawanDto;
+import com.evaluasi.EvaluasiHUMBackEnd.dto.PertanyaanJawabanDto;
 import com.evaluasi.EvaluasiHUMBackEnd.dto.RuleDto;
 import com.evaluasi.EvaluasiHUMBackEnd.exception.AllException;
 import com.evaluasi.EvaluasiHUMBackEnd.service.KaryawanService;
@@ -28,12 +29,6 @@ public class KaryawanController {
             ex.printStackTrace();
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
-    }
-
-
-    @GetMapping(path = "/all")
-    public List<KaryawanDto>showallkaryawan(){
-        return karyawanService.showall();
     }
 
     @GetMapping(path = "/findbyid/{id}")
@@ -63,41 +58,19 @@ public class KaryawanController {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
-
-    @GetMapping("/karyawanpagination/{offset}/{pageSize}")
-    public ResponseEntity<List<KaryawanDto>> showAllKaryawanPagination(@PathVariable int offset, @PathVariable int pageSize) {
-        Page<KaryawanDto> karyawanDtoPage = karyawanService.showAllKaryawanPagination(offset, pageSize);
-
-        List<KaryawanDto> karyawanDtoList = karyawanDtoPage.getContent();
-        HttpHeaders headers = new HttpHeaders();
-        headers.add("X-Total-Count", String.valueOf(karyawanDtoPage.getTotalElements()));
-
-        return new ResponseEntity<>(karyawanDtoList, headers, HttpStatus.OK);
-    }
-    @GetMapping("/karyawanpaginationbyjabatan/{jabatan}/{offset}/{pageSize}")
-    public ResponseEntity<Page<KaryawanDto>> showAllKaryawanPaginationByJabatan(
-            @PathVariable String jabatan,@PathVariable int offset, @PathVariable int pageSize) {
-        Page<KaryawanDto> karyawanDtoPage = karyawanService.showAllKaryawanPaginationByJabatan(jabatan, offset, pageSize);
+    // REQ => <url>/karyawan/showall?jabatan=Sales&page=1&limit=10
+    // OR => <url>/karyawan/showall
+    @GetMapping("/showall")
+    @ResponseBody
+    public ResponseEntity<Page<KaryawanDto>> showAllAndPaginationKaryawan(
+            @RequestParam(required = false) String jabatan, // => optional
+            @RequestParam(defaultValue = "desc") String order, // => optional
+            @RequestParam(name = "page", defaultValue = "1") int offset, // => optional
+            @RequestParam(name = "limit", defaultValue = "10") int pageSize // => optional
+    ) {
+        Page<KaryawanDto> karyawanDtoPage = karyawanService.showAllAndPaginationKaryawan(jabatan, order, offset, pageSize);
         return ResponseEntity.ok(karyawanDtoPage);
     }
-    @GetMapping("/karyawanpaginationascjabatan/{offset}/{pageSize}")
-    public ResponseEntity<List<KaryawanDto>> showAllKaryawanPaginationAscJabatan(@PathVariable int offset, @PathVariable int pageSize) {
-        Page<KaryawanDto> karyawanDtoPage = karyawanService.showAllKaryawanPaginationAscJabatan(offset, pageSize);
 
-        List<KaryawanDto> karyawanDtoList = karyawanDtoPage.getContent();
-        HttpHeaders headers = new HttpHeaders();
-        headers.add("X-Total-Count", String.valueOf(karyawanDtoPage.getTotalElements()));
 
-        return new ResponseEntity<>(karyawanDtoList, headers, HttpStatus.OK);
-    }
-    @GetMapping("/karyawanpaginationdescjabatan/{offset}/{pageSize}")
-    public ResponseEntity<List<KaryawanDto>> showAllKaryawanPaginationDescJabatan(@PathVariable int offset, @PathVariable int pageSize) {
-        Page<KaryawanDto> karyawanDtoPage = karyawanService.showAllKaryawanPaginationDescJabatan(offset, pageSize);
-
-        List<KaryawanDto> karyawanDtoList = karyawanDtoPage.getContent();
-        HttpHeaders headers = new HttpHeaders();
-        headers.add("X-Total-Count", String.valueOf(karyawanDtoPage.getTotalElements()));
-
-        return new ResponseEntity<>(karyawanDtoList, headers, HttpStatus.OK);
-    }
 }
