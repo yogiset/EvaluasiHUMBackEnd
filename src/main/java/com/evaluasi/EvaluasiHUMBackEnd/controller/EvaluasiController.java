@@ -50,7 +50,6 @@ public class EvaluasiController {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
-        HttpHeaders headers = new HttpHeaders();
     // REQ => <url>/evaluasi/showall?hasil=baik&page=1&limit=10
     // OR => <url>/evaluasi/showall?tanggal=2021-11-10&page=1&limit=10
     // OR => <url>/evaluasi/showall
