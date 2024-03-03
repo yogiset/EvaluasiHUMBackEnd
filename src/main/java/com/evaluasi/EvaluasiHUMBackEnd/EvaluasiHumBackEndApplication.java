@@ -64,8 +64,8 @@ public class EvaluasiHumBackEndApplication implements CommandLineRunner {
 			Karyawan regulerKaryawan = new Karyawan();
 
 			regulerUser.setKodeuser("USER");
-			regulerUser.setUsername("USER");
-			String rawPassword = "USER";
+			regulerUser.setUsername("TESTUSER");
+			String rawPassword = "TESTUSER";
 			String encodedPassword = passwordEncoder.encode(rawPassword);
 			regulerUser.setPassword(encodedPassword);
 			regulerUser.setRole("USER");

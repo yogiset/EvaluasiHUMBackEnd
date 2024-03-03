@@ -11,6 +11,7 @@ import java.time.LocalDate;
 @AllArgsConstructor
 public class UserEvaResultDto {
     private Long idkar;
+    private Long ideva;
     private String nik;
     private String nama;
     private String divisi;

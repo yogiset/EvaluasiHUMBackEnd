@@ -70,6 +70,7 @@ public class EvaluasiService {
                     EvaluasiDto evaluasiDto = new EvaluasiDto();
                     Karyawan karyawan = evaluasi.getKaryawan();
                     evaluasiDto.setNik(karyawan.getNik());
+                    evaluasiDto.setIdeva(evaluasi.getIdeva());
                     evaluasiDto.setKodeevaluasi(evaluasi.getKodeevaluasi());
                     evaluasiDto.setTanggalevaluasi(evaluasi.getTanggalevaluasi());
                     evaluasiDto.setHasilevaluasi(evaluasi.getHasilevaluasi());
@@ -148,6 +149,7 @@ public class EvaluasiService {
                     resultDto.setTanggalmasuk(karyawan.getTanggalmasuk());
                     resultDto.setMasakerja(karyawan.getMasakerja());
                     resultDto.setTingkatan(karyawan.getTingkatan());
+                    resultDto.setIdeva(evaluasi.getIdeva());
                     resultDto.setKodeevaluasi(evaluasi.getKodeevaluasi());
                     resultDto.setTanggalevaluasi(evaluasi.getTanggalevaluasi());
                     resultDto.setHasilevaluasi(evaluasi.getHasilevaluasi());
@@ -198,6 +200,7 @@ public class EvaluasiService {
         resultDto.setTanggalmasuk(karyawan.getTanggalmasuk());
         resultDto.setMasakerja(karyawan.getMasakerja());
         resultDto.setTingkatan(karyawan.getTingkatan());
+        resultDto.setIdeva(evaluasi.getIdeva());
         resultDto.setKodeevaluasi(evaluasi.getKodeevaluasi());
         resultDto.setTanggalevaluasi(evaluasi.getTanggalevaluasi());
         resultDto.setHasilevaluasi(evaluasi.getHasilevaluasi());
