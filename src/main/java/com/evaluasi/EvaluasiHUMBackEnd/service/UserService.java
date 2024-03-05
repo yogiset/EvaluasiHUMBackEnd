@@ -74,15 +74,24 @@ public class UserService {
         try {
             log.info("Inside edit user");
             Optional<User> optionalUser = userRepository.findById(id);
+            if (!optionalUser.isPresent()) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found for ID: " + id);
+            }
             User user = optionalUser.get();
 
             user.setKodeuser(userDto.getKodeuser());
             user.setUsername(userDto.getUsername());
+
             String rawPassword = userDto.getPassword();
-            String encodedPassword = passwordEncoder.encode(rawPassword);
-            user.setPassword(encodedPassword);
+            if (rawPassword == null || rawPassword.isEmpty()) {
+                rawPassword = user.getPassword();
+            } else {
+                String encodedPassword = passwordEncoder.encode(rawPassword);
+                user.setPassword(encodedPassword);
+            }
+
             user.setRole(userDto.getRole());
-            user.setStatus(userDto.getStatus());
+            user.setStatus(userDto.getStatus());;
             Karyawan karyawan = karyawanRepository.findByNik(userDto.getNik());
             if (karyawan == null) {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Karyawan not found for NIK: " + userDto.getNik());
