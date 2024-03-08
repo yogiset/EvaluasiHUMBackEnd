@@ -16,4 +16,6 @@ public class EvaluasiDto {
     private String hasilevaluasi;
     private String perluditingkatkan;
     private String nik;
+    private String nama;
+    private String jabatan;
 }
