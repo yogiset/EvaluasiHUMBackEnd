@@ -71,9 +71,9 @@ public class EvaluasiController {
         return evaluasiService.findByIdEva(id);
     }
 
-    @GetMapping("/findbyidkar/{id}")
+    @GetMapping("/findbyideva/{id}")
     public UserEvaResultDto findByIdkar(@PathVariable Long id) throws AllException {
-        return evaluasiService.findByIdKar(id);
+        return evaluasiService.findByIdHasilEva(id);
     }
 
     // REQ => <url>/evaluasi/showallevaluasikaryawan?hasil=baik&page=1&limit=10
