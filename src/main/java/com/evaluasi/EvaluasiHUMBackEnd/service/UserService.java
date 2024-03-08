@@ -154,7 +154,7 @@ public class UserService {
                     );
 
                     try {
-                        String jwtToken = jwtUtil.generateToken(user.getUsername(), user.getRole(), user.getIduser(), user.getKaryawan().getNik());
+                        String jwtToken = jwtUtil.generateToken(user.getUsername(), user.getRole(), user.getIduser(), user.getKaryawan().getNik(),user.getKaryawan().getIdkar());
                         return ResponseEntity.ok().body(Collections.singletonMap("token", jwtToken));
                     } catch (Exception e) {
                         return ResponseEntity.badRequest().body(Collections.singletonMap("message", "Token has expired. Please log in again."));
@@ -266,7 +266,7 @@ public class UserService {
 
     public ResponseEntity<Object> changeUsername(ChangeUsername changeUsername) {
         try {
-            log.info("Change password");
+            log.info("Change username");
             log.info("Received request with payload: {}", changeUsername);
 
             Long id = changeUsername.getId();
@@ -290,8 +290,8 @@ public class UserService {
                 return ResponseEntity.badRequest().body(Collections.singletonMap("error", "Token is null or empty"));
             }
         } catch (Exception ex) {
-            log.error("An error occurred while changing the password", ex);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Collections.singletonMap("error", "An error occurred while changing the password"));
+            log.error("An error occurred while changing the username", ex);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Collections.singletonMap("error", "An error occurred while changing the username"));
         }
     }
 
@@ -331,8 +331,6 @@ public class UserService {
         return new PageImpl<>(resultList, userPage.getPageable(), userPage.getTotalElements());
 
     }
-
-
 
 }
 

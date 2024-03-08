@@ -1,9 +1,11 @@
 package com.evaluasi.EvaluasiHUMBackEnd.service;
 
+import com.evaluasi.EvaluasiHUMBackEnd.dto.ChangeEmail;
 import com.evaluasi.EvaluasiHUMBackEnd.dto.KaryawanDto;
 import com.evaluasi.EvaluasiHUMBackEnd.dto.RuleDto;
 import com.evaluasi.EvaluasiHUMBackEnd.entity.Karyawan;
 import com.evaluasi.EvaluasiHUMBackEnd.entity.Rule;
+import com.evaluasi.EvaluasiHUMBackEnd.entity.User;
 import com.evaluasi.EvaluasiHUMBackEnd.exception.AllException;
 import com.evaluasi.EvaluasiHUMBackEnd.repository.KaryawanRepository;
 import lombok.RequiredArgsConstructor;
@@ -12,9 +14,11 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -174,5 +178,35 @@ public class KaryawanService {
     }
 
 
+    public ResponseEntity<Object> changeEmails(ChangeEmail changeEmail) {
+        try {
+            log.info("Change Emails");
+            log.info("Received request with payload: {}", changeEmail);
+
+            Long idkar = changeEmail.getIdkar();
+            if (idkar != null) {
+                Karyawan karyawan = karyawanRepository.findByIdkar(idkar);
+                if (karyawan != null) {
+                    String oldEmail = changeEmail.getOldemail();
+                    String newEmail = changeEmail.getNewemail();
+                    if (oldEmail.equals(karyawan.getEmail())) {
+                        karyawan.setEmail(newEmail);
+                        karyawanRepository.save(karyawan);
+                        return ResponseEntity.ok(Collections.singletonMap("message", "Email updated successfully"));
+                    } else {
+                        return ResponseEntity.badRequest().body(Collections.singletonMap("error", "Incorrect old email"));
+                    }
+                } else {
+                    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Collections.singletonMap("error", "Email not found"));
+                }
+            } else {
+                log.error("Token is null or empty");
+                return ResponseEntity.badRequest().body(Collections.singletonMap("error", "Token is null or empty"));
+            }
+        } catch (Exception ex) {
+            log.error("An error occurred while changing the email", ex);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Collections.singletonMap("error", "An error occurred while changing the email"));
+        }
+    }
 }
 

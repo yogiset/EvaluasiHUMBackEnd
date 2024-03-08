@@ -1,9 +1,7 @@
 package com.evaluasi.EvaluasiHUMBackEnd.controller;
 
 
-import com.evaluasi.EvaluasiHUMBackEnd.dto.KaryawanDto;
-import com.evaluasi.EvaluasiHUMBackEnd.dto.PertanyaanJawabanDto;
-import com.evaluasi.EvaluasiHUMBackEnd.dto.RuleDto;
+import com.evaluasi.EvaluasiHUMBackEnd.dto.*;
 import com.evaluasi.EvaluasiHUMBackEnd.exception.AllException;
 import com.evaluasi.EvaluasiHUMBackEnd.service.KaryawanService;
 import lombok.RequiredArgsConstructor;
@@ -72,5 +70,14 @@ public class KaryawanController {
         return ResponseEntity.ok(karyawanDtoPage);
     }
 
+    @PostMapping("/changeemail")
+    public ResponseEntity<Object>changeEmail(@RequestBody ChangeEmail changeEmail){
+        try {
+            return karyawanService.changeEmails(changeEmail);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
 
 }
