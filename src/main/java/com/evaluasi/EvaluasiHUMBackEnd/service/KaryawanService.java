@@ -36,6 +36,7 @@ public class KaryawanService {
                 karyawan.setNama(karyawanDto.getNama());
                 karyawan.setDivisi(karyawanDto.getDivisi());
                 karyawan.setJabatan(karyawanDto.getJabatan());
+                karyawan.setEmail(karyawanDto.getEmail());
                 karyawan.setTanggalmasuk(karyawanDto.getTanggalmasuk());
 
                 String masakerjaString = karyawan.getMasakerja();
@@ -75,6 +76,7 @@ public class KaryawanService {
             karyawan.setNama(karyawanDto.getNama());
             karyawan.setDivisi(karyawanDto.getDivisi());
             karyawan.setJabatan(karyawanDto.getJabatan());
+            karyawan.setEmail(karyawanDto.getEmail());
             karyawan.setTanggalmasuk(karyawanDto.getTanggalmasuk());
 
             String masakerjaString = karyawan.getMasakerja();
@@ -135,6 +137,7 @@ public class KaryawanService {
         karyawanDto.setNama(karyawan.getNama());
         karyawanDto.setDivisi(karyawan.getDivisi());
         karyawanDto.setJabatan(karyawan.getJabatan());
+        karyawanDto.setEmail(karyawan.getEmail());
         karyawanDto.setTanggalmasuk(karyawan.getTanggalmasuk());
         karyawanDto.setMasakerja(karyawan.getMasakerja());
         karyawanDto.setTingkatan(karyawan.getTingkatan());
@@ -158,6 +161,7 @@ public class KaryawanService {
                     karyawanDto.setNama(karyawan.getNama());
                     karyawanDto.setDivisi(karyawan.getDivisi());
                     karyawanDto.setJabatan(karyawan.getJabatan());
+                    karyawanDto.setEmail(karyawan.getEmail());
                     karyawanDto.setTanggalmasuk(karyawan.getTanggalmasuk());
                     karyawanDto.setMasakerja(karyawan.getMasakerja());
                     karyawanDto.setTingkatan(karyawan.getTingkatan());

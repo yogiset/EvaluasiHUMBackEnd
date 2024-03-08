@@ -27,6 +27,8 @@ public class Karyawan {
     private String nama;
     private String divisi;
     private String jabatan;
+    @Column(unique = true,nullable = false)
+    private String email;
     private LocalDate tanggalmasuk;
     private String masakerja;
     private String tingkatan;
@@ -39,7 +41,6 @@ public class Karyawan {
 
         return years + " Tahun, " + months + " Bulan, " + days + " Hari";
     }
-
 
     @OneToMany(mappedBy = "karyawan", cascade = CascadeType.ALL)
     private List<User> userList;

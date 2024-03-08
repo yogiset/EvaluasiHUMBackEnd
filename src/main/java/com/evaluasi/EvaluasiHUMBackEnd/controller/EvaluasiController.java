@@ -56,13 +56,14 @@ public class EvaluasiController {
     @GetMapping("/showall")
     @ResponseBody
     public ResponseEntity<Page<EvaluasiDto>> showAllAndPaginationEvaluasi(
+            @RequestParam(name = "nama",required = false) String nama,
             @RequestParam(name = "hasil",required = false) String hasilevaluasi, // => optional
             @RequestParam(name = "tanggal",required = false) LocalDate tanggalevaluasi,// => optional
             @RequestParam(defaultValue = "desc") String order, // => optional
             @RequestParam(name = "page", defaultValue = "1") int offset, // => optional
             @RequestParam(name = "limit", defaultValue = "10") int pageSize // => optional
     ) {
-        Page<EvaluasiDto> evaluasiDtoPage = evaluasiService.showAllAndPaginationEvaluasi(hasilevaluasi,tanggalevaluasi, order, offset, pageSize);
+        Page<EvaluasiDto> evaluasiDtoPage = evaluasiService.showAllAndPaginationEvaluasi(nama,hasilevaluasi,tanggalevaluasi, order, offset, pageSize);
         return ResponseEntity.ok(evaluasiDtoPage);
     }
 

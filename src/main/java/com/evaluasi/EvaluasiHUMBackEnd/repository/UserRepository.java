@@ -1,5 +1,6 @@
 package com.evaluasi.EvaluasiHUMBackEnd.repository;
 
+import com.evaluasi.EvaluasiHUMBackEnd.entity.Karyawan;
 import com.evaluasi.EvaluasiHUMBackEnd.entity.Rule;
 import com.evaluasi.EvaluasiHUMBackEnd.entity.User;
 import org.springframework.data.domain.Page;
@@ -26,6 +27,6 @@ public interface UserRepository extends JpaRepository<User,Long> {
 
     @Query("SELECT p FROM User p WHERE p.role = :role")
     Page<User> findByRole(String role, Pageable pageable);
-
+    Optional<User> findByKaryawan(Karyawan karyawan);
     boolean existsByUsername(String username);
 }

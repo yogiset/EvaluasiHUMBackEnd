@@ -50,6 +50,7 @@ public class EvaluasiHumBackEndApplication implements CommandLineRunner {
 			karyawan.setNama("SUPERADMIN");
 			karyawan.setDivisi("SUPERADMIN");
 			karyawan.setJabatan("SUPERADMIN");
+			karyawan.setEmail("SUPERADMIN@hum.com");
 			LocalDate tanggal = LocalDate.of(1, 1, 1);
 			karyawan.setTanggalmasuk(tanggal);
 			karyawan.setTingkatan("HighestAdministrator");
@@ -75,6 +76,7 @@ public class EvaluasiHumBackEndApplication implements CommandLineRunner {
 			regulerKaryawan.setNama("USER");
 			regulerKaryawan.setDivisi("USER");
 			regulerKaryawan.setJabatan("USER");
+			regulerKaryawan.setEmail("USER@hum.com");
 			LocalDate tanggal = LocalDate.of(1, 1, 1);
 			regulerKaryawan.setTanggalmasuk(tanggal);
 			regulerKaryawan.setTingkatan("USER");

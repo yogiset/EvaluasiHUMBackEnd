@@ -54,24 +54,30 @@ public class EvaluasiService {
 
     }
 
-    public Page<EvaluasiDto> showAllAndPaginationEvaluasi(String hasilevaluasi, LocalDate tanggalevaluasi, String order, int offset, int pageSize) {
+    public Page<EvaluasiDto> showAllAndPaginationEvaluasi(String nama, String hasilevaluasi, LocalDate tanggalevaluasi, String order, int offset, int pageSize) {
         log.info("Inside showAllAndPaginationEvaluasi");
-        Page<Evaluasi>evaluasiPage;
-        if (hasilevaluasi == null || tanggalevaluasi == null) {
-            evaluasiPage = evaluasiRepository.findAll(PageRequest.of(offset - 1, pageSize,  "desc".equals(order) ? Sort.by("ideva").descending() : Sort.by("ideva").ascending()));
-        }else if(tanggalevaluasi != null){
+        Page<Evaluasi> evaluasiPage;
+
+        if (nama != null && hasilevaluasi != null) {
+            evaluasiPage = evaluasiRepository.findByKaryawanNamaContainingIgnoreCaseAndHasilevaluasi(nama, hasilevaluasi, PageRequest.of(offset - 1, pageSize, "desc".equals(order) ? Sort.by("ideva").descending() : Sort.by("ideva").ascending()));
+        } else if (nama != null) {
+            evaluasiPage = evaluasiRepository.findByKaryawanNamaContainingIgnoreCase(nama, PageRequest.of(offset - 1, pageSize, "desc".equals(order) ? Sort.by("ideva").descending() : Sort.by("ideva").ascending()));
+        } else if (hasilevaluasi != null) {
+            evaluasiPage = evaluasiRepository.findByHasilEvaluasi(hasilevaluasi, PageRequest.of(offset - 1, pageSize, "desc".equals(order) ? Sort.by("ideva").descending() : Sort.by("ideva").ascending()));
+        } else if(tanggalevaluasi != null){
             evaluasiPage = evaluasiRepository.findByTanggalEvaluasi(tanggalevaluasi,PageRequest.of(offset - 1,pageSize, "desc".equals(order) ? Sort.by("ideva").descending() : Sort.by("ideva").ascending()));
         } else {
-            evaluasiPage = evaluasiRepository.findByHasilEvaluasi(hasilevaluasi,PageRequest.of(offset - 1,pageSize, "desc".equals(order) ? Sort.by("ideva").descending() : Sort.by("ideva").ascending()));
+            evaluasiPage = evaluasiRepository.findAll(PageRequest.of(offset - 1, pageSize, "desc".equals(order) ? Sort.by("ideva").descending() : Sort.by("ideva").ascending()));
         }
 
-                List<EvaluasiDto> resultList = evaluasiPage.getContent().stream()
+        List<EvaluasiDto> resultList = evaluasiPage.getContent().stream()
                 .map(evaluasi -> {
                     EvaluasiDto evaluasiDto = new EvaluasiDto();
                     Karyawan karyawan = evaluasi.getKaryawan();
                     evaluasiDto.setNik(karyawan.getNik());
                     evaluasiDto.setNama(karyawan.getNama());
                     evaluasiDto.setJabatan(karyawan.getJabatan());
+                    evaluasiDto.setEmail(karyawan.getEmail());
                     evaluasiDto.setIdeva(evaluasi.getIdeva());
                     evaluasiDto.setKodeevaluasi(evaluasi.getKodeevaluasi());
                     evaluasiDto.setTanggalevaluasi(evaluasi.getTanggalevaluasi());
@@ -82,8 +88,8 @@ public class EvaluasiService {
                 .collect(Collectors.toList());
 
         return new PageImpl<>(resultList, evaluasiPage.getPageable(), evaluasiPage.getTotalElements());
-
     }
+
 
 
 
@@ -148,6 +154,7 @@ public class EvaluasiService {
                     resultDto.setNama(karyawan.getNama());
                     resultDto.setDivisi(karyawan.getDivisi());
                     resultDto.setJabatan(karyawan.getJabatan());
+                    resultDto.setEmail(karyawan.getEmail());
                     resultDto.setTanggalmasuk(karyawan.getTanggalmasuk());
                     resultDto.setMasakerja(karyawan.getMasakerja());
                     resultDto.setTingkatan(karyawan.getTingkatan());
@@ -182,6 +189,7 @@ public class EvaluasiService {
         }
         evaluasiDto.setNama(karyawan.getNama());
         evaluasiDto.setJabatan(karyawan.getJabatan());
+        evaluasiDto.setEmail(karyawan.getEmail());
 
         return  evaluasiDto;
     }
@@ -198,6 +206,7 @@ public class EvaluasiService {
         resultDto.setNama(karyawan.getNama());
         resultDto.setDivisi(karyawan.getDivisi());
         resultDto.setJabatan(karyawan.getJabatan());
+        resultDto.setEmail(karyawan.getEmail());
         resultDto.setTanggalmasuk(karyawan.getTanggalmasuk());
         resultDto.setMasakerja(karyawan.getMasakerja());
         resultDto.setTingkatan(karyawan.getTingkatan());

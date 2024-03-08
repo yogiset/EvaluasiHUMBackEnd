@@ -18,4 +18,5 @@ public class EvaluasiDto {
     private String nik;
     private String nama;
     private String jabatan;
+    private String email;
 }

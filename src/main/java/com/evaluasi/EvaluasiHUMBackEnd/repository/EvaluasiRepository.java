@@ -16,6 +16,8 @@ import java.util.Optional;
 public interface EvaluasiRepository extends JpaRepository<Evaluasi,Long> {
 
     Evaluasi findByKodeevaluasi(String kodeevaluasi);
+    Page<Evaluasi> findByKaryawanNamaContainingIgnoreCaseAndHasilevaluasi(String nama, String hasilevaluasi, Pageable pageable);
+    Page<Evaluasi> findByKaryawanNamaContainingIgnoreCase(String nama, Pageable pageable);
     @Query("SELECT p FROM Evaluasi p WHERE p.hasilevaluasi = :hasilevaluasi")
     Page<Evaluasi> findByHasilEvaluasi(String hasilevaluasi, Pageable pageable);
 

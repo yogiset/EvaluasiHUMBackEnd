@@ -127,22 +127,34 @@ public class UserService {
     public ResponseEntity<Object> login(AuthResponse authResponse) {
         try {
             log.info("Inside login");
-            String username = authResponse.getUsername();
+            String identifier = authResponse.getUsername();
             String password = authResponse.getPassword();
 
-            Optional<User> userOpt = userRepository.findByUsername(username);
+            boolean isEmail = isValidEmail(identifier);
+
+            Optional<User> userOpt = Optional.empty();
+            if (isEmail) {
+                Optional<Karyawan> karyawanOptional = karyawanRepository.findByEmail(identifier);
+                if (karyawanOptional.isPresent()) {
+                    Karyawan karyawan = karyawanOptional.get();
+                    userOpt = userRepository.findByKaryawan(karyawan);
+                }
+            } else {
+                userOpt = userRepository.findByUsername(identifier);
+            }
+
             if (userOpt.isPresent()) {
                 User user = userOpt.get();
 
                 if (user.getStatus()) {
                     authenticationManager.authenticate(
                             new UsernamePasswordAuthenticationToken(
-                                    username, password
+                                    user.getUsername(), password
                             )
                     );
 
                     try {
-                        String jwtToken = jwtUtil.generateToken(user.getUsername(), user.getRole(), user.getIduser(),user.getKaryawan().getNik());
+                        String jwtToken = jwtUtil.generateToken(user.getUsername(), user.getRole(), user.getIduser(), user.getKaryawan().getNik());
                         return ResponseEntity.ok().body(Collections.singletonMap("token", jwtToken));
                     } catch (Exception e) {
                         return ResponseEntity.badRequest().body(Collections.singletonMap("message", "Token has expired. Please log in again."));
@@ -151,12 +163,15 @@ public class UserService {
                     return ResponseEntity.badRequest().body(Collections.singletonMap("message", "Please ask Admin/HRD to activate your account."));
                 }
             } else {
-                return ResponseEntity.badRequest().body(Collections.singletonMap("message", "Our system didn't find your username. Please contact Admin/HRD."));
+                return ResponseEntity.badRequest().body(Collections.singletonMap("message", "Our system didn't find your username or email. Please contact Admin/HRD."));
             }
         } catch (Exception ex) {
             log.error("Exception during login", ex);
             return ResponseEntity.badRequest().body(Collections.singletonMap("message", "Bad Credentials. Please check your username or password"));
         }
+    }
+    private boolean isValidEmail(String email) {
+        return email.contains("@");
     }
 
     public UserEvaResultDto getUserEvaResultByUsername(String username,UserEvaResultDto userEvaResultDtoo,AuthResponse authResponse) {

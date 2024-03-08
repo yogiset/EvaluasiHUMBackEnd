@@ -16,6 +16,7 @@ public class UserEvaResultDto {
     private String nama;
     private String divisi;
     private String jabatan;
+    private String email;
     private LocalDate tanggalmasuk;
     private String masakerja;
     private String tingkatan;

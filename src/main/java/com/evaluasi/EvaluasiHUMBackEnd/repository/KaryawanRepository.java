@@ -15,11 +15,11 @@ public interface KaryawanRepository extends JpaRepository<Karyawan,Long> {
 
     Karyawan findByNik(String nik);
     Karyawan findByIdkar(Long idkar);
-
     Karyawan findByJabatan(String jabatan);
 
     @Query("SELECT p FROM Karyawan p WHERE p.jabatan = :jabatan")
     Page<Karyawan> findByJabatan(String jabatan, Pageable pageable);
     Optional<Karyawan> findByNama(String nama);
+    Optional<Karyawan>findByEmail(String email);
 
 }
