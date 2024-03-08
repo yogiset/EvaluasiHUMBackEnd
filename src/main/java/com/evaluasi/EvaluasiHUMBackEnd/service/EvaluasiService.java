@@ -70,6 +70,8 @@ public class EvaluasiService {
                     EvaluasiDto evaluasiDto = new EvaluasiDto();
                     Karyawan karyawan = evaluasi.getKaryawan();
                     evaluasiDto.setNik(karyawan.getNik());
+                    evaluasiDto.setNama(karyawan.getNama());
+                    evaluasiDto.setJabatan(karyawan.getJabatan());
                     evaluasiDto.setIdeva(evaluasi.getIdeva());
                     evaluasiDto.setKodeevaluasi(evaluasi.getKodeevaluasi());
                     evaluasiDto.setTanggalevaluasi(evaluasi.getTanggalevaluasi());
@@ -167,11 +169,8 @@ public class EvaluasiService {
         log.info("inside findbyideva");
         Evaluasi evaluasi = evaluasiRepository.findById(id).orElseThrow(() -> new AllException("Evaluasi with id " + id + " not found"));
 
-        return mapEvaluasiToEvaluasiDto(evaluasi);
-    }
-
-    public EvaluasiDto mapEvaluasiToEvaluasiDto(Evaluasi evaluasi){
         EvaluasiDto evaluasiDto = new EvaluasiDto();
+        Karyawan karyawan = evaluasi.getKaryawan();
         evaluasiDto.setIdeva(evaluasi.getIdeva());
         evaluasiDto.setKodeevaluasi(evaluasi.getKodeevaluasi());
         evaluasiDto.setTanggalevaluasi(evaluasi.getTanggalevaluasi());
@@ -181,14 +180,16 @@ public class EvaluasiService {
         if(evaluasi.getKaryawan() != null){
             evaluasiDto.setNik(evaluasi.getKaryawan().getNik());
         }
+        evaluasiDto.setNama(karyawan.getNama());
+        evaluasiDto.setJabatan(karyawan.getJabatan());
 
         return  evaluasiDto;
     }
 
-    public UserEvaResultDto findByIdKar(Long id) throws AllException {
+    public UserEvaResultDto findByIdHasilEva(Long id) throws AllException {
         log.info("inside findbyidkar");
-        Evaluasi evaluasi = evaluasiRepository.findByIdkar(id)
-                .orElseThrow(() -> new AllException("Hasil Evaluasi with idkar " + id + " not found"));
+        Evaluasi evaluasi = evaluasiRepository.findById(id)
+                .orElseThrow(() -> new AllException("Hasil Evaluasi with id evaluation " + id + " not found"));
 
         UserEvaResultDto resultDto = new UserEvaResultDto();
         Karyawan karyawan = evaluasi.getKaryawan();
