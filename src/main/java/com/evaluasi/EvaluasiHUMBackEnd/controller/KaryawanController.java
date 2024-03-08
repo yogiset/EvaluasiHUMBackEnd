@@ -22,9 +22,9 @@ public class KaryawanController {
     private final KaryawanService karyawanService;
 
     @PostMapping(path = "/addkaryawan")
-    public ResponseEntity<Object> addkaryawan(@RequestBody KaryawanDto karyawanDto) {
+    public ResponseEntity<Object> addkaryawan(@RequestBody KaryawanDto karyawanDto,String nik) {
         try {
-            return karyawanService.addkaryawan(karyawanDto);
+            return karyawanService.addkaryawan(karyawanDto,nik);
         } catch (Exception ex) {
             ex.printStackTrace();
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);

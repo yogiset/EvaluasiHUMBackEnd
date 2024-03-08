@@ -25,33 +25,40 @@ import java.util.stream.Collectors;
 public class KaryawanService {
 
     private final KaryawanRepository karyawanRepository;
-    public ResponseEntity<Object> addkaryawan(KaryawanDto karyawanDto) {
+    public ResponseEntity<Object> addkaryawan(KaryawanDto karyawanDto,String nik) {
         log.info("inside add",karyawanDto);
         try{
-            Karyawan karyawan = new Karyawan();
-            karyawan.setNik(karyawanDto.getNik());
-            karyawan.setNama(karyawanDto.getNama());
-            karyawan.setDivisi(karyawanDto.getDivisi());
-            karyawan.setJabatan(karyawanDto.getJabatan());
-            karyawan.setTanggalmasuk(karyawanDto.getTanggalmasuk());
+            Karyawan opKaryawan = karyawanRepository.findByNik(nik);
 
-            String masakerjaString = karyawan.getMasakerja();
-            String[] masakerjaParts = masakerjaString.split(" ");
-            int years = Integer.parseInt(masakerjaParts[0]);
+            if (opKaryawan == null) {
+                Karyawan karyawan = new Karyawan();
+                karyawan.setNik(karyawanDto.getNik());
+                karyawan.setNama(karyawanDto.getNama());
+                karyawan.setDivisi(karyawanDto.getDivisi());
+                karyawan.setJabatan(karyawanDto.getJabatan());
+                karyawan.setTanggalmasuk(karyawanDto.getTanggalmasuk());
 
-            String tingkat;
-            if(years == 0){
-                tingkat = "Trial/Kontrak";
-            }else if (years < 5) {
-                tingkat = "Junior";
+                String masakerjaString = karyawan.getMasakerja();
+                String[] masakerjaParts = masakerjaString.split(" ");
+                int years = Integer.parseInt(masakerjaParts[0]);
+
+                String tingkat;
+                if(years == 0){
+                    tingkat = "Trial/Kontrak";
+                }else if (years < 5) {
+                    tingkat = "Junior";
+                } else {
+                    tingkat = "Senior";
+                }
+                karyawan.setTingkatan(tingkat);
+
+                karyawanRepository.save(karyawan);
+
+                return ResponseEntity.ok("New karyawan added successfully");
             } else {
-                tingkat = "Senior";
+                return ResponseEntity.status(404).body("Karyawan with "+nik+" is exist");
             }
-            karyawan.setTingkatan(tingkat);
 
-            karyawanRepository.save(karyawan);
-
-            return ResponseEntity.ok("New karyawan added successfully");
         } catch (Exception e) {
             log.error("Error creating new karyawan", e);
             return ResponseEntity.status(500).body("Error creating new karyawan");
