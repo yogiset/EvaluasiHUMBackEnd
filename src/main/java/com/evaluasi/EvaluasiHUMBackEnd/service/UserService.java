@@ -39,6 +39,10 @@ public class UserService {
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
 
+    public long getTotalUsers() {
+        log.info("Inside getTotalUsers");
+        return userRepository.count();
+    }
 
     public ResponseEntity<Object> createAccount(UserDto userDto) {
         try {

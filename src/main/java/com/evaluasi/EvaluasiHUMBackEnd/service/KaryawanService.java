@@ -29,6 +29,11 @@ import java.util.stream.Collectors;
 public class KaryawanService {
 
     private final KaryawanRepository karyawanRepository;
+
+    public Long getTotalKaryawan(){
+        log.info("Inside getTotalKaryawan");
+        return karyawanRepository.count();
+    }
     public ResponseEntity<Object> addkaryawan(KaryawanDto karyawanDto,String nik) {
         log.info("inside add",karyawanDto);
         try{

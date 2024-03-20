@@ -7,6 +7,8 @@ import com.evaluasi.EvaluasiHUMBackEnd.entity.Karyawan;
 import com.evaluasi.EvaluasiHUMBackEnd.exception.AllException;
 import com.evaluasi.EvaluasiHUMBackEnd.repository.EvaluasiRepository;
 import com.evaluasi.EvaluasiHUMBackEnd.repository.KaryawanRepository;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.TypedQuery;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -28,6 +30,53 @@ import java.util.stream.Collectors;
 public class EvaluasiService {
     private final EvaluasiRepository evaluasiRepository;
     private final KaryawanRepository karyawanRepository;
+    private final EntityManager entityManager;
+
+    public List<LocalDate> getUniqueTanggalEvaluasiByHasilEvaluasi(String hasilevaluasi) {
+        TypedQuery<LocalDate> query = entityManager.createQuery(
+                "SELECT DISTINCT e.tanggalevaluasi FROM Evaluasi e WHERE e.hasilevaluasi = :hasilevaluasi",
+                LocalDate.class
+        );
+        query.setParameter("hasilevaluasi", hasilevaluasi);
+        return query.getResultList();
+    }
+
+    public long getCountForHasilAndTanggalEvaluasi(String hasilevaluasi, LocalDate tanggalevaluasi) {
+        TypedQuery<Long> query = entityManager.createQuery(
+                "SELECT COUNT(e) FROM Evaluasi e WHERE e.hasilevaluasi = :hasilevaluasi AND e.tanggalevaluasi = :tanggalevaluasi",
+                Long.class
+        );
+        query.setParameter("hasilevaluasi", hasilevaluasi);
+        query.setParameter("tanggalevaluasi", tanggalevaluasi);
+        return query.getSingleResult();
+    }
+    public Long getTotalEvaluasi(){
+        log.info("Inside getTotalEvaluasi");
+        return evaluasiRepository.count();
+    }
+    public List<String> getUniqueHasilEvaluasi() {
+        // Fetch all Evaluasi entities from the repository
+        List<Evaluasi> evaluasiList = evaluasiRepository.findAll();
+
+        // Extract unique values of hasilevaluasi from the list of Evaluasi entities
+        List<String> uniqueHasilEvaluasi = evaluasiList.stream()
+                .map(Evaluasi::getHasilevaluasi)
+                .distinct()
+                .collect(Collectors.toList());
+
+        return uniqueHasilEvaluasi;
+    }
+
+    public List<LocalDate> getUniqueTanggalEvaluasi() {
+        List<Evaluasi> evaluasiList = evaluasiRepository.findAll();
+
+        List<LocalDate> uniqueTanggalEvaluasi = evaluasiList.stream()
+                .map(Evaluasi::getTanggalevaluasi)
+                .distinct()
+                .collect(Collectors.toList());
+
+        return uniqueTanggalEvaluasi;
+    }
 
     public ResponseEntity<Object> addEvaluasi(EvaluasiDto evaluasiDto) {
         try{
