@@ -8,10 +8,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
@@ -38,20 +35,25 @@ public class APIResponseBuilder {
         apiResponse.put("totalEvaluasi", totalEvaluasi);
 
         List<String> labels = evaluasiService.getUniqueHasilEvaluasi();
-        String[] colors = {"#1bfe15", "#faf53b", "#e40b2b"};  // Add more colors if needed
+        String[] staticColors = {"#1bfe15", "#faf53b", "#e40b2b"};  // Add more colors if needed
+        String[] dynamicColors = generateColors(labels.size());
+        // Combine static and dynamic colors
+        String[] colors = new String[staticColors.length + dynamicColors.length];
+        System.arraycopy(staticColors, 0, colors, 0, staticColors.length);
+        System.arraycopy(dynamicColors, 0, colors, staticColors.length, dynamicColors.length);
 
         List<Map<String, Object>> dataChart = new ArrayList<>();
         int dataIndex = 1; // Counter for unique data key
         for (String label : labels) {
             Map<String, Object> chartData = new HashMap<>();
-            chartData.put("Hasil Evaluasi", label);
+            chartData.put("label", label);
 
             List<Map<String, Object>> data = new ArrayList<>(); // Separate data for each Hasil Evaluasi
             List<LocalDate> uniqueTanggalEvaluasi = evaluasiService.getUniqueTanggalEvaluasiByHasilEvaluasi(label);
             for (LocalDate tanggalEvaluasi : uniqueTanggalEvaluasi) {
                 int count = (int) evaluasiService.getCountForHasilAndTanggalEvaluasi(label, tanggalEvaluasi); // Adjust this method according to your data access logic
                 Map<String, Object> dataPoint = new HashMap<>();
-                dataPoint.put("Tanggal Evaluasi", DateTimeFormatter.ISO_DATE.format(tanggalEvaluasi));
+                dataPoint.put("primary", DateTimeFormatter.ISO_DATE.format(tanggalEvaluasi));
                 dataPoint.put("result", count);
                 data.add(dataPoint);
             }
@@ -63,6 +65,7 @@ public class APIResponseBuilder {
                 currentResult += count; // Summing up counts for current Hasil Evaluasi
             }
             chartData.put("currentResult", currentResult);
+            chartData.put("color", colors[dataIndex - 1]);
 
             dataChart.add(chartData);
 
@@ -71,6 +74,18 @@ public class APIResponseBuilder {
         apiResponse.put("dataChart", dataChart);
 
         return apiResponse;
+    }
+
+    private String[] generateColors(int numberOfColors) {
+        String[] colors = new String[numberOfColors];
+        Random rand = new Random();
+        for (int i = 0; i < numberOfColors; i++) {
+            int r = rand.nextInt(256);
+            int g = rand.nextInt(256);
+            int b = rand.nextInt(256);
+            colors[i] = String.format("#%02x%02x%02x", r, g, b);
+        }
+        return colors;
     }
 }
 
