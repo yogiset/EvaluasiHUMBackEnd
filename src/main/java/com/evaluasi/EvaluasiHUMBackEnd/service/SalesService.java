@@ -46,6 +46,8 @@ public class SalesService {
             sales.setKaryawan(karyawan);
             sales.setTarget(salesDto.getTarget());
             sales.setTahun(salesDto.getTahun());
+            sales.setTercapai(salesDto.getTercapai());
+            sales.setTercapaipersen(salesDto.getTercapaipersen());
 
             salesRepository.save(sales);
 
@@ -55,6 +57,8 @@ public class SalesService {
                     SalesDetail salesDetail = new SalesDetail();
                     salesDetail.setBulan(salesDetailDto.getBulan());
                     salesDetail.setTargetbln(salesDetailDto.getTargetbln());
+                    salesDetail.setTercapaii(salesDetailDto.getTercapaii());
+                    salesDetail.setTercapaipersenn(salesDetailDto.getTercapaipersenn());
                     salesDetail.setSales(sales);
                     salesDetailRepository.save(salesDetail);
                 }
@@ -78,6 +82,8 @@ public class SalesService {
             Sales sales = optionalSales.get();
             sales.setTarget(salesDto.getTarget());
             sales.setTahun(salesDto.getTahun());
+            sales.setTercapai(salesDto.getTercapai());
+            sales.setTercapaipersen(salesDto.getTercapaipersen());
 
             salesRepository.save(sales);
 
@@ -90,12 +96,16 @@ public class SalesService {
                         SalesDetail salesDetail = optionalSalesDetail.get();
                         salesDetail.setBulan(salesDetailDto.getBulan());
                         salesDetail.setTargetbln(salesDetailDto.getTargetbln());
+                        salesDetail.setTercapaii(salesDetailDto.getTercapaii());
+                        salesDetail.setTercapaipersenn(salesDetailDto.getTercapaipersenn());
                         salesDetailRepository.save(salesDetail);
                     } else {
                         // If SalesDetail with the given ID doesn't exist, create new SalesDetail
                         SalesDetail salesDetail = new SalesDetail();
                         salesDetail.setBulan(salesDetailDto.getBulan());
                         salesDetail.setTargetbln(salesDetailDto.getTargetbln());
+                        salesDetail.setTercapaii(salesDetailDto.getTercapaii());
+                        salesDetail.setTercapaipersenn(salesDetailDto.getTercapaipersenn());
                         salesDetail.setSales(sales);
                         salesDetailRepository.save(salesDetail);
                     }
@@ -151,6 +161,8 @@ public class SalesService {
                     salesDto.setNama(karyawan.getNama());
                     salesDto.setTarget(sales.getTarget());
                     salesDto.setTahun(sales.getTahun());
+                    salesDto.setTercapai(sales.getTercapai());
+                    salesDto.setTercapaipersen(sales.getTercapaipersen());
 
                     // Map SalesDetail information
                     List<SalesDetailDto> salesDetailDtoList = sales.getSalesDetails().stream()
@@ -159,6 +171,8 @@ public class SalesService {
                                 salesDetailDto.setId(saless.getId());
                                 salesDetailDto.setBulan(saless.getBulan());
                                 salesDetailDto.setTargetbln(saless.getTargetbln());
+                                salesDetailDto.setTercapaii(saless.getTercapaii());
+                                salesDetailDto.setTercapaipersenn(saless.getTercapaipersenn());
                                 salesDetailDto.setIdsales(saless.getSales().getIdsales());
                                 return salesDetailDto;
                             })
@@ -183,6 +197,8 @@ public class SalesService {
             salesDto.setNama(karyawan.getNama());
             salesDto.setTarget(sales.getTarget());
             salesDto.setTahun(sales.getTahun());
+            salesDto.setTercapai(sales.getTercapai());
+            salesDto.setTercapaipersen(sales.getTercapaipersen());
 
         List<SalesDetailDto> salesDetailDtoList = sales.getSalesDetails().stream()
                 .map(saless -> {
@@ -190,6 +206,8 @@ public class SalesService {
                     salesDetailDto.setId(saless.getId());
                     salesDetailDto.setBulan(saless.getBulan());
                     salesDetailDto.setTargetbln(saless.getTargetbln());
+                    salesDetailDto.setTercapaii(saless.getTercapaii());
+                    salesDetailDto.setTercapaipersenn(saless.getTercapaipersenn());
                     salesDetailDto.setIdsales(saless.getSales().getIdsales());
                     return salesDetailDto;
                 })

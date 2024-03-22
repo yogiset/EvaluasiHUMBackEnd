@@ -20,6 +20,8 @@ public class Sales {
     private Long idsales;
     private Integer target;
     private Integer tahun;
+    private Integer tercapai;
+    private String tercapaipersen;
 
     @OneToMany(mappedBy = "sales",cascade = CascadeType.ALL)
     private List<SalesDetail>salesDetails;

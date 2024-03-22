@@ -15,5 +15,7 @@ public class SalesDto {
     private String nama;
     private Integer target;
     private Integer tahun;
+    private Integer tercapai;
+    private String tercapaipersen;
     private List<SalesDetailDto> salesDetailDtoList;
 }

@@ -18,6 +18,8 @@ public class SalesDetail {
     private Long id;
     private String bulan;
     private Integer targetbln;
+    private Integer tercapaii;
+    private String tercapaipersenn;
 
     @ManyToOne(cascade = CascadeType.PERSIST)
     @JoinColumn(name = "idsales", nullable = false)
