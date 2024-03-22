@@ -6,6 +6,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @Data
 @Entity
 @AllArgsConstructor
@@ -19,7 +21,11 @@ public class Sales {
     private Integer target;
     private Integer tahun;
 
+    @OneToMany(mappedBy = "sales",cascade = CascadeType.ALL)
+    private List<SalesDetail>salesDetails;
+
     @ManyToOne(cascade = CascadeType.PERSIST)
     @JoinColumn(name = "nik", nullable = false)
     private Karyawan karyawan;
 }
+

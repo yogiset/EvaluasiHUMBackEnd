@@ -4,16 +4,12 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.List;
-
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class SalesDto {
+public class SalesDetailDto {
+    private Long id;
+    private String bulan;
+    private Integer targetbln;
     private Long idsales;
-    private String nik;
-    private String nama;
-    private Integer target;
-    private Integer tahun;
-    private List<SalesDetailDto> salesDetailDtoList;
 }

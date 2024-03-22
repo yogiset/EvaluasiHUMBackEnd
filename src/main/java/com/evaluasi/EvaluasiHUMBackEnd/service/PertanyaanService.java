@@ -191,7 +191,6 @@ public class PertanyaanService {
                 return ResponseEntity.notFound().build();
             }
 
-
             Optional<Pertanyaan> optionalPertanyaan = pertanyaanRepository.findById(id);
             if (optionalPertanyaan.isPresent()) {
                 Pertanyaan pertanyaan = optionalPertanyaan.get();

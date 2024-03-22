@@ -1,12 +1,15 @@
 package com.evaluasi.EvaluasiHUMBackEnd.service;
 
+import com.evaluasi.EvaluasiHUMBackEnd.dto.SalesDetailDto;
 import com.evaluasi.EvaluasiHUMBackEnd.dto.SalesDto;
 import com.evaluasi.EvaluasiHUMBackEnd.dto.UserDto;
 import com.evaluasi.EvaluasiHUMBackEnd.entity.Karyawan;
 import com.evaluasi.EvaluasiHUMBackEnd.entity.Sales;
+import com.evaluasi.EvaluasiHUMBackEnd.entity.SalesDetail;
 import com.evaluasi.EvaluasiHUMBackEnd.entity.User;
 import com.evaluasi.EvaluasiHUMBackEnd.exception.AllException;
 import com.evaluasi.EvaluasiHUMBackEnd.repository.KaryawanRepository;
+import com.evaluasi.EvaluasiHUMBackEnd.repository.SalesDetailRepository;
 import com.evaluasi.EvaluasiHUMBackEnd.repository.SalesRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -19,6 +22,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -29,6 +33,7 @@ import java.util.stream.Collectors;
 public class SalesService {
     private final SalesRepository salesRepository;
     private final KaryawanRepository karyawanRepository;
+    private final SalesDetailRepository salesDetailRepository;
 
 
     public ResponseEntity<Object> createSales(SalesDto salesDto, String nik) {
@@ -44,6 +49,15 @@ public class SalesService {
             sales.setTahun(salesDto.getTahun());
 
             salesRepository.save(sales);
+
+                for (SalesDetailDto salesDetailDto : salesDto.getSalesDetailDtoList()) {
+                    SalesDetail salesDetail = new SalesDetail();
+                    salesDetail.setBulan(salesDetailDto.getBulan());
+                    salesDetail.setTargetbln(salesDetailDto.getTargetbln());
+                    salesDetail.setSales(sales);
+                    salesDetailRepository.save(salesDetail);
+                }
+
 
             return ResponseEntity.ok("New data Sales added successfully");
 
@@ -66,6 +80,18 @@ public class SalesService {
             sales.setTahun(salesDto.getTahun());
 
             salesRepository.save(sales);
+
+            for (SalesDetailDto salesDetailDto : salesDto.getSalesDetailDtoList()) {
+                Optional<SalesDetail>optionalSalesDetail = salesDetailRepository.findById(salesDetailDto.getId());
+                if (optionalSalesDetail.isPresent()){
+                    SalesDetail salesDetail = optionalSalesDetail.get();
+                    salesDetail.setBulan(salesDetailDto.getBulan());
+                    salesDetail.setTargetbln(salesDetailDto.getTargetbln());
+                    salesDetailRepository.save(salesDetail);
+                } else {
+                    return ResponseEntity.notFound().build();
+                }
+            }
             return ResponseEntity.ok("Data Sales edited successfully");
         } catch (Exception e) {
             log.error("Error edited data sales", e);
@@ -93,15 +119,15 @@ public class SalesService {
 
     public Page<SalesDto> showAllAndPaginationSales(Integer target, Integer tahun, String order, int offset, int pageSize) {
         log.info("Inside showAllAndPaginationSales");
-        Page<Sales>salesPage;
+        Page<Sales> salesPage;
         if (target != null && tahun != null) {
-            salesPage = salesRepository.findByTahunAndTarget(tahun,target,PageRequest.of(offset - 1, pageSize,  "desc".equals(order) ? Sort.by("idsales").descending() : Sort.by("idsales").ascending()));
-        } else if(target != null) {
-            salesPage = salesRepository.findByTarget(target,PageRequest.of(offset - 1,pageSize, "desc".equals(order) ? Sort.by("idsales").descending() : Sort.by("idsales").ascending()));
-        } else if(tahun != null) {
-            salesPage = salesRepository.findByTahun(tahun,PageRequest.of(offset - 1,pageSize, "desc".equals(order) ? Sort.by("idsales").descending() : Sort.by("idsales").ascending()));
-        }else {
-            salesPage = salesRepository.findAll(PageRequest.of(offset - 1,pageSize, "desc".equals(order) ? Sort.by("idsales").descending() : Sort.by("idsales").ascending()));
+            salesPage = salesRepository.findByTahunAndTarget(tahun, target, PageRequest.of(offset - 1, pageSize, "desc".equals(order) ? Sort.by("idsales").descending() : Sort.by("idsales").ascending()));
+        } else if (target != null) {
+            salesPage = salesRepository.findByTarget(target, PageRequest.of(offset - 1, pageSize, "desc".equals(order) ? Sort.by("idsales").descending() : Sort.by("idsales").ascending()));
+        } else if (tahun != null) {
+            salesPage = salesRepository.findByTahun(tahun, PageRequest.of(offset - 1, pageSize, "desc".equals(order) ? Sort.by("idsales").descending() : Sort.by("idsales").ascending()));
+        } else {
+            salesPage = salesRepository.findAll(PageRequest.of(offset - 1, pageSize, "desc".equals(order) ? Sort.by("idsales").descending() : Sort.by("idsales").ascending()));
         }
         List<SalesDto> resultList = salesPage.getContent().stream()
                 .map(sales -> {
@@ -112,13 +138,25 @@ public class SalesService {
                     salesDto.setNama(karyawan.getNama());
                     salesDto.setTarget(sales.getTarget());
                     salesDto.setTahun(sales.getTahun());
+
+                    // Map SalesDetail information
+                    List<SalesDetailDto> salesDetailDtoList = sales.getSalesDetails().stream()
+                            .map(saless -> {
+                                SalesDetailDto salesDetailDto = new SalesDetailDto();
+                                salesDetailDto.setId(saless.getId());
+                                salesDetailDto.setBulan(saless.getBulan());
+                                salesDetailDto.setTargetbln(saless.getTargetbln());
+                                salesDetailDto.setIdsales(saless.getSales().getIdsales());
+                                return salesDetailDto;
+                            })
+                            .collect(Collectors.toList());
+                    salesDto.setSalesDetailDtoList(salesDetailDtoList);
                     return salesDto;
                 })
                 .collect(Collectors.toList());
 
         return new PageImpl<>(resultList, salesPage.getPageable(), salesPage.getTotalElements());
-
-        }
+    }
 
     public SalesDto fetchSalesDtoByIdsales(Long id) throws AllException {
         log.info("Inside fetchUserDtoByIduser");
@@ -132,6 +170,19 @@ public class SalesService {
             salesDto.setNama(karyawan.getNama());
             salesDto.setTarget(sales.getTarget());
             salesDto.setTahun(sales.getTahun());
+
+        List<SalesDetailDto> salesDetailDtoList = sales.getSalesDetails().stream()
+                .map(saless -> {
+                    SalesDetailDto salesDetailDto = new SalesDetailDto();
+                    salesDetailDto.setId(saless.getId());
+                    salesDetailDto.setBulan(saless.getBulan());
+                    salesDetailDto.setTargetbln(saless.getTargetbln());
+                    salesDetailDto.setIdsales(saless.getSales().getIdsales());
+                    return salesDetailDto;
+                })
+                .collect(Collectors.toList());
+        salesDto.setSalesDetailDtoList(salesDetailDtoList);
+
             return salesDto;
     }
 
