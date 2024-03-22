@@ -35,7 +35,6 @@ public class SalesService {
     private final KaryawanRepository karyawanRepository;
     private final SalesDetailRepository salesDetailRepository;
 
-
     public ResponseEntity<Object> createSales(SalesDto salesDto, String nik) {
         log.info("inside createSales", salesDto);
         try {
@@ -50,6 +49,8 @@ public class SalesService {
 
             salesRepository.save(sales);
 
+            // Check if SalesDetailDtoList is not null before iterating
+            if (salesDto.getSalesDetailDtoList() != null) {
                 for (SalesDetailDto salesDetailDto : salesDto.getSalesDetailDtoList()) {
                     SalesDetail salesDetail = new SalesDetail();
                     salesDetail.setBulan(salesDetailDto.getBulan());
@@ -57,8 +58,7 @@ public class SalesService {
                     salesDetail.setSales(sales);
                     salesDetailRepository.save(salesDetail);
                 }
-
-
+            }
             return ResponseEntity.ok("New data Sales added successfully");
 
         } catch (Exception e) {
