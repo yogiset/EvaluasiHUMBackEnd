@@ -73,7 +73,7 @@ public class SalesService {
             log.info("Inside edit sales");
             Optional<Sales> optionalSales = salesRepository.findById(id);
             if (!optionalSales.isPresent()) {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Sales no found with id " + id);
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Sales not found with id " + id);
             }
             Sales sales = optionalSales.get();
             sales.setTarget(salesDto.getTarget());
@@ -81,23 +81,36 @@ public class SalesService {
 
             salesRepository.save(sales);
 
-            for (SalesDetailDto salesDetailDto : salesDto.getSalesDetailDtoList()) {
-                Optional<SalesDetail>optionalSalesDetail = salesDetailRepository.findById(salesDetailDto.getId());
-                if (optionalSalesDetail.isPresent()){
-                    SalesDetail salesDetail = optionalSalesDetail.get();
-                    salesDetail.setBulan(salesDetailDto.getBulan());
-                    salesDetail.setTargetbln(salesDetailDto.getTargetbln());
-                    salesDetailRepository.save(salesDetail);
-                } else {
-                    return ResponseEntity.notFound().build();
+            List<SalesDetailDto> salesDetailDtoList = salesDto.getSalesDetailDtoList();
+            if (salesDetailDtoList != null) {
+                for (SalesDetailDto salesDetailDto : salesDetailDtoList) {
+                    Optional<SalesDetail> optionalSalesDetail = salesDetailRepository.findById(salesDetailDto.getId());
+                    if (optionalSalesDetail.isPresent()) {
+                        // If SalesDetail with the given ID exists, update it
+                        SalesDetail salesDetail = optionalSalesDetail.get();
+                        salesDetail.setBulan(salesDetailDto.getBulan());
+                        salesDetail.setTargetbln(salesDetailDto.getTargetbln());
+                        salesDetailRepository.save(salesDetail);
+                    } else {
+                        // If SalesDetail with the given ID doesn't exist, create new SalesDetail
+                        SalesDetail salesDetail = new SalesDetail();
+                        salesDetail.setBulan(salesDetailDto.getBulan());
+                        salesDetail.setTargetbln(salesDetailDto.getTargetbln());
+                        salesDetail.setSales(sales);
+                        salesDetailRepository.save(salesDetail);
+                    }
                 }
+            } else {
+
             }
+
             return ResponseEntity.ok("Data Sales edited successfully");
         } catch (Exception e) {
-            log.error("Error edited data sales", e);
-            return ResponseEntity.status(500).body("Error edited data sales");
+            log.error("Error editing data sales", e);
+            return ResponseEntity.status(500).body("Error editing data sales");
         }
     }
+
 
 
     public ResponseEntity<Object> deleteSales(Long id) {
