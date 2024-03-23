@@ -33,7 +33,8 @@ public class EvaluasiHumBackEndApplication implements CommandLineRunner {
 	public void run(String... args) throws Exception {
 
 			User userr = userRepository.findByUsernameId("SUPERADMIN");
-		if (userr == null) {
+			User user2 = userRepository.findByUsernameId("USER");
+		if (userr == null && user2 == null) {
 
 			User user = new User();
 			Karyawan karyawan = new Karyawan();
@@ -56,19 +57,15 @@ public class EvaluasiHumBackEndApplication implements CommandLineRunner {
 			karyawan.setTingkatan("HighestAdministrator");
 			user.setKaryawan(karyawan);
 			userRepository.save(user);
-		}
-
-		User user2 = userRepository.findByUsernameId("USER");
-		if (user2 == null) {
 
 			User regulerUser = new User();
 			Karyawan regulerKaryawan = new Karyawan();
 
 			regulerUser.setKodeuser("USER");
 			regulerUser.setUsername("TESTUSER");
-			String rawPassword = "TESTUSER";
-			String encodedPassword = passwordEncoder.encode(rawPassword);
-			regulerUser.setPassword(encodedPassword);
+			String rawPassword1 = "TESTUSER";
+			String encodedPassword1 = passwordEncoder.encode(rawPassword1);
+			regulerUser.setPassword(encodedPassword1);
 			regulerUser.setRole("USER");
 			regulerUser.setStatus(true);
 			regulerUser.setCreated(Instant.now());
@@ -77,8 +74,8 @@ public class EvaluasiHumBackEndApplication implements CommandLineRunner {
 			regulerKaryawan.setDivisi("USER");
 			regulerKaryawan.setJabatan("USER");
 			regulerKaryawan.setEmail("USER@hum.com");
-			LocalDate tanggal = LocalDate.of(1, 1, 1);
-			regulerKaryawan.setTanggalmasuk(tanggal);
+			LocalDate tanggal1 = LocalDate.of(1, 1, 1);
+			regulerKaryawan.setTanggalmasuk(tanggal1);
 			regulerKaryawan.setTingkatan("USER");
 			regulerUser.setKaryawan(regulerKaryawan);
 			userRepository.save(regulerUser);
