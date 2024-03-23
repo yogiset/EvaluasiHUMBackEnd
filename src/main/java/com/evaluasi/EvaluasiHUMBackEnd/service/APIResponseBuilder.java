@@ -43,7 +43,7 @@ public class APIResponseBuilder {
         System.arraycopy(dynamicColors, 0, colors, staticColors.length, dynamicColors.length);
 
         List<Map<String, Object>> dataChart = new ArrayList<>();
-        int dataIndex = 1; // Counter for unique data key
+        int dataIndex = 1;
         for (String label : labels) {
             Map<String, Object> chartData = new HashMap<>();
             chartData.put("label", label);
@@ -57,7 +57,7 @@ public class APIResponseBuilder {
                 dataPoint.put("result", count);
                 data.add(dataPoint);
             }
-            chartData.put("data" + dataIndex, data); // Assign specific data to each Hasil Evaluasi
+            chartData.put("data", data); // Assign specific data to each Hasil Evaluasi
 
             int currentResult = 0;
             for (Map<String, Object> dataPoint : data) {
@@ -68,8 +68,7 @@ public class APIResponseBuilder {
             chartData.put("color", colors[dataIndex - 1]);
 
             dataChart.add(chartData);
-
-            dataIndex++; // Increment data index for next Hasil Evaluasi
+            dataIndex++;
         }
         apiResponse.put("dataChart", dataChart);
 
