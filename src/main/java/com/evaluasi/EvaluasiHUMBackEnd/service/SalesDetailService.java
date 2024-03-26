@@ -39,6 +39,17 @@ public class SalesDetailService {
 
             salesDetailRepository.save(salesDetail);
 
+            double totalTercapaii = sales.getSalesDetails().stream()
+                    .mapToDouble(SalesDetail::getTercapaii)
+                    .sum();
+
+            sales.setTercapai((int) totalTercapaii);
+
+            double overallPercentage = (totalTercapaii * 100.0) / (sales.getTarget());
+
+            sales.setTercapaipersen(String.format("%.2f%%", overallPercentage));
+            salesRepository.save(sales);
+
             return ResponseEntity.ok("New Sales Detail added successfully");
 
         } catch (Exception e) {
@@ -55,6 +66,7 @@ public class SalesDetailService {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body("SalesDetail not found for Id: " + id);
             }
             SalesDetail salesDetail = optionalSalesDetail.get();
+            Sales sales = salesDetail.getSales();
 
             salesDetail.setBulan(salesDetailDto.getBulan());
             salesDetail.setTargetbln(salesDetailDto.getTargetbln());
@@ -63,6 +75,16 @@ public class SalesDetailService {
 
             salesDetailRepository.save(salesDetail);
 
+            double totalTercapaii = sales.getSalesDetails().stream()
+                    .mapToDouble(SalesDetail::getTercapaii)
+                    .sum();
+
+            sales.setTercapai((int)totalTercapaii);
+
+            double overallPercentage = (totalTercapaii * 100.0) / (sales.getTarget());
+            sales.setTercapaipersen(String.format("%.2f%%", overallPercentage));
+            salesRepository.save(sales);
+
             return ResponseEntity.ok("Sales Detail edited successfully");
 
         } catch (Exception e) {
@@ -70,6 +92,7 @@ public class SalesDetailService {
             return ResponseEntity.status(500).body("Error editing sales detail");
         }
     }
+
 
     public ResponseEntity<Object> deleteSalesDetail(Long id) {
         log.info("Inside DeleteSalesDetail");

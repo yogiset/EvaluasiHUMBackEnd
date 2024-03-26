@@ -46,12 +46,10 @@ public class SalesService {
             sales.setKaryawan(karyawan);
             sales.setTarget(salesDto.getTarget());
             sales.setTahun(salesDto.getTahun());
-            sales.setTercapai(salesDto.getTercapai());
-            sales.setTercapaipersen(salesDto.getTercapaipersen());
 
-            salesRepository.save(sales);
+            // Initialize the salesDetails list to an empty ArrayList
+            sales.setSalesDetails(new ArrayList<>());
 
-            // Check if SalesDetailDtoList is not null before iterating
             if (salesDto.getSalesDetailDtoList() != null) {
                 for (SalesDetailDto salesDetailDto : salesDto.getSalesDetailDtoList()) {
                     SalesDetail salesDetail = new SalesDetail();
@@ -61,8 +59,23 @@ public class SalesService {
                     salesDetail.setTercapaipersenn(salesDetailDto.getTercapaipersenn());
                     salesDetail.setSales(sales);
                     salesDetailRepository.save(salesDetail);
+
+                    // Add the created SalesDetail object to the salesDetails list
+                    sales.getSalesDetails().add(salesDetail);
                 }
             }
+
+            double totalTercapaii = sales.getSalesDetails().stream()
+                    .mapToDouble(SalesDetail::getTercapaii)
+                    .sum();
+
+            sales.setTercapai((int) totalTercapaii);
+
+            double overallPercentage = (totalTercapaii * 100.0) / sales.getTarget();
+            sales.setTercapaipersen(String.format("%.2f%%", overallPercentage));
+
+            salesRepository.save(sales);
+
             return ResponseEntity.ok("New data Sales added successfully");
 
         } catch (Exception e) {
@@ -70,6 +83,7 @@ public class SalesService {
             return ResponseEntity.status(500).body("Error creating new data sales");
         }
     }
+
 
 
     public ResponseEntity<Object> editSales(Long id, SalesDto salesDto) {
@@ -161,11 +175,7 @@ public class SalesService {
                     salesDto.setNama(karyawan.getNama());
                     salesDto.setTarget(sales.getTarget());
                     salesDto.setTahun(sales.getTahun());
-                    // Calculate total tercapaii from SalesDetail
-                    double total = sales.getSalesDetails().stream()
-                            .mapToDouble(SalesDetail::getTercapaii)
-                            .sum();
-                    salesDto.setTercapai((int) total);
+                    salesDto.setTercapai(sales.getTercapai());
                     salesDto.setTercapaipersen(sales.getTercapaipersen());
 
                     // Map SalesDetail information
