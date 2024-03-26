@@ -161,7 +161,11 @@ public class SalesService {
                     salesDto.setNama(karyawan.getNama());
                     salesDto.setTarget(sales.getTarget());
                     salesDto.setTahun(sales.getTahun());
-                    salesDto.setTercapai(sales.getTercapai());
+                    // Calculate total tercapaii from SalesDetail
+                    double total = sales.getSalesDetails().stream()
+                            .mapToDouble(SalesDetail::getTercapaii)
+                            .sum();
+                    salesDto.setTercapai((int) total);
                     salesDto.setTercapaipersen(sales.getTercapaipersen());
 
                     // Map SalesDetail information
