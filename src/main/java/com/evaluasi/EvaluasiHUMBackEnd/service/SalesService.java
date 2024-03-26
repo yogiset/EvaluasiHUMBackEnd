@@ -56,7 +56,9 @@ public class SalesService {
                     salesDetail.setBulan(salesDetailDto.getBulan());
                     salesDetail.setTargetbln(salesDetailDto.getTargetbln());
                     salesDetail.setTercapaii(salesDetailDto.getTercapaii());
-                    salesDetail.setTercapaipersenn(salesDetailDto.getTercapaipersenn());
+
+                    double percent = (salesDetail.getTercapaii() * 100.0) / salesDetail.getTargetbln();
+                    salesDetail.setTercapaipersenn(String.format("%.2f%%",percent));
                     salesDetail.setSales(sales);
                     salesDetailRepository.save(salesDetail);
 

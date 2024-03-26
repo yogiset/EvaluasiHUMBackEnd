@@ -35,7 +35,8 @@ public class SalesDetailService {
             salesDetail.setBulan(salesDetailDto.getBulan());
             salesDetail.setTargetbln(salesDetailDto.getTargetbln());
             salesDetail.setTercapaii(salesDetailDto.getTercapaii());
-            salesDetail.setTercapaipersenn(salesDetailDto.getTercapaipersenn());
+            double percent = (salesDetail.getTercapaii() * 100.0) / salesDetail.getTargetbln();
+            salesDetail.setTercapaipersenn(String.format("%.2f%%",percent));
 
             salesDetailRepository.save(salesDetail);
 
@@ -71,7 +72,8 @@ public class SalesDetailService {
             salesDetail.setBulan(salesDetailDto.getBulan());
             salesDetail.setTargetbln(salesDetailDto.getTargetbln());
             salesDetail.setTercapaii(salesDetailDto.getTercapaii());
-            salesDetail.setTercapaipersenn(salesDetailDto.getTercapaipersenn());
+            double percent = (salesDetail.getTercapaii() * 100.0) / salesDetail.getTargetbln();
+            salesDetail.setTercapaipersenn(String.format("%.2f%%",percent));
 
             salesDetailRepository.save(salesDetail);
 
