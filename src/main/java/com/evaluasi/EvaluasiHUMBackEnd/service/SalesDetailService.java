@@ -98,20 +98,37 @@ public class SalesDetailService {
 
     public ResponseEntity<Object> deleteSalesDetail(Long id) {
         log.info("Inside DeleteSalesDetail");
-        try{
-        Optional<SalesDetail> optionalSalesDetail  = salesDetailRepository.findById(id);
+        try {
+            Optional<SalesDetail> optionalSalesDetail = salesDetailRepository.findById(id);
 
-        if (optionalSalesDetail.isPresent()) {
-            salesDetailRepository.deleteById(id);
-            return ResponseEntity.ok("Successfully deleted sales detail");
-        } else {
-            return ResponseEntity.status(404).body("sales detail not found");
+            if (optionalSalesDetail.isPresent()) {
+                SalesDetail salesDetail = optionalSalesDetail.get();
+                Sales sales = salesDetail.getSales();
+
+                salesDetailRepository.deleteById(id);
+
+                double totalTercapaii = sales.getSalesDetails().stream()
+                        .mapToDouble(SalesDetail::getTercapaii)
+                        .sum();
+
+                sales.setTercapai((int) totalTercapaii);
+
+                double overallPercentage = (totalTercapaii * 100.0) / (sales.getTarget());
+                sales.setTercapaipersen(String.format("%.2f%%", overallPercentage));
+
+                salesRepository.save(sales);
+
+                return ResponseEntity.ok("Successfully deleted sales detail");
+            } else {
+                return ResponseEntity.status(404).body("Sales detail not found");
+            }
+        } catch (Exception e) {
+            log.error("Error deleting sales detail", e);
+            return ResponseEntity.status(500).body("Error deleting sales detail");
         }
-    } catch (Exception e) {
-        log.error("Error deleted sales detail", e);
-        return ResponseEntity.status(500).body("Error deleted sales detail");
     }
-    }
+
+
 
     public SalesDetailDto fetchSalesDetailDtoById(Long id) throws AllException {
         log.info("Inside fetchSalesDetailDtoById");
