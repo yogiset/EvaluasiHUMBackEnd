@@ -22,6 +22,7 @@ public class Sales {
     private Integer tahun;
     private Integer tercapai;
     private String tercapaipersen;
+    private String keterangan;
 
     @OneToMany(mappedBy = "sales",cascade = CascadeType.ALL)
     private List<SalesDetail>salesDetails;

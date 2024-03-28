@@ -46,8 +46,8 @@ public class SalesService {
             sales.setKaryawan(karyawan);
             sales.setTarget(salesDto.getTarget());
             sales.setTahun(salesDto.getTahun());
+            sales.setKeterangan(salesDto.getKeterangan());
 
-            // Initialize the salesDetails list to an empty ArrayList
             sales.setSalesDetails(new ArrayList<>());
 
             if (salesDto.getSalesDetailDtoList() != null) {
@@ -98,8 +98,15 @@ public class SalesService {
             Sales sales = optionalSales.get();
             sales.setTarget(salesDto.getTarget());
             sales.setTahun(salesDto.getTahun());
-            sales.setTercapai(salesDto.getTercapai());
-            sales.setTercapaipersen(salesDto.getTercapaipersen());
+            double totalTercapaii = sales.getSalesDetails().stream()
+                    .mapToDouble(SalesDetail::getTercapaii)
+                    .sum();
+
+            sales.setTercapai((int) totalTercapaii);
+
+            double overallPercentage = (totalTercapaii * 100.0) / sales.getTarget();
+            sales.setTercapaipersen(String.format("%.2f%%", overallPercentage));
+            sales.setKeterangan(salesDto.getKeterangan());
 
             salesRepository.save(sales);
 
@@ -179,6 +186,7 @@ public class SalesService {
                     salesDto.setTahun(sales.getTahun());
                     salesDto.setTercapai(sales.getTercapai());
                     salesDto.setTercapaipersen(sales.getTercapaipersen());
+                    salesDto.setKeterangan(sales.getKeterangan());
 
                     // Map SalesDetail information
                     List<SalesDetailDto> salesDetailDtoList = sales.getSalesDetails().stream()
@@ -215,6 +223,7 @@ public class SalesService {
             salesDto.setTahun(sales.getTahun());
             salesDto.setTercapai(sales.getTercapai());
             salesDto.setTercapaipersen(sales.getTercapaipersen());
+            salesDto.setKeterangan(sales.getKeterangan());
 
         List<SalesDetailDto> salesDetailDtoList = sales.getSalesDetails().stream()
                 .map(saless -> {
