@@ -51,4 +51,10 @@ public class Karyawan {
     @OneToMany(mappedBy = "karyawan", cascade = CascadeType.ALL)
     private List<Sales> salesList;
 
+    @OneToMany(mappedBy = "karyawan", cascade = CascadeType.ALL)
+    private List<Cpt> cptList;
+
+    @OneToMany(mappedBy = "karyawan", cascade = CascadeType.ALL)
+    private List<Picos> picosList;
+
 }
