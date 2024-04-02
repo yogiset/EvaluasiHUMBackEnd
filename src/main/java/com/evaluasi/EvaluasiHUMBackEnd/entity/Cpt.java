@@ -19,10 +19,10 @@ public class Cpt {
     private int tahun;
     private int panolcustomer;
     private int coverage;
-    private int coveragepersen;
+    private double coveragepersen;
     private int penetration;
-    private double throughput;
-    private int hitrate;
+    private String throughput;
+    private double hitrate;
 
     @ManyToOne(cascade = CascadeType.PERSIST)
     @JoinColumn(name = "nik", nullable = false)
