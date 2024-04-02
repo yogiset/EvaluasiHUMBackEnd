@@ -74,7 +74,7 @@ public class SalesService {
             sales.setTercapai((int) totalTercapaii);
 
             double overallPercentage = (totalTercapaii * 100.0) / sales.getTarget();
-            sales.setTercapaipersen(String.format("%.2f%%", overallPercentage));
+            sales.setTercapaipersen(overallPercentage);
 
             salesRepository.save(sales);
 
@@ -105,7 +105,7 @@ public class SalesService {
             sales.setTercapai((int) totalTercapaii);
 
             double overallPercentage = (totalTercapaii * 100.0) / sales.getTarget();
-            sales.setTercapaipersen(String.format("%.2f%%", overallPercentage));
+            sales.setTercapaipersen(overallPercentage);
             sales.setKeterangan(salesDto.getKeterangan());
 
             salesRepository.save(sales);

@@ -18,10 +18,10 @@ public class Sales {
     @SequenceGenerator(name = "sales_sequence",sequenceName = "sales_sequence",allocationSize = 1)
     @GeneratedValue(strategy = GenerationType.SEQUENCE,generator = "sales_sequence")
     private Long idsales;
-    private Integer target;
-    private Integer tahun;
-    private Integer tercapai;
-    private String tercapaipersen;
+    private int target;
+    private int tahun;
+    private int tercapai;
+    private double tercapaipersen;
     private String keterangan;
 
     @OneToMany(mappedBy = "sales",cascade = CascadeType.ALL)

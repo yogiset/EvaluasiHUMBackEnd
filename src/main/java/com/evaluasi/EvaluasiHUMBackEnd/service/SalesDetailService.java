@@ -48,7 +48,7 @@ public class SalesDetailService {
 
             double overallPercentage = (totalTercapaii * 100.0) / (sales.getTarget());
 
-            sales.setTercapaipersen(String.format("%.2f%%", overallPercentage));
+            sales.setTercapaipersen(overallPercentage);
             salesRepository.save(sales);
 
             return ResponseEntity.ok("New Sales Detail added successfully");
@@ -84,7 +84,7 @@ public class SalesDetailService {
             sales.setTercapai((int)totalTercapaii);
 
             double overallPercentage = (totalTercapaii * 100.0) / (sales.getTarget());
-            sales.setTercapaipersen(String.format("%.2f%%", overallPercentage));
+            sales.setTercapaipersen(overallPercentage);
             salesRepository.save(sales);
 
             return ResponseEntity.ok("Sales Detail edited successfully");
@@ -114,7 +114,7 @@ public class SalesDetailService {
                 sales.setTercapai((int) totalTercapaii);
 
                 double overallPercentage = (totalTercapaii * 100.0) / (sales.getTarget());
-                sales.setTercapaipersen(String.format("%.2f%%", overallPercentage));
+                sales.setTercapaipersen(overallPercentage);
 
                 salesRepository.save(sales);
 

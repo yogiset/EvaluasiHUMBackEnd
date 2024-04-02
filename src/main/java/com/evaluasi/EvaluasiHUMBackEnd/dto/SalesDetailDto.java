@@ -10,8 +10,8 @@ import lombok.NoArgsConstructor;
 public class SalesDetailDto {
     private Long id;
     private String bulan;
-    private Integer targetbln;
-    private Integer tercapaii;
+    private int targetbln;
+    private int tercapaii;
     private String tercapaipersenn;
     private Long idsales;
 }

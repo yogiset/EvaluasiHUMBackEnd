@@ -13,10 +13,10 @@ public class SalesDto {
     private Long idsales;
     private String nik;
     private String nama;
-    private Integer target;
-    private Integer tahun;
-    private Integer tercapai;
-    private String tercapaipersen;
+    private int target;
+    private int tahun;
+    private int tercapai;
+    private double tercapaipersen;
     private String keterangan;
     private List<SalesDetailDto> salesDetailDtoList;
 }
