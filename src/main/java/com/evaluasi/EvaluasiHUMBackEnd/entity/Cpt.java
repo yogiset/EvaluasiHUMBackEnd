@@ -21,7 +21,7 @@ public class Cpt {
     private int coverage;
     private double coveragepersen;
     private int penetration;
-    private String throughput;
+    private double throughput;
     private double hitrate;
 
     @ManyToOne(cascade = CascadeType.PERSIST)
