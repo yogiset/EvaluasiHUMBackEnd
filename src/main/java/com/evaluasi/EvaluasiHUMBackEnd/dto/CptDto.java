@@ -15,7 +15,7 @@ public class CptDto {
     private int panolcustomer;
     private int coverage;
     private double coveragepersen;
-    private int penetration;
+    private double penetration;
     private double throughput;
     private double hitrate;
 }
