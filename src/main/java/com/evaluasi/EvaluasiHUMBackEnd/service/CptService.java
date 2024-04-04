@@ -65,6 +65,7 @@ public class CptService {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Cpt not found with id " + id);
         }
         Cpt cpt = optionalCpt.get();
+        cpt.setTahun(cptDto.getTahun());
         cpt.setPanolcustomer(cptDto.getPanolcustomer());
         cpt.setCoverage(cptDto.getCoverage());
 
