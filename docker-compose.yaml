@@ -1,0 +1,24 @@
+services:
+  db:
+    ports:
+      - '5432:5432'
+    container_name: postgresql_container
+    image: postgres
+    environment:
+      - POSTGRES_DB=evaluasihum2
+      - POSTGRES_PASSWORD=admin
+      - POSTGRES_USER=admin
+    volumes:
+      - E:\postgres_datapart:/var/lib/postgresql/data
+    restart: always
+  backend:
+    build: .
+    container_name: backendapp_container
+    ports:
+      - '8089:8089'
+    environment:
+      db-url: jdbc:postgresql://db:5432/evaluasihum2
+      db-username: admin
+      db-password: admin
+    depends_on:
+      - db
