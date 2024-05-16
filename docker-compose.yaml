@@ -1,5 +1,14 @@
 version: "3.9"
 services:
+  react-app:
+    image: reactjs/evaluasihum:1.0.0
+    container_name: reactapp_container
+    ports:
+      - '5173:5173'
+    networks:
+      - psr-app
+    depends_on:
+      - api-server
   api-server:
     build: .
     image: spring-evaluasihum:1.0.0
