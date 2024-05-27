@@ -1,4 +1,5 @@
 services:
+
   evaluasihum_fe:
     build:
       context: ./EvaluasiHUM
@@ -11,6 +12,7 @@ services:
       - psr-app
     depends_on:
       - evaluasihum_be
+    restart: always #optional dont use it if your apps still got many bugs
 
   evaluasihum_be:
     build:
@@ -26,6 +28,7 @@ services:
       - psr-app
     depends_on:
       - database
+    restart: always #optional dont use it if your apps still got many bugs  
 
   database:
     container_name: postgres_container
