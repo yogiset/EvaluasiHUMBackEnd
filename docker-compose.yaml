@@ -1,4 +1,5 @@
 services:
+
   api-server:
     build: .
     image: spring-evaluasihum:1.0.0
@@ -11,6 +12,8 @@ services:
       - psr-app
     depends_on:
       - database
+    restart: always #optional dont use it if your apps still got many bugs
+
   react-app:
     image: reactjs-evaluasihum:1.0.0
     container_name: reactapp_container
@@ -20,6 +23,8 @@ services:
       - psr-app
     depends_on:
       - api-server
+    restart: always #optional dont use it if your apps still got many bugs
+
   database:
     container_name: postgres_container
     ports:
@@ -33,9 +38,11 @@ services:
     networks:
       - psr-app
     restart: always
+
 networks:
   psr-app:
     driver: bridge
+
 volumes:
   postgres-data:
     driver: local
