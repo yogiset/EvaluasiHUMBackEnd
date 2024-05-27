@@ -1,7 +1,18 @@
-version: "3.9"
 services:
+  api-server:
+    build: .
+    image: spring-evaluasihum:1.0.0
+    container_name: backendapp_container
+    ports:
+      - '8082:8082'
+    env_file:
+      - .env
+    networks:
+      - psr-app
+    depends_on:
+      - database
   react-app:
-    image: reactjs/evaluasihum:1.0.0
+    image: reactjs-evaluasihum:1.0.0
     container_name: reactapp_container
     ports:
       - '5173:5173'
@@ -9,28 +20,13 @@ services:
       - psr-app
     depends_on:
       - api-server
-  api-server:
-    build: .
-    image: spring-evaluasihum:1.0.0
-    container_name: backendapp_container
-    ports:
-      - '8082:8082'
-    environment:
-      database-url: jdbc:postgresql://database:5432/evaluasihum
-      database-username: postgres
-      database-password: admin
-    networks:
-      - psr-app
-    depends_on:
-      - database
   database:
     container_name: postgres_container
     ports:
       - '5432:5432'
     image: postgres:latest
-    environment:
+    env_file:
       - .env
-      - POSTGRES_HOST_AUTH_METHOD=trust
     volumes:
       - postgres-data:/data/db
       - ./init.sql:/docker-entrypoint-initdb.d/init.sql
@@ -39,7 +35,7 @@ services:
     restart: always
 networks:
   psr-app:
-   driver: bridge
+    driver: bridge
 volumes:
   postgres-data:
     driver: local
