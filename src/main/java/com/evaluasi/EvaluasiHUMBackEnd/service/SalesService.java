@@ -1,5 +1,6 @@
 package com.evaluasi.EvaluasiHUMBackEnd.service;
 
+import com.evaluasi.EvaluasiHUMBackEnd.dto.PenilaianSalesDto;
 import com.evaluasi.EvaluasiHUMBackEnd.dto.SalesDetailDto;
 import com.evaluasi.EvaluasiHUMBackEnd.dto.SalesDto;
 import com.evaluasi.EvaluasiHUMBackEnd.dto.UserDto;
@@ -21,6 +22,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.text.Normalizer;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
@@ -41,7 +43,13 @@ public class SalesService {
             Sales sales = new Sales();
             Karyawan karyawan = karyawanRepository.findByNik(salesDto.getNik());
             if (karyawan == null) {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Karyawan not found for NIK: " + salesDto.getNik());
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                        .body("Karyawan not found for NIK: " + salesDto.getNik());
+            }
+            // Check if the karyawan's jabatan is "Sales"
+            if (!"Sales".equalsIgnoreCase(karyawan.getJabatan())) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                        .body("Karyawan with NIK: " + salesDto.getNik() + " is not a Sales");
             }
             sales.setKaryawan(karyawan);
             sales.setTarget(salesDto.getTarget());
@@ -58,7 +66,7 @@ public class SalesService {
                     salesDetail.setTercapaii(salesDetailDto.getTercapaii());
 
                     double percent = (salesDetail.getTercapaii() * 100.0) / salesDetail.getTargetbln();
-                    salesDetail.setTercapaipersenn(String.format("%.2f%%",percent));
+                    salesDetail.setTercapaipersenn(String.format("%.2f%%", percent));
                     salesDetail.setSales(sales);
                     salesDetailRepository.save(salesDetail);
 
@@ -86,8 +94,6 @@ public class SalesService {
         }
     }
 
-
-
     public ResponseEntity<Object> editSales(Long id, SalesDto salesDto) {
         try {
             log.info("Inside edit sales");
@@ -98,15 +104,24 @@ public class SalesService {
             Sales sales = optionalSales.get();
             sales.setTarget(salesDto.getTarget());
             sales.setTahun(salesDto.getTahun());
+            sales.setKeterangan(salesDto.getKeterangan());
             double totalTercapaii = sales.getSalesDetails().stream()
                     .mapToDouble(SalesDetail::getTercapaii)
                     .sum();
 
-            sales.setTercapai((int) totalTercapaii);
+            if (totalTercapaii > 0) {
+                sales.setTercapai((int) totalTercapaii);
+            } else {
+                sales.setTercapai(salesDto.getTercapai());
+            }
 
-            double overallPercentage = (totalTercapaii * 100.0) / sales.getTarget();
-            sales.setTercapaipersen(overallPercentage);
-            sales.setKeterangan(salesDto.getKeterangan());
+            if (totalTercapaii > 0){
+                double overallPercentage = (totalTercapaii * 100.0) / sales.getTarget();
+                sales.setTercapaipersen(overallPercentage);
+            } else {
+                double overallPercentage = (salesDto.getTercapai() * 100.0) / sales.getTarget();
+                sales.setTercapaipersen(overallPercentage);
+            }
 
             salesRepository.save(sales);
 
@@ -144,12 +159,10 @@ public class SalesService {
         }
     }
 
-
-
     public ResponseEntity<Object> deleteSales(Long id) {
         try {
             log.info("Inside delete sales");
-            Optional<Sales> optionalSales  = salesRepository.findById(id);
+            Optional<Sales> optionalSales = salesRepository.findById(id);
 
             if (optionalSales.isPresent()) {
                 salesRepository.deleteById(id);
@@ -163,17 +176,22 @@ public class SalesService {
         }
     }
 
-    public Page<SalesDto> showAllAndPaginationSales(Integer target, Integer tahun, String order, int offset, int pageSize) {
+    public Page<SalesDto> showAllAndPaginationSales(Integer target, Integer tahun, String order, int offset,
+            int pageSize) {
         log.info("Inside showAllAndPaginationSales");
         Page<Sales> salesPage;
         if (target != null && tahun != null) {
-            salesPage = salesRepository.findByTahunAndTarget(tahun, target, PageRequest.of(offset - 1, pageSize, "desc".equals(order) ? Sort.by("idsales").descending() : Sort.by("idsales").ascending()));
+            salesPage = salesRepository.findByTahunAndTarget(tahun, target, PageRequest.of(offset - 1, pageSize,
+                    "desc".equals(order) ? Sort.by("idsales").descending() : Sort.by("idsales").ascending()));
         } else if (target != null) {
-            salesPage = salesRepository.findByTarget(target, PageRequest.of(offset - 1, pageSize, "desc".equals(order) ? Sort.by("idsales").descending() : Sort.by("idsales").ascending()));
+            salesPage = salesRepository.findByTarget(target, PageRequest.of(offset - 1, pageSize,
+                    "desc".equals(order) ? Sort.by("idsales").descending() : Sort.by("idsales").ascending()));
         } else if (tahun != null) {
-            salesPage = salesRepository.findByTahun(tahun, PageRequest.of(offset - 1, pageSize, "desc".equals(order) ? Sort.by("idsales").descending() : Sort.by("idsales").ascending()));
+            salesPage = salesRepository.findByTahun(tahun, PageRequest.of(offset - 1, pageSize,
+                    "desc".equals(order) ? Sort.by("idsales").descending() : Sort.by("idsales").ascending()));
         } else {
-            salesPage = salesRepository.findAll(PageRequest.of(offset - 1, pageSize, "desc".equals(order) ? Sort.by("idsales").descending() : Sort.by("idsales").ascending()));
+            salesPage = salesRepository.findAll(PageRequest.of(offset - 1, pageSize,
+                    "desc".equals(order) ? Sort.by("idsales").descending() : Sort.by("idsales").ascending()));
         }
         List<SalesDto> resultList = salesPage.getContent().stream()
                 .map(sales -> {
@@ -214,16 +232,16 @@ public class SalesService {
         Sales sales = salesRepository.findById(id)
                 .orElseThrow(() -> new AllException("Sales with idsales " + id + " not found"));
 
-            SalesDto salesDto = new SalesDto();
-            Karyawan karyawan = sales.getKaryawan();
-            salesDto.setIdsales(sales.getIdsales());
-            salesDto.setNik(karyawan.getNik());
-            salesDto.setNama(karyawan.getNama());
-            salesDto.setTarget(sales.getTarget());
-            salesDto.setTahun(sales.getTahun());
-            salesDto.setTercapai(sales.getTercapai());
-            salesDto.setTercapaipersen(sales.getTercapaipersen());
-            salesDto.setKeterangan(sales.getKeterangan());
+        SalesDto salesDto = new SalesDto();
+        Karyawan karyawan = sales.getKaryawan();
+        salesDto.setIdsales(sales.getIdsales());
+        salesDto.setNik(karyawan.getNik());
+        salesDto.setNama(karyawan.getNama());
+        salesDto.setTarget(sales.getTarget());
+        salesDto.setTahun(sales.getTahun());
+        salesDto.setTercapai(sales.getTercapai());
+        salesDto.setTercapaipersen(sales.getTercapaipersen());
+        salesDto.setKeterangan(sales.getKeterangan());
 
         List<SalesDetailDto> salesDetailDtoList = sales.getSalesDetails().stream()
                 .map(saless -> {
@@ -239,10 +257,56 @@ public class SalesService {
                 .collect(Collectors.toList());
         salesDto.setSalesDetailDtoList(salesDetailDtoList);
 
-            return salesDto;
+        return salesDto;
     }
 
+    // Utility method to normalize strings by removing spaces and punctuation
+    private String normalizeString(String input) {
+        if (input == null) return "";
+        // Remove punctuation and normalize spaces
+        String normalized = Normalizer.normalize(input, Normalizer.Form.NFD);
+        normalized = normalized.replaceAll("[\\p{InCombiningDiacriticalMarks}]+", ""); // Remove diacritics
+        normalized = normalized.replaceAll("[\\p{Punct}\\s]+", "").toLowerCase(); // Remove punctuation and spaces
+        return normalized;
+    }
 
+    public Page<PenilaianSalesDto> paginationPenilaianSales(Integer tahun, String order, int offset, int pageSize) {
+        log.info("Inside showAllAndPaginationSales");
+        Page<Sales> salesPage;
+        if (tahun != null) {
+            salesPage = salesRepository.findByTahun(tahun, PageRequest.of(offset - 1, pageSize,
+                    "desc".equals(order) ? Sort.by("keterangan").descending() : Sort.by("keterangan").ascending()));
+        } else {
+            salesPage = salesRepository.findAll(PageRequest.of(offset - 1, pageSize,
+                    "desc".equals(order) ? Sort.by("keterangan").descending() : Sort.by("keterangan").ascending()));
+        }
+        List<PenilaianSalesDto> resultList = salesPage.getContent().stream()
+                .map(sales -> {
+                    PenilaianSalesDto penilaianSalesDto = new PenilaianSalesDto();
+                    Karyawan karyawan = sales.getKaryawan();
+                    penilaianSalesDto.setIdsales(sales.getIdsales());
+                    penilaianSalesDto.setNama(karyawan.getNama());
+                    penilaianSalesDto.setTahun(sales.getTahun());
+                    String keterangan = sales.getKeterangan();
+//                    String normalizedKeterangan = normalizeString(keterangan);
+                        if ("Achivement Total".equalsIgnoreCase(keterangan)) {
+                            penilaianSalesDto.setAchievtotal(sales.getTercapaipersen());
+                        } else if ("Achivement Gadus".equalsIgnoreCase(keterangan)) {
+                            penilaianSalesDto.setAchievgadus(sales.getTercapaipersen());
+                        } else if ("Achivement Premium".equalsIgnoreCase(keterangan)) {
+                            penilaianSalesDto.setAchievpremium(sales.getTercapaipersen());
+                        } else if ("Coverage(Jumlah Customer dan Jumlah Visit)".equalsIgnoreCase(keterangan)) {
+                            penilaianSalesDto.setJumvisit(sales.getTercapaipersen());
+                            if(sales.getTarget() != 0.0){
+                                penilaianSalesDto.setJumcustomer(sales.getTarget());
+                            }
+                        }
+
+                    return penilaianSalesDto;
+                })
+                .collect(Collectors.toList());
+
+        return new PageImpl<>(resultList, salesPage.getPageable(), salesPage.getTotalElements());
+
+    }
 }
-
-

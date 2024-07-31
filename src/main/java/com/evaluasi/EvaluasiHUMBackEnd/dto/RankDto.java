@@ -7,10 +7,13 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class HimpunanKriteriaDto {
-    private Long idhim;
-    private String nmkriteria;
-    private String nmhimpunan;
-    private Integer nilai;
+public class RankDto {
+    private Long idrank;
+    private Long idsales;
+    private String nama;
+    private int nilai;
+    private String predikat;
     private String keterangan;
+    private int tahun;
+    
 }

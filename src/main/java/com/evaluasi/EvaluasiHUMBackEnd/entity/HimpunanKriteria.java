@@ -18,6 +18,6 @@ public class HimpunanKriteria {
     private Long idhim;
     private String nmkriteria;
     private String nmhimpunan;
-    private int nilai;
+    private Integer nilai;
     private String keterangan;
 }

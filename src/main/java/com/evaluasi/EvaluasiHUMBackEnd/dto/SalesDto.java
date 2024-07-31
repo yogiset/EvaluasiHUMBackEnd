@@ -13,6 +13,7 @@ public class SalesDto {
     private Long idsales;
     private String nik;
     private String nama;
+    private String jabatan;
     private int target;
     private int tahun;
     private int tercapai;

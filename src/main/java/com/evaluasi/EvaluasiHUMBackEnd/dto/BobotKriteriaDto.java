@@ -7,10 +7,8 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class HimpunanKriteriaDto {
-    private Long idhim;
+public class BobotKriteriaDto {
+    private Long idbobot;
     private String nmkriteria;
-    private String nmhimpunan;
-    private Integer nilai;
-    private String keterangan;
+    private Integer bobot;
 }

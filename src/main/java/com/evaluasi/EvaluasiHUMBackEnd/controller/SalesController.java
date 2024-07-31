@@ -1,5 +1,6 @@
 package com.evaluasi.EvaluasiHUMBackEnd.controller;
 
+import com.evaluasi.EvaluasiHUMBackEnd.dto.PenilaianSalesDto;
 import com.evaluasi.EvaluasiHUMBackEnd.dto.SalesDto;
 import com.evaluasi.EvaluasiHUMBackEnd.dto.UserDto;
 import com.evaluasi.EvaluasiHUMBackEnd.exception.AllException;
@@ -66,4 +67,15 @@ public class SalesController {
         return salesService.fetchSalesDtoByIdsales(id);
     }
 
+    @GetMapping(path = "/penilaiansales")
+    @ResponseBody
+    public ResponseEntity<Page<PenilaianSalesDto>> penilaianSales(
+            @RequestParam(required = false) Integer tahun, // => optional
+            @RequestParam(defaultValue = "desc") String order, // => optional
+            @RequestParam(name = "page", defaultValue = "1") int offset, // => optional
+            @RequestParam(name = "limit", defaultValue = "10") int pageSize // => optional
+    ) {
+        Page<PenilaianSalesDto> penilaianSalesDtoPage = salesService.paginationPenilaianSales(tahun, order, offset, pageSize);
+        return ResponseEntity.ok(penilaianSalesDtoPage);
+    }
 }

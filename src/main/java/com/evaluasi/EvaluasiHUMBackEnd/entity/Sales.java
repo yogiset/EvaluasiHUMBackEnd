@@ -30,5 +30,8 @@ public class Sales {
     @ManyToOne(cascade = CascadeType.PERSIST)
     @JoinColumn(name = "nik", nullable = false)
     private Karyawan karyawan;
+
+    @OneToOne(mappedBy = "sales")
+    private Rank rank;
 }
 
