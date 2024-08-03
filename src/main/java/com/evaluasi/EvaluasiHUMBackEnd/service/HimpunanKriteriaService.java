@@ -83,15 +83,15 @@ public class HimpunanKriteriaService {
         }
     }
 
-    public Page<HimpunanKriteriaDto> showAllAndPaginationHim(String keterangan, Integer nilai, String order, int offset, int pageSize) {
+    public Page<HimpunanKriteriaDto> showAllAndPaginationHim(String keterangan, String nmkriteria, String order, int offset, int pageSize) {
         log.info("Inside showAllAndPaginationHim");
         Page<HimpunanKriteria> himpunanKriteriaPage;
-        if (nilai != null && keterangan != null) {
-            himpunanKriteriaPage = himpunanKriteriaRepository.findByNilaiAndKeterangan(nilai,keterangan, PageRequest.of(offset - 1, pageSize,  "desc".equals(order) ? Sort.by("idhim").descending() : Sort.by("idhim").ascending()));
-        } else if (nilai != null) {
-            himpunanKriteriaPage = himpunanKriteriaRepository.findByNilai(nilai, PageRequest.of(offset - 1, pageSize,  "desc".equals(order) ? Sort.by("idhim").descending() : Sort.by("idhim").ascending()));
+        if (keterangan != null && nmkriteria != null) {
+            himpunanKriteriaPage = himpunanKriteriaRepository.findByKeteranganAndNmkriteriaContainingIgnoreCase(keterangan,nmkriteria, PageRequest.of(offset - 1, pageSize,  "desc".equals(order) ? Sort.by("idhim").descending() : Sort.by("idhim").ascending()));
+        } else if (nmkriteria != null) {
+            himpunanKriteriaPage = himpunanKriteriaRepository.findByNmkriteriaContainingIgnoreCase(nmkriteria, PageRequest.of(offset - 1, pageSize,  "desc".equals(order) ? Sort.by("idhim").descending() : Sort.by("idhim").ascending()));
         } else if (keterangan != null) {
-            himpunanKriteriaPage = himpunanKriteriaRepository.findByKeterangan(keterangan, PageRequest.of(offset - 1, pageSize,  "desc".equals(order) ? Sort.by("idhim").descending() : Sort.by("idhim").ascending()));
+            himpunanKriteriaPage = himpunanKriteriaRepository.findByKeteranganContainingIgnoreCase(keterangan, PageRequest.of(offset - 1, pageSize,  "desc".equals(order) ? Sort.by("idhim").descending() : Sort.by("idhim").ascending()));
         } else {
             himpunanKriteriaPage = himpunanKriteriaRepository.findAll(PageRequest.of(offset - 1, pageSize,  "desc".equals(order) ? Sort.by("idhim").descending() : Sort.by("idhim").ascending()));
         }

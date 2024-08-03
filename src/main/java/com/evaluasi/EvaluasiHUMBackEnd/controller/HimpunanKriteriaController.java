@@ -52,12 +52,12 @@ public class HimpunanKriteriaController {
     @ResponseBody
     public ResponseEntity<Page<HimpunanKriteriaDto>> showAllAndPaginationHim(
             @RequestParam(required = false) String keterangan, // => optional
-            @RequestParam(required = false) Integer nilai, // => optional
+            @RequestParam(required = false) String nmkriteria, // => optional
             @RequestParam(defaultValue = "desc") String order, // => optional
             @RequestParam(name = "page", defaultValue = "1") int offset, // => optional
             @RequestParam(name = "limit", defaultValue = "10") int pageSize // => optional
     ) {
-        Page<HimpunanKriteriaDto> himpunanKriteriaDtoPage = himpunanKriteriaService.showAllAndPaginationHim(keterangan,nilai, order, offset, pageSize);
+        Page<HimpunanKriteriaDto> himpunanKriteriaDtoPage = himpunanKriteriaService.showAllAndPaginationHim(keterangan,nmkriteria, order, offset, pageSize);
         return ResponseEntity.ok(himpunanKriteriaDtoPage);
     }
 

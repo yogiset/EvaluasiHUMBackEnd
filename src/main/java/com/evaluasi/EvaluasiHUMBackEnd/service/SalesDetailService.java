@@ -33,22 +33,73 @@ public class SalesDetailService {
             SalesDetail salesDetail = new SalesDetail();
             salesDetail.setSales(sales);
             salesDetail.setBulan(salesDetailDto.getBulan());
-            salesDetail.setTargetbln(salesDetailDto.getTargetbln());
-            salesDetail.setTercapaii(salesDetailDto.getTercapaii());
-            double percent = (salesDetail.getTercapaii() * 100.0) / salesDetail.getTargetbln();
-            salesDetail.setTercapaipersenn(String.format("%.2f%%",percent));
+            salesDetail.setJumlahvisit(salesDetailDto.getJumlahvisit());
+
+            salesDetail.setTargetblntotal(salesDetailDto.getTargetblntotal());
+            salesDetail.setTercapaiitotal(salesDetailDto.getTercapaiitotal());
+            double percenttotal = (salesDetail.getTercapaiitotal() * 100.0) / salesDetail.getTargetblntotal();
+            salesDetail.setTercapaipersenntotal(String.format("%.2f%%",percenttotal));
+
+            salesDetail.setTargetblngadus(salesDetailDto.getTargetblngadus());
+            salesDetail.setTercapaiigadus(salesDetailDto.getTercapaiigadus());
+            double percentgadus = (salesDetail.getTercapaiigadus() * 100.0) / salesDetail.getTargetblngadus();
+            salesDetail.setTercapaipersenngadus(String.format("%.2f%%",percentgadus));
+
+            salesDetail.setTargetblnpremium(salesDetailDto.getTargetblnpremium());
+            salesDetail.setTercapaiipremium(salesDetailDto.getTercapaiipremium());
+            double percentpremium = (salesDetail.getTercapaiipremium() * 100.0) / salesDetail.getTargetblnpremium();
+            salesDetail.setTercapaipersennpremium(String.format("%.2f%%",percentpremium));
 
             salesDetailRepository.save(salesDetail);
 
-            double totalTercapaii = sales.getSalesDetails().stream()
-                    .mapToDouble(SalesDetail::getTercapaii)
+
+
+            double totalTercapaiitotal = sales.getSalesDetails().stream()
+                    .mapToDouble(SalesDetail::getTercapaiitotal)
                     .sum();
 
-            sales.setTercapai((int) totalTercapaii);
+            sales.setTercapaitotal((int) totalTercapaiitotal);
 
-            double overallPercentage = (totalTercapaii * 100.0) / (sales.getTarget());
+            double overallPercentagetotal = (totalTercapaiitotal * 100.0) / (sales.getTargettotal());
 
-            sales.setTercapaipersen(overallPercentage);
+            sales.setTercapaipersentotal(overallPercentagetotal);
+
+
+
+            double totalTercapaiigadus = sales.getSalesDetails().stream()
+                    .mapToDouble(SalesDetail::getTercapaiigadus)
+                    .sum();
+
+            sales.setTercapaigadus((int) totalTercapaiigadus);
+
+            double overallPercentagegadus = (totalTercapaiigadus * 100.0) / (sales.getTargetgadus());
+
+            sales.setTercapaipersengadus(overallPercentagegadus);
+
+
+            double totalTercapaiipremium = sales.getSalesDetails().stream()
+                    .mapToDouble(SalesDetail::getTercapaiipremium)
+                    .sum();
+
+            sales.setTercapaipremium((int) totalTercapaiipremium);
+
+            double overallPercentagepremium = (totalTercapaiipremium * 100.0) / (sales.getTargetpremium());
+
+            sales.setTercapaipersenpremium(overallPercentagepremium);
+
+
+            double totalVisit = sales.getSalesDetails().stream()
+                    .mapToDouble(SalesDetail::getJumlahvisit)
+                    .sum();
+
+            if ( totalVisit > 0){
+                int numberOfDetails = sales.getSalesDetails().size();
+                double averageVisit = numberOfDetails > 0 ? totalVisit / numberOfDetails : 0;
+                sales.setJumlahvisit(averageVisit);
+            } else {
+                sales.setJumlahvisit(sales.getJumlahvisit());
+            }
+
             salesRepository.save(sales);
 
             return ResponseEntity.ok("New Sales Detail added successfully");
@@ -70,21 +121,72 @@ public class SalesDetailService {
             Sales sales = salesDetail.getSales();
 
             salesDetail.setBulan(salesDetailDto.getBulan());
-            salesDetail.setTargetbln(salesDetailDto.getTargetbln());
-            salesDetail.setTercapaii(salesDetailDto.getTercapaii());
-            double percent = (salesDetail.getTercapaii() * 100.0) / salesDetail.getTargetbln();
-            salesDetail.setTercapaipersenn(String.format("%.2f%%",percent));
+            salesDetail.setJumlahvisit(salesDetailDto.getJumlahvisit());
+
+            salesDetail.setTargetblntotal(salesDetailDto.getTargetblntotal());
+            salesDetail.setTercapaiitotal(salesDetailDto.getTercapaiitotal());
+            double percenttotal = (salesDetail.getTercapaiitotal() * 100.0) / salesDetail.getTargetblntotal();
+            salesDetail.setTercapaipersenntotal(String.format("%.2f%%",percenttotal));
+
+            salesDetail.setTargetblngadus(salesDetailDto.getTargetblngadus());
+            salesDetail.setTercapaiigadus(salesDetailDto.getTercapaiigadus());
+            double percentgadus = (salesDetail.getTercapaiigadus() * 100.0) / salesDetail.getTargetblngadus();
+            salesDetail.setTercapaipersenngadus(String.format("%.2f%%",percentgadus));
+
+            salesDetail.setTargetblnpremium(salesDetailDto.getTargetblnpremium());
+            salesDetail.setTercapaiipremium(salesDetailDto.getTercapaiipremium());
+            double percentpremium = (salesDetail.getTercapaiipremium() * 100.0) / salesDetail.getTargetblnpremium();
+            salesDetail.setTercapaipersennpremium(String.format("%.2f%%",percentpremium));
 
             salesDetailRepository.save(salesDetail);
 
-            double totalTercapaii = sales.getSalesDetails().stream()
-                    .mapToDouble(SalesDetail::getTercapaii)
+            double totalTercapaiitotal = sales.getSalesDetails().stream()
+                    .mapToDouble(SalesDetail::getTercapaiitotal)
                     .sum();
 
-            sales.setTercapai((int)totalTercapaii);
+            sales.setTercapaitotal((int) totalTercapaiitotal);
 
-            double overallPercentage = (totalTercapaii * 100.0) / (sales.getTarget());
-            sales.setTercapaipersen(overallPercentage);
+            double overallPercentagetotal = (totalTercapaiitotal * 100.0) / (sales.getTargettotal());
+
+            sales.setTercapaipersentotal(overallPercentagetotal);
+
+
+
+            double totalTercapaiigadus = sales.getSalesDetails().stream()
+                    .mapToDouble(SalesDetail::getTercapaiigadus)
+                    .sum();
+
+            sales.setTercapaigadus((int) totalTercapaiigadus);
+
+            double overallPercentagegadus = (totalTercapaiigadus * 100.0) / (sales.getTargetgadus());
+
+            sales.setTercapaipersengadus(overallPercentagegadus);
+
+
+            double totalTercapaiipremium = sales.getSalesDetails().stream()
+                    .mapToDouble(SalesDetail::getTercapaiipremium)
+                    .sum();
+
+            sales.setTercapaipremium((int) totalTercapaiipremium);
+
+            double overallPercentagepremium = (totalTercapaiipremium * 100.0) / (sales.getTargetpremium());
+
+            sales.setTercapaipersenpremium(overallPercentagepremium);
+
+
+            double totalVisit = sales.getSalesDetails().stream()
+                    .mapToDouble(SalesDetail::getJumlahvisit)
+                    .sum();
+
+            if ( totalVisit > 0){
+                int numberOfDetails = sales.getSalesDetails().size();
+                double averageVisit = numberOfDetails > 0 ? totalVisit / numberOfDetails : 0;
+                sales.setJumlahvisit(averageVisit);
+            } else {
+                sales.setJumlahvisit(sales.getJumlahvisit());
+            }
+
+
             salesRepository.save(sales);
 
             return ResponseEntity.ok("Sales Detail edited successfully");
@@ -107,14 +209,51 @@ public class SalesDetailService {
 
                 salesDetailRepository.deleteById(id);
 
-                double totalTercapaii = sales.getSalesDetails().stream()
-                        .mapToDouble(SalesDetail::getTercapaii)
+                double totalTercapaiitotal = sales.getSalesDetails().stream()
+                        .mapToDouble(SalesDetail::getTercapaiitotal)
                         .sum();
 
-                sales.setTercapai((int) totalTercapaii);
+                sales.setTercapaitotal((int) totalTercapaiitotal);
 
-                double overallPercentage = (totalTercapaii * 100.0) / (sales.getTarget());
-                sales.setTercapaipersen(overallPercentage);
+                double overallPercentagetotal = (totalTercapaiitotal * 100.0) / (sales.getTargettotal());
+
+                sales.setTercapaipersentotal(overallPercentagetotal);
+
+
+
+                double totalTercapaiigadus = sales.getSalesDetails().stream()
+                        .mapToDouble(SalesDetail::getTercapaiigadus)
+                        .sum();
+
+                sales.setTercapaigadus((int) totalTercapaiigadus);
+
+                double overallPercentagegadus = (totalTercapaiigadus * 100.0) / (sales.getTargetgadus());
+
+                sales.setTercapaipersengadus(overallPercentagegadus);
+
+
+                double totalTercapaiipremium = sales.getSalesDetails().stream()
+                        .mapToDouble(SalesDetail::getTercapaiipremium)
+                        .sum();
+
+                sales.setTercapaipremium((int) totalTercapaiipremium);
+
+                double overallPercentagepremium = (totalTercapaiipremium * 100.0) / (sales.getTargetpremium());
+
+                sales.setTercapaipersenpremium(overallPercentagepremium);
+
+
+                double totalVisit = sales.getSalesDetails().stream()
+                        .mapToDouble(SalesDetail::getJumlahvisit)
+                        .sum();
+
+                if ( totalVisit > 0){
+                    int numberOfDetails = sales.getSalesDetails().size();
+                    double averageVisit = numberOfDetails > 0 ? totalVisit / numberOfDetails : 0;
+                    sales.setJumlahvisit(averageVisit);
+                } else {
+                    sales.setJumlahvisit(sales.getJumlahvisit());
+                }
 
                 salesRepository.save(sales);
 
@@ -140,9 +279,20 @@ public class SalesDetailService {
         Sales sales = salesDetail.getSales();
         salesDetailDto.setId(salesDetail.getId());
         salesDetailDto.setBulan(salesDetail.getBulan());
-        salesDetailDto.setTargetbln(salesDetail.getTargetbln());
-        salesDetailDto.setTercapaii(salesDetail.getTercapaii());
-        salesDetailDto.setTercapaipersenn(salesDetail.getTercapaipersenn());
+
+        salesDetailDto.setTargetblntotal(salesDetail.getTargetblntotal());
+        salesDetailDto.setTercapaiitotal(salesDetail.getTercapaiitotal());
+        salesDetailDto.setTercapaipersenntotal(salesDetail.getTercapaipersenntotal());
+
+        salesDetailDto.setTargetblngadus(salesDetail.getTargetblngadus());
+        salesDetailDto.setTercapaiigadus(salesDetail.getTercapaiigadus());
+        salesDetailDto.setTercapaipersenngadus(salesDetail.getTercapaipersenngadus());
+
+        salesDetailDto.setTargetblnpremium(salesDetail.getTargetblnpremium());
+        salesDetailDto.setTercapaiipremium(salesDetail.getTercapaiipremium());
+        salesDetailDto.setTercapaipersennpremium(salesDetail.getTercapaipersennpremium());
+
+        salesDetailDto.setJumlahvisit(salesDetail.getJumlahvisit());
         salesDetailDto.setIdsales(sales.getIdsales());
 
         return salesDetailDto;

@@ -102,13 +102,13 @@ public class CptService {
         }
     }
 
-    public Page<CptDto> showAllAndPaginationCpt(Integer coveragepersen, Integer tahun, String order, int offset, int pageSize) {
+    public Page<CptDto> showAllAndPaginationCpt(String nama, Integer tahun, String order, int offset, int pageSize) {
         log.info("Inside showAllAndPaginationCpt");
         Page<Cpt> cptPage;
-        if (coveragepersen != null && tahun != null) {
-            cptPage = cptRepository.findByTahunAndCoveragepersen(coveragepersen,tahun,PageRequest.of(offset - 1, pageSize,  "desc".equals(order) ? Sort.by("idcpt").descending() : Sort.by("idcpt").ascending()));
-        } else if (coveragepersen != null) {
-            cptPage = cptRepository.findByCoveragePersen(coveragepersen,PageRequest.of(offset - 1, pageSize,  "desc".equals(order) ? Sort.by("idcpt").descending() : Sort.by("idcpt").ascending()));
+        if (nama != null && tahun != null) {
+            cptPage = cptRepository.findByTahunAndNamaContainingIgnoreCase(tahun,nama,PageRequest.of(offset - 1, pageSize,  "desc".equals(order) ? Sort.by("idcpt").descending() : Sort.by("idcpt").ascending()));
+        } else if (nama != null) {
+            cptPage = cptRepository.findByNamaContainingIgnoreCase(nama,PageRequest.of(offset - 1, pageSize,  "desc".equals(order) ? Sort.by("idcpt").descending() : Sort.by("idcpt").ascending()));
         } else if (tahun != null) {
             cptPage = cptRepository.findByTahun(tahun,PageRequest.of(offset - 1, pageSize,  "desc".equals(order) ? Sort.by("idcpt").descending() : Sort.by("idcpt").ascending()));
         } else {

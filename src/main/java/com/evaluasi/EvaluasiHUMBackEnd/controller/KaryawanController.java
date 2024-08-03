@@ -61,12 +61,13 @@ public class KaryawanController {
     @GetMapping("/showall")
     @ResponseBody
     public ResponseEntity<Page<KaryawanDto>> showAllAndPaginationKaryawan(
-            @RequestParam(required = false) String jabatan, // => optional
+            @RequestParam(required = false) String jabatan,
+            @RequestParam(required = false) String nama, // => optional
             @RequestParam(defaultValue = "desc") String order, // => optional
             @RequestParam(name = "page", defaultValue = "1") int offset, // => optional
             @RequestParam(name = "limit", defaultValue = "10") int pageSize // => optional
     ) {
-        Page<KaryawanDto> karyawanDtoPage = karyawanService.showAllAndPaginationKaryawan(jabatan, order, offset, pageSize);
+        Page<KaryawanDto> karyawanDtoPage = karyawanService.showAllAndPaginationKaryawan(jabatan,nama, order, offset, pageSize);
         return ResponseEntity.ok(karyawanDtoPage);
     }
 

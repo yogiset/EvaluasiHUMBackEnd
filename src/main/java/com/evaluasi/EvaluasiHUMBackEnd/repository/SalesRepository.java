@@ -10,9 +10,14 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface SalesRepository extends JpaRepository<Sales,Long> {
-    @Query("SELECT p FROM Sales p WHERE p.target = :target")
-    Page<Sales> findByTarget(Integer target, Pageable pageable);
+
     @Query("SELECT p FROM Sales p WHERE p.tahun = :tahun")
     Page<Sales> findByTahun(Integer tahun, Pageable pageable);
-    Page<Sales> findByTahunAndTarget(Integer tahun,Integer target, Pageable pageable);
+
+    @Query("SELECT s FROM Sales s JOIN s.karyawan k WHERE LOWER(k.nama) LIKE LOWER(CONCAT('%', :nama, '%'))")
+    Page<Sales> findByNamaContainingIgnoreCase(String nama, Pageable pageable);
+
+    @Query("SELECT s FROM Sales s JOIN s.karyawan k WHERE s.tahun = :tahun AND LOWER(k.nama) LIKE LOWER(CONCAT('%', :nama, '%'))")
+    Page<Sales> findByTahunAndNamaContainingIgnoreCase(Integer tahun, String nama, Pageable pageable);
+
 }

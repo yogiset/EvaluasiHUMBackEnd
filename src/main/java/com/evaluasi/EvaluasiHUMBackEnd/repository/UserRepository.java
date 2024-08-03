@@ -27,6 +27,21 @@ public interface UserRepository extends JpaRepository<User,Long> {
 
     @Query("SELECT p FROM User p WHERE p.role = :role")
     Page<User> findByRole(String role, Pageable pageable);
+
+    @Query("SELECT p FROM User p WHERE p.username = :username")
+    Page<User> findByUsername(String username, Pageable pageable);
+
+    Page<User> findByUsernameAndRole(String username, String role, Pageable pageable);
+
     Optional<User> findByKaryawan(Karyawan karyawan);
     boolean existsByUsername(String username);
+
+    @Query("SELECT k FROM User k WHERE LOWER(k.username) LIKE LOWER(CONCAT('%', :username, '%'))")
+    Page<User> findByUsernameContainingIgnoreCase(String username, Pageable pageable);
+
+    @Query("SELECT k FROM User k WHERE LOWER(k.role) LIKE LOWER(CONCAT('%', :role, '%'))")
+    Page<User> findByRoleContainingIgnoreCase(String role, Pageable pageable);
+
+    @Query("SELECT k FROM User k WHERE LOWER(k.username) = LOWER(:username) AND LOWER(k.role) LIKE LOWER(CONCAT('%', :role, '%'))")
+    Page<User> findByUsernameAndRoleContainingIgnoreCase(String username, String role, Pageable pageable);
 }

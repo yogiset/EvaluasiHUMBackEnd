@@ -1,17 +1,9 @@
 package com.evaluasi.EvaluasiHUMBackEnd.service;
 
-import com.evaluasi.EvaluasiHUMBackEnd.dto.PenilaianSalesDto;
-import com.evaluasi.EvaluasiHUMBackEnd.dto.SalesDetailDto;
-import com.evaluasi.EvaluasiHUMBackEnd.dto.SalesDto;
-import com.evaluasi.EvaluasiHUMBackEnd.dto.UserDto;
-import com.evaluasi.EvaluasiHUMBackEnd.entity.Karyawan;
-import com.evaluasi.EvaluasiHUMBackEnd.entity.Sales;
-import com.evaluasi.EvaluasiHUMBackEnd.entity.SalesDetail;
-import com.evaluasi.EvaluasiHUMBackEnd.entity.User;
+import com.evaluasi.EvaluasiHUMBackEnd.dto.*;
+import com.evaluasi.EvaluasiHUMBackEnd.entity.*;
 import com.evaluasi.EvaluasiHUMBackEnd.exception.AllException;
-import com.evaluasi.EvaluasiHUMBackEnd.repository.KaryawanRepository;
-import com.evaluasi.EvaluasiHUMBackEnd.repository.SalesDetailRepository;
-import com.evaluasi.EvaluasiHUMBackEnd.repository.SalesRepository;
+import com.evaluasi.EvaluasiHUMBackEnd.repository.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -36,6 +28,8 @@ public class SalesService {
     private final SalesRepository salesRepository;
     private final KaryawanRepository karyawanRepository;
     private final SalesDetailRepository salesDetailRepository;
+    private final HimpunanKriteriaRepository himpunanKriteriaRepository;
+    private final BobotKriteriaRepository bobotKriteriaRepository;
 
     public ResponseEntity<Object> createSales(SalesDto salesDto, String nik) {
         log.info("inside createSales", salesDto);
@@ -52,9 +46,12 @@ public class SalesService {
                         .body("Karyawan with NIK: " + salesDto.getNik() + " is not a Sales");
             }
             sales.setKaryawan(karyawan);
-            sales.setTarget(salesDto.getTarget());
             sales.setTahun(salesDto.getTahun());
-            sales.setKeterangan(salesDto.getKeterangan());
+            sales.setTargettotal(salesDto.getTargettotal());
+            sales.setTargetgadus(salesDto.getTargetgadus());
+            sales.setTargetpremium(salesDto.getTargetpremium());
+            sales.setJumlahcustomer(salesDto.getJumlahcustomer());
+
 
             sales.setSalesDetails(new ArrayList<>());
 
@@ -62,11 +59,21 @@ public class SalesService {
                 for (SalesDetailDto salesDetailDto : salesDto.getSalesDetailDtoList()) {
                     SalesDetail salesDetail = new SalesDetail();
                     salesDetail.setBulan(salesDetailDto.getBulan());
-                    salesDetail.setTargetbln(salesDetailDto.getTargetbln());
-                    salesDetail.setTercapaii(salesDetailDto.getTercapaii());
+                    salesDetail.setTargetblntotal(salesDetailDto.getTargetblntotal());
+                    salesDetail.setTargetblngadus(salesDetailDto.getTargetblngadus());
+                    salesDetail.setTargetblnpremium(salesDetailDto.getTargetblnpremium());
+                    salesDetail.setTercapaiitotal(salesDetailDto.getTercapaiitotal());
+                    salesDetail.setTercapaiigadus(salesDetailDto.getTargetblngadus());
 
-                    double percent = (salesDetail.getTercapaii() * 100.0) / salesDetail.getTargetbln();
-                    salesDetail.setTercapaipersenn(String.format("%.2f%%", percent));
+                    double percenttotal = (salesDetail.getTercapaiitotal() * 100.0) / salesDetail.getTargetblntotal();
+                    salesDetail.setTercapaipersenntotal(String.format("%.2f%%", percenttotal));
+                    double percentgadus = (salesDetail.getTercapaiigadus() * 100.0) / salesDetail.getTargetblngadus();
+                    salesDetail.setTercapaipersenngadus(String.format("%.2f%%", percentgadus));
+                    double percentpremium = (salesDetail.getTercapaiipremium() * 100.0) / salesDetail.getTargetblnpremium();
+                    salesDetail.setTercapaipersennpremium(String.format("%.2f%%", percentpremium));
+
+                    salesDetail.setJumlahvisit(salesDetailDto.getJumlahvisit());
+
                     salesDetail.setSales(sales);
                     salesDetailRepository.save(salesDetail);
 
@@ -75,14 +82,51 @@ public class SalesService {
                 }
             }
 
-            double totalTercapaii = sales.getSalesDetails().stream()
-                    .mapToDouble(SalesDetail::getTercapaii)
+            double totalTercapaiitotal = sales.getSalesDetails().stream()
+                    .mapToDouble(SalesDetail::getTercapaiitotal)
                     .sum();
 
-            sales.setTercapai((int) totalTercapaii);
+            sales.setTercapaitotal((int) totalTercapaiitotal);
 
-            double overallPercentage = (totalTercapaii * 100.0) / sales.getTarget();
-            sales.setTercapaipersen(overallPercentage);
+            double overallPercentagetotal = (totalTercapaiitotal * 100.0) / sales.getTargettotal();
+            sales.setTercapaipersentotal(overallPercentagetotal);
+
+
+
+            double totalTercapaiigadus = sales.getSalesDetails().stream()
+                    .mapToDouble(SalesDetail::getTercapaiigadus)
+                    .sum();
+
+            sales.setTercapaigadus((int) totalTercapaiigadus);
+
+            double overallPercentagegadus = (totalTercapaiigadus * 100.0) / sales.getTargetgadus();
+            sales.setTercapaipersengadus(overallPercentagegadus);
+
+
+
+
+            double totalTercapaiipremium = sales.getSalesDetails().stream()
+                    .mapToDouble(SalesDetail::getTercapaiipremium)
+                    .sum();
+
+            sales.setTercapaipremium((int) totalTercapaiipremium);
+
+            double overallPercentagepremium = (totalTercapaiipremium * 100.0) / sales.getTargetpremium();
+            sales.setTercapaipersenpremium(overallPercentagepremium);
+
+
+
+            double totalVisit = sales.getSalesDetails().stream()
+                    .mapToDouble(SalesDetail::getJumlahvisit)
+                    .sum();
+
+            if ( totalVisit > 0){
+                int numberOfDetails = sales.getSalesDetails().size();
+                double averageVisit = numberOfDetails > 0 ? totalVisit / numberOfDetails : 0;
+                sales.setJumlahvisit(averageVisit);
+            } else {
+                sales.setJumlahvisit(salesDto.getJumlahvisit());
+            }
 
             salesRepository.save(sales);
 
@@ -102,25 +146,79 @@ public class SalesService {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Sales not found with id " + id);
             }
             Sales sales = optionalSales.get();
-            sales.setTarget(salesDto.getTarget());
             sales.setTahun(salesDto.getTahun());
-            sales.setKeterangan(salesDto.getKeterangan());
-            double totalTercapaii = sales.getSalesDetails().stream()
-                    .mapToDouble(SalesDetail::getTercapaii)
+            sales.setTargettotal(salesDto.getTargettotal());
+            sales.setTargetgadus(salesDto.getTargetgadus());
+            sales.setTargetpremium(salesDto.getTargetpremium());
+            sales.setJumlahcustomer(salesDto.getJumlahcustomer());
+
+            double totalTercapaiitotal = sales.getSalesDetails().stream()
+                    .mapToDouble(SalesDetail::getTercapaiitotal)
                     .sum();
 
-            if (totalTercapaii > 0) {
-                sales.setTercapai((int) totalTercapaii);
+            if (totalTercapaiitotal > 0) {
+                sales.setTercapaitotal((int) totalTercapaiitotal);
             } else {
-                sales.setTercapai(salesDto.getTercapai());
+                sales.setTercapaitotal(salesDto.getTercapaitotal());
             }
 
-            if (totalTercapaii > 0){
-                double overallPercentage = (totalTercapaii * 100.0) / sales.getTarget();
-                sales.setTercapaipersen(overallPercentage);
+            if (totalTercapaiitotal > 0){
+                double overallPercentagetotal = (totalTercapaiitotal * 100.0) / sales.getTargettotal();
+                sales.setTercapaipersentotal(overallPercentagetotal);
             } else {
-                double overallPercentage = (salesDto.getTercapai() * 100.0) / sales.getTarget();
-                sales.setTercapaipersen(overallPercentage);
+                double overallPercentage = (salesDto.getTercapaitotal() * 100.0) / sales.getTargettotal();
+                sales.setTercapaipersentotal(overallPercentage);
+            }
+
+
+
+            double totalTercapaiigadus = sales.getSalesDetails().stream()
+                    .mapToDouble(SalesDetail::getTercapaiigadus)
+                    .sum();
+
+            if (totalTercapaiigadus > 0) {
+                sales.setTercapaigadus((int) totalTercapaiigadus);
+            } else {
+                sales.setTercapaigadus(salesDto.getTercapaigadus());
+            }
+
+            if (totalTercapaiigadus > 0){
+                double overallPercentagegadus = (totalTercapaiigadus * 100.0) / sales.getTargetgadus();
+                sales.setTercapaipersengadus(overallPercentagegadus);
+            } else {
+                double overallPercentagegadus = (salesDto.getTercapaigadus() * 100.0) / sales.getTargetgadus();
+                sales.setTercapaipersengadus(overallPercentagegadus);
+            }
+
+
+            double totalTercapaiipremium = sales.getSalesDetails().stream()
+                    .mapToDouble(SalesDetail::getTercapaiipremium)
+                    .sum();
+
+            if (totalTercapaiipremium > 0) {
+                sales.setTercapaipremium((int) totalTercapaiipremium);
+            } else {
+                sales.setTercapaipremium(salesDto.getTercapaipremium());
+            }
+
+            if (totalTercapaiipremium > 0){
+                double overallPercentagepremium = (totalTercapaiipremium * 100.0) / sales.getTargetpremium();
+                sales.setTercapaipersenpremium(overallPercentagepremium);
+            } else {
+                double overallPercentagepremium = (salesDto.getTercapaipremium() * 100.0) / sales.getTargetpremium();
+                sales.setTercapaipersenpremium(overallPercentagepremium);
+            }
+
+            double totalVisit = sales.getSalesDetails().stream()
+                    .mapToDouble(SalesDetail::getJumlahvisit)
+                    .sum();
+
+            if ( totalVisit > 0){
+                int numberOfDetails = sales.getSalesDetails().size();
+                double averageVisit = numberOfDetails > 0 ? totalVisit / numberOfDetails : 0;
+                sales.setJumlahvisit(averageVisit);
+            } else {
+                sales.setJumlahvisit(salesDto.getJumlahvisit());
             }
 
             salesRepository.save(sales);
@@ -133,17 +231,38 @@ public class SalesService {
                         // If SalesDetail with the given ID exists, update it
                         SalesDetail salesDetail = optionalSalesDetail.get();
                         salesDetail.setBulan(salesDetailDto.getBulan());
-                        salesDetail.setTargetbln(salesDetailDto.getTargetbln());
-                        salesDetail.setTercapaii(salesDetailDto.getTercapaii());
-                        salesDetail.setTercapaipersenn(salesDetailDto.getTercapaipersenn());
+                        salesDetail.setTargetblntotal(salesDetailDto.getTargetblntotal());
+                        salesDetail.setTercapaiitotal(salesDetailDto.getTercapaiitotal());
+                        salesDetail.setTercapaipersenntotal(salesDetailDto.getTercapaipersenntotal());
+
+                        salesDetail.setTargetblngadus(salesDetailDto.getTargetblngadus());
+                        salesDetail.setTercapaiigadus(salesDetailDto.getTercapaiigadus());
+                        salesDetail.setTercapaipersenngadus(salesDetailDto.getTercapaipersenngadus());
+
+                        salesDetail.setTargetblnpremium(salesDetailDto.getTargetblnpremium());
+                        salesDetail.setTercapaiipremium(salesDetailDto.getTercapaiipremium());
+                        salesDetail.setTercapaipersennpremium(salesDetailDto.getTercapaipersennpremium());
+
+                        salesDetail.setJumlahvisit(salesDetailDto.getJumlahvisit());
+
                         salesDetailRepository.save(salesDetail);
                     } else {
                         // If SalesDetail with the given ID doesn't exist, create new SalesDetail
                         SalesDetail salesDetail = new SalesDetail();
                         salesDetail.setBulan(salesDetailDto.getBulan());
-                        salesDetail.setTargetbln(salesDetailDto.getTargetbln());
-                        salesDetail.setTercapaii(salesDetailDto.getTercapaii());
-                        salesDetail.setTercapaipersenn(salesDetailDto.getTercapaipersenn());
+                        salesDetail.setTargetblntotal(salesDetailDto.getTargetblntotal());
+                        salesDetail.setTercapaiitotal(salesDetailDto.getTercapaiitotal());
+                        salesDetail.setTercapaipersenntotal(salesDetailDto.getTercapaipersenntotal());
+
+                        salesDetail.setTargetblngadus(salesDetailDto.getTargetblngadus());
+                        salesDetail.setTercapaiigadus(salesDetailDto.getTercapaiigadus());
+                        salesDetail.setTercapaipersenngadus(salesDetailDto.getTercapaipersenngadus());
+
+                        salesDetail.setTargetblnpremium(salesDetailDto.getTargetblnpremium());
+                        salesDetail.setTercapaiipremium(salesDetailDto.getTercapaiipremium());
+                        salesDetail.setTercapaipersennpremium(salesDetailDto.getTercapaipersennpremium());
+
+                        salesDetail.setJumlahvisit(salesDetailDto.getJumlahvisit());
                         salesDetail.setSales(sales);
                         salesDetailRepository.save(salesDetail);
                     }
@@ -176,23 +295,24 @@ public class SalesService {
         }
     }
 
-    public Page<SalesDto> showAllAndPaginationSales(Integer target, Integer tahun, String order, int offset,
-            int pageSize) {
+    public Page<SalesDto> showAllAndPaginationSales(Integer tahun, String nama, String order, int offset, int pageSize) {
         log.info("Inside showAllAndPaginationSales");
         Page<Sales> salesPage;
-        if (target != null && tahun != null) {
-            salesPage = salesRepository.findByTahunAndTarget(tahun, target, PageRequest.of(offset - 1, pageSize,
-                    "desc".equals(order) ? Sort.by("idsales").descending() : Sort.by("idsales").ascending()));
-        } else if (target != null) {
-            salesPage = salesRepository.findByTarget(target, PageRequest.of(offset - 1, pageSize,
+
+        if (tahun != null && nama != null) {
+            salesPage = salesRepository.findByTahunAndNamaContainingIgnoreCase(tahun, nama, PageRequest.of(offset - 1, pageSize,
                     "desc".equals(order) ? Sort.by("idsales").descending() : Sort.by("idsales").ascending()));
         } else if (tahun != null) {
             salesPage = salesRepository.findByTahun(tahun, PageRequest.of(offset - 1, pageSize,
+                    "desc".equals(order) ? Sort.by("idsales").descending() : Sort.by("idsales").ascending()));
+        } else if (nama != null) {
+            salesPage = salesRepository.findByNamaContainingIgnoreCase(nama, PageRequest.of(offset - 1, pageSize,
                     "desc".equals(order) ? Sort.by("idsales").descending() : Sort.by("idsales").ascending()));
         } else {
             salesPage = salesRepository.findAll(PageRequest.of(offset - 1, pageSize,
                     "desc".equals(order) ? Sort.by("idsales").descending() : Sort.by("idsales").ascending()));
         }
+
         List<SalesDto> resultList = salesPage.getContent().stream()
                 .map(sales -> {
                     SalesDto salesDto = new SalesDto();
@@ -200,11 +320,19 @@ public class SalesService {
                     salesDto.setIdsales(sales.getIdsales());
                     salesDto.setNik(karyawan.getNik());
                     salesDto.setNama(karyawan.getNama());
-                    salesDto.setTarget(sales.getTarget());
+                    salesDto.setJabatan(karyawan.getJabatan());
                     salesDto.setTahun(sales.getTahun());
-                    salesDto.setTercapai(sales.getTercapai());
-                    salesDto.setTercapaipersen(sales.getTercapaipersen());
-                    salesDto.setKeterangan(sales.getKeterangan());
+                    salesDto.setTargettotal(sales.getTargettotal());
+                    salesDto.setTargetgadus(sales.getTargetgadus());
+                    salesDto.setTargetpremium(sales.getTargetpremium());
+                    salesDto.setTercapaitotal(sales.getTercapaitotal());
+                    salesDto.setTercapaigadus(sales.getTercapaigadus());
+                    salesDto.setTercapaipremium(sales.getTercapaipremium());
+                    salesDto.setTercapaipersentotal(sales.getTercapaipersentotal());
+                    salesDto.setTercapaipersengadus(sales.getTercapaipersengadus());
+                    salesDto.setTercapaipersenpremium(sales.getTercapaipersenpremium());
+                    salesDto.setJumlahcustomer(sales.getJumlahcustomer());
+                    salesDto.setJumlahvisit(sales.getJumlahvisit());
 
                     // Map SalesDetail information
                     List<SalesDetailDto> salesDetailDtoList = sales.getSalesDetails().stream()
@@ -212,9 +340,21 @@ public class SalesService {
                                 SalesDetailDto salesDetailDto = new SalesDetailDto();
                                 salesDetailDto.setId(saless.getId());
                                 salesDetailDto.setBulan(saless.getBulan());
-                                salesDetailDto.setTargetbln(saless.getTargetbln());
-                                salesDetailDto.setTercapaii(saless.getTercapaii());
-                                salesDetailDto.setTercapaipersenn(saless.getTercapaipersenn());
+
+                                salesDetailDto.setTargetblntotal(saless.getTargetblntotal());
+                                salesDetailDto.setTercapaiitotal(saless.getTercapaiitotal());
+                                salesDetailDto.setTercapaipersenntotal(saless.getTercapaipersenntotal());
+
+                                salesDetailDto.setTargetblngadus(saless.getTargetblngadus());
+                                salesDetailDto.setTercapaiigadus(saless.getTercapaiigadus());
+                                salesDetailDto.setTercapaipersenngadus(saless.getTercapaipersenngadus());
+
+                                salesDetailDto.setTargetblnpremium(saless.getTargetblnpremium());
+                                salesDetailDto.setTercapaiipremium(saless.getTercapaiipremium());
+                                salesDetailDto.setTercapaipersennpremium(saless.getTercapaipersennpremium());
+
+                                salesDetailDto.setJumlahvisit(saless.getJumlahvisit());
+
                                 salesDetailDto.setIdsales(saless.getSales().getIdsales());
                                 return salesDetailDto;
                             })
@@ -227,6 +367,152 @@ public class SalesService {
         return new PageImpl<>(resultList, salesPage.getPageable(), salesPage.getTotalElements());
     }
 
+    public Page<AchivementTotalDto> achivementTotalPagination(Integer tahun, String nama, String order, int offset, int pageSize) {
+        log.info("Inside showachivementTotalPagination");
+        Page<Sales> salesPage;
+
+        if (tahun != null && nama != null) {
+            salesPage = salesRepository.findByTahunAndNamaContainingIgnoreCase(tahun, nama, PageRequest.of(offset - 1, pageSize,
+                    "desc".equals(order) ? Sort.by("idsales").descending() : Sort.by("idsales").ascending()));
+        } else if (tahun != null) {
+            salesPage = salesRepository.findByTahun(tahun, PageRequest.of(offset - 1, pageSize,
+                    "desc".equals(order) ? Sort.by("idsales").descending() : Sort.by("idsales").ascending()));
+        } else if (nama != null) {
+            salesPage = salesRepository.findByNamaContainingIgnoreCase(nama, PageRequest.of(offset - 1, pageSize,
+                    "desc".equals(order) ? Sort.by("idsales").descending() : Sort.by("idsales").ascending()));
+        } else {
+            salesPage = salesRepository.findAll(PageRequest.of(offset - 1, pageSize,
+                    "desc".equals(order) ? Sort.by("idsales").descending() : Sort.by("idsales").ascending()));
+        }
+        List<AchivementTotalDto> resultList = salesPage.getContent().stream()
+                .map(sales -> {
+                    AchivementTotalDto achivementTotalDto = new AchivementTotalDto();
+                    Karyawan karyawan = sales.getKaryawan();
+                    achivementTotalDto.setIdsales(sales.getIdsales());
+                    achivementTotalDto.setNik(karyawan.getNik());
+                    achivementTotalDto.setNama(karyawan.getNama());
+                    achivementTotalDto.setTahun(sales.getTahun());
+                    achivementTotalDto.setTargettotal(sales.getTargettotal());
+                    achivementTotalDto.setTercapaitotal(sales.getTercapaitotal());
+                    achivementTotalDto.setTercapaipersentotal(sales.getTercapaipersentotal());
+
+                    return achivementTotalDto;
+                })
+                .collect(Collectors.toList());
+
+        return new PageImpl<>(resultList, salesPage.getPageable(), salesPage.getTotalElements());
+
+    }
+
+    public Page<AchivementGadusDto> achivementGadusPagination(Integer tahun, String nama, String order, int offset, int pageSize) {
+        log.info("Inside showachivementGadusPagination");
+        Page<Sales> salesPage;
+
+        if (tahun != null && nama != null) {
+            salesPage = salesRepository.findByTahunAndNamaContainingIgnoreCase(tahun, nama, PageRequest.of(offset - 1, pageSize,
+                    "desc".equals(order) ? Sort.by("idsales").descending() : Sort.by("idsales").ascending()));
+        } else if (tahun != null) {
+            salesPage = salesRepository.findByTahun(tahun, PageRequest.of(offset - 1, pageSize,
+                    "desc".equals(order) ? Sort.by("idsales").descending() : Sort.by("idsales").ascending()));
+        } else if (nama != null) {
+            salesPage = salesRepository.findByNamaContainingIgnoreCase(nama, PageRequest.of(offset - 1, pageSize,
+                    "desc".equals(order) ? Sort.by("idsales").descending() : Sort.by("idsales").ascending()));
+        } else {
+            salesPage = salesRepository.findAll(PageRequest.of(offset - 1, pageSize,
+                    "desc".equals(order) ? Sort.by("idsales").descending() : Sort.by("idsales").ascending()));
+        }
+        List<AchivementGadusDto> resultList = salesPage.getContent().stream()
+                .map(sales -> {
+                    AchivementGadusDto achivementGadusDto = new AchivementGadusDto();
+                    Karyawan karyawan = sales.getKaryawan();
+                    achivementGadusDto.setIdsales(sales.getIdsales());
+                    achivementGadusDto.setNik(karyawan.getNik());
+                    achivementGadusDto.setNama(karyawan.getNama());
+                    achivementGadusDto.setTahun(sales.getTahun());
+                    achivementGadusDto.setTargetgadus(sales.getTargetgadus());
+                    achivementGadusDto.setTercapaigadus(sales.getTercapaigadus());
+                    achivementGadusDto.setTercapaipersengadus(sales.getTercapaipersengadus());
+                    return achivementGadusDto;
+                })
+                .collect(Collectors.toList());
+
+        return new PageImpl<>(resultList, salesPage.getPageable(), salesPage.getTotalElements());
+
+    }
+
+    public Page<AchivementPremiumDto> achivementPremiumPagination(Integer tahun, String nama, String order, int offset, int pageSize) {
+        log.info("Inside showachivementPremiumPagination");
+        Page<Sales> salesPage;
+
+        if (tahun != null && nama != null) {
+            salesPage = salesRepository.findByTahunAndNamaContainingIgnoreCase(tahun, nama, PageRequest.of(offset - 1, pageSize,
+                    "desc".equals(order) ? Sort.by("idsales").descending() : Sort.by("idsales").ascending()));
+        } else if (tahun != null) {
+            salesPage = salesRepository.findByTahun(tahun, PageRequest.of(offset - 1, pageSize,
+                    "desc".equals(order) ? Sort.by("idsales").descending() : Sort.by("idsales").ascending()));
+        } else if (nama != null) {
+            salesPage = salesRepository.findByNamaContainingIgnoreCase(nama, PageRequest.of(offset - 1, pageSize,
+                    "desc".equals(order) ? Sort.by("idsales").descending() : Sort.by("idsales").ascending()));
+        } else {
+            salesPage = salesRepository.findAll(PageRequest.of(offset - 1, pageSize,
+                    "desc".equals(order) ? Sort.by("idsales").descending() : Sort.by("idsales").ascending()));
+        }
+        List<AchivementPremiumDto> resultList = salesPage.getContent().stream()
+                .map(sales -> {
+                    AchivementPremiumDto achivementPremiumDto = new AchivementPremiumDto();
+                    Karyawan karyawan = sales.getKaryawan();
+                    achivementPremiumDto.setIdsales(sales.getIdsales());
+                    achivementPremiumDto.setNik(karyawan.getNik());
+                    achivementPremiumDto.setNama(karyawan.getNama());
+                    achivementPremiumDto.setTahun(sales.getTahun());
+                    achivementPremiumDto.setTargetpremium(sales.getTargetpremium());
+                    achivementPremiumDto.setTercapaipremium(sales.getTercapaipremium());
+                    achivementPremiumDto.setTercapaipersenpremium(sales.getTercapaipersenpremium());
+                    return achivementPremiumDto;
+                })
+                .collect(Collectors.toList());
+
+        return new PageImpl<>(resultList, salesPage.getPageable(), salesPage.getTotalElements());
+
+
+    }
+
+    public Page<JumlahCustomerAndVisitDto> jumlahCustomerAndVisitPagination(Integer tahun, String nama, String order, int offset, int pageSize) {
+        log.info("Inside jumlahCustomerAndVisitPagination");
+        Page<Sales> salesPage;
+
+        if (tahun != null && nama != null) {
+            salesPage = salesRepository.findByTahunAndNamaContainingIgnoreCase(tahun, nama, PageRequest.of(offset - 1, pageSize,
+                    "desc".equals(order) ? Sort.by("idsales").descending() : Sort.by("idsales").ascending()));
+        } else if (tahun != null) {
+            salesPage = salesRepository.findByTahun(tahun, PageRequest.of(offset - 1, pageSize,
+                    "desc".equals(order) ? Sort.by("idsales").descending() : Sort.by("idsales").ascending()));
+        } else if (nama != null) {
+            salesPage = salesRepository.findByNamaContainingIgnoreCase(nama, PageRequest.of(offset - 1, pageSize,
+                    "desc".equals(order) ? Sort.by("idsales").descending() : Sort.by("idsales").ascending()));
+        } else {
+            salesPage = salesRepository.findAll(PageRequest.of(offset - 1, pageSize,
+                    "desc".equals(order) ? Sort.by("idsales").descending() : Sort.by("idsales").ascending()));
+        }
+        List<JumlahCustomerAndVisitDto> resultList = salesPage.getContent().stream()
+                .map(sales -> {
+                    JumlahCustomerAndVisitDto jumlahCustomerAndVisitDto = new JumlahCustomerAndVisitDto();
+                    Karyawan karyawan = sales.getKaryawan();
+                    jumlahCustomerAndVisitDto.setIdsales(sales.getIdsales());
+                    jumlahCustomerAndVisitDto.setNik(karyawan.getNik());
+                    jumlahCustomerAndVisitDto.setNama(karyawan.getNama());
+                    jumlahCustomerAndVisitDto.setTahun(sales.getTahun());
+                    jumlahCustomerAndVisitDto.setJumlahcustomer(sales.getJumlahcustomer());
+                    jumlahCustomerAndVisitDto.setJumlahvisit(sales.getJumlahvisit());
+                    return jumlahCustomerAndVisitDto;
+                })
+                .collect(Collectors.toList());
+
+        return new PageImpl<>(resultList, salesPage.getPageable(), salesPage.getTotalElements());
+
+    }
+
+
     public SalesDto fetchSalesDtoByIdsales(Long id) throws AllException {
         log.info("Inside fetchUserDtoByIduser");
         Sales sales = salesRepository.findById(id)
@@ -237,20 +523,40 @@ public class SalesService {
         salesDto.setIdsales(sales.getIdsales());
         salesDto.setNik(karyawan.getNik());
         salesDto.setNama(karyawan.getNama());
-        salesDto.setTarget(sales.getTarget());
+        salesDto.setJabatan(karyawan.getJabatan());
         salesDto.setTahun(sales.getTahun());
-        salesDto.setTercapai(sales.getTercapai());
-        salesDto.setTercapaipersen(sales.getTercapaipersen());
-        salesDto.setKeterangan(sales.getKeterangan());
+        salesDto.setTargettotal(sales.getTargettotal());
+        salesDto.setTargetgadus(sales.getTargetgadus());
+        salesDto.setTargetpremium(sales.getTargetpremium());
+        salesDto.setTercapaitotal(sales.getTercapaitotal());
+        salesDto.setTercapaigadus(sales.getTercapaigadus());
+        salesDto.setTercapaipremium(sales.getTercapaipremium());
+        salesDto.setTercapaipersentotal(sales.getTercapaipersentotal());
+        salesDto.setTercapaipersengadus(sales.getTercapaipersengadus());
+        salesDto.setTercapaipersenpremium(sales.getTercapaipersenpremium());
+        salesDto.setJumlahcustomer(sales.getJumlahcustomer());
+        salesDto.setJumlahvisit(sales.getJumlahvisit());
 
         List<SalesDetailDto> salesDetailDtoList = sales.getSalesDetails().stream()
                 .map(saless -> {
                     SalesDetailDto salesDetailDto = new SalesDetailDto();
                     salesDetailDto.setId(saless.getId());
                     salesDetailDto.setBulan(saless.getBulan());
-                    salesDetailDto.setTargetbln(saless.getTargetbln());
-                    salesDetailDto.setTercapaii(saless.getTercapaii());
-                    salesDetailDto.setTercapaipersenn(saless.getTercapaipersenn());
+
+                    salesDetailDto.setTargetblntotal(saless.getTargetblntotal());
+                    salesDetailDto.setTercapaiitotal(saless.getTercapaiitotal());
+                    salesDetailDto.setTercapaipersenntotal(saless.getTercapaipersenntotal());
+
+                    salesDetailDto.setTargetblngadus(saless.getTargetblngadus());
+                    salesDetailDto.setTercapaiigadus(saless.getTercapaiigadus());
+                    salesDetailDto.setTercapaipersenngadus(saless.getTercapaipersenngadus());
+
+                    salesDetailDto.setTargetblnpremium(saless.getTargetblnpremium());
+                    salesDetailDto.setTercapaiipremium(saless.getTercapaiipremium());
+                    salesDetailDto.setTercapaipersennpremium(saless.getTercapaipersennpremium());
+
+                    salesDetailDto.setJumlahvisit(saless.getJumlahvisit());
+
                     salesDetailDto.setIdsales(saless.getSales().getIdsales());
                     return salesDetailDto;
                 })
@@ -260,26 +566,23 @@ public class SalesService {
         return salesDto;
     }
 
-    // Utility method to normalize strings by removing spaces and punctuation
-    private String normalizeString(String input) {
-        if (input == null) return "";
-        // Remove punctuation and normalize spaces
-        String normalized = Normalizer.normalize(input, Normalizer.Form.NFD);
-        normalized = normalized.replaceAll("[\\p{InCombiningDiacriticalMarks}]+", ""); // Remove diacritics
-        normalized = normalized.replaceAll("[\\p{Punct}\\s]+", "").toLowerCase(); // Remove punctuation and spaces
-        return normalized;
-    }
-
-    public Page<PenilaianSalesDto> paginationPenilaianSales(Integer tahun, String order, int offset, int pageSize) {
-        log.info("Inside showAllAndPaginationSales");
+    public Page<PenilaianSalesDto> paginationPenilaianSales(Integer tahun,String nama, String order, int offset, int pageSize) {
+        log.info("Inside Pagination Penilaian Sales");
         Page<Sales> salesPage;
-        if (tahun != null) {
+        if (tahun != null && nama != null) {
+            salesPage = salesRepository.findByTahunAndNamaContainingIgnoreCase(tahun, nama, PageRequest.of(offset - 1, pageSize,
+                    "desc".equals(order) ? Sort.by("idsales").descending() : Sort.by("idsales").ascending()));
+        } else if (tahun != null) {
             salesPage = salesRepository.findByTahun(tahun, PageRequest.of(offset - 1, pageSize,
-                    "desc".equals(order) ? Sort.by("keterangan").descending() : Sort.by("keterangan").ascending()));
+                    "desc".equals(order) ? Sort.by("idsales").descending() : Sort.by("idsales").ascending()));
+        } else if (nama != null) {
+            salesPage = salesRepository.findByNamaContainingIgnoreCase(nama, PageRequest.of(offset - 1, pageSize,
+                    "desc".equals(order) ? Sort.by("idsales").descending() : Sort.by("idsales").ascending()));
         } else {
             salesPage = salesRepository.findAll(PageRequest.of(offset - 1, pageSize,
-                    "desc".equals(order) ? Sort.by("keterangan").descending() : Sort.by("keterangan").ascending()));
+                    "desc".equals(order) ? Sort.by("idsales").descending() : Sort.by("idsales").ascending()));
         }
+
         List<PenilaianSalesDto> resultList = salesPage.getContent().stream()
                 .map(sales -> {
                     PenilaianSalesDto penilaianSalesDto = new PenilaianSalesDto();
@@ -287,20 +590,19 @@ public class SalesService {
                     penilaianSalesDto.setIdsales(sales.getIdsales());
                     penilaianSalesDto.setNama(karyawan.getNama());
                     penilaianSalesDto.setTahun(sales.getTahun());
-                    String keterangan = sales.getKeterangan();
-//                    String normalizedKeterangan = normalizeString(keterangan);
-                        if ("Achivement Total".equalsIgnoreCase(keterangan)) {
-                            penilaianSalesDto.setAchievtotal(sales.getTercapaipersen());
-                        } else if ("Achivement Gadus".equalsIgnoreCase(keterangan)) {
-                            penilaianSalesDto.setAchievgadus(sales.getTercapaipersen());
-                        } else if ("Achivement Premium".equalsIgnoreCase(keterangan)) {
-                            penilaianSalesDto.setAchievpremium(sales.getTercapaipersen());
-                        } else if ("Coverage(Jumlah Customer dan Jumlah Visit)".equalsIgnoreCase(keterangan)) {
-                            penilaianSalesDto.setJumvisit(sales.getTercapaipersen());
-                            if(sales.getTarget() != 0.0){
-                                penilaianSalesDto.setJumcustomer(sales.getTarget());
-                            }
-                        }
+
+                            penilaianSalesDto.setAchievtotal(sales.getTercapaipersentotal());
+
+                            penilaianSalesDto.setAchievgadus(sales.getTercapaipersengadus());
+
+                            penilaianSalesDto.setAchievpremium(sales.getTercapaipersenpremium());
+
+                            penilaianSalesDto.setJumvisit(sales.getJumlahvisit());
+
+                            penilaianSalesDto.setJumcustomer(sales.getJumlahcustomer());
+
+
+
 
                     return penilaianSalesDto;
                 })
@@ -309,4 +611,205 @@ public class SalesService {
         return new PageImpl<>(resultList, salesPage.getPageable(), salesPage.getTotalElements());
 
     }
+
+    public Page<PenilaianSalesDto> paginationPenilaianKriteria(Integer tahun,String nama, String order, int offset, int pageSize) {
+        log.info("Inside pagination Penilaian Kriteria");
+        Page<Sales> salesPage;
+        if (tahun != null && nama != null) {
+            salesPage = salesRepository.findByTahunAndNamaContainingIgnoreCase(tahun, nama, PageRequest.of(offset - 1, pageSize,
+                    "desc".equals(order) ? Sort.by("idsales").descending() : Sort.by("idsales").ascending()));
+        } else if (tahun != null) {
+            salesPage = salesRepository.findByTahun(tahun, PageRequest.of(offset - 1, pageSize,
+                    "desc".equals(order) ? Sort.by("idsales").descending() : Sort.by("idsales").ascending()));
+        } else if (nama != null) {
+            salesPage = salesRepository.findByNamaContainingIgnoreCase(nama, PageRequest.of(offset - 1, pageSize,
+                    "desc".equals(order) ? Sort.by("idsales").descending() : Sort.by("idsales").ascending()));
+        } else {
+            salesPage = salesRepository.findAll(PageRequest.of(offset - 1, pageSize,
+                    "desc".equals(order) ? Sort.by("idsales").descending() : Sort.by("idsales").ascending()));
+        }
+        List<PenilaianSalesDto> resultList = salesPage.getContent().stream()
+                .map(sales -> {
+                    PenilaianSalesDto penilaianSalesDto = new PenilaianSalesDto();
+                    Karyawan karyawan = sales.getKaryawan();
+                    penilaianSalesDto.setIdsales(sales.getIdsales());
+                    penilaianSalesDto.setNama(karyawan.getNama());
+                    penilaianSalesDto.setTahun(sales.getTahun());
+
+                    penilaianSalesDto.setAchievtotal(getNilaiForAchivement("Achivement Total", sales.getTercapaipersentotal()));
+                    penilaianSalesDto.setAchievgadus(getNilaiForAchivement("Achivement Gadus", sales.getTercapaipersengadus()));
+                    penilaianSalesDto.setAchievpremium(getNilaiForAchivement("Achivement Premium", sales.getTercapaipersenpremium()));
+                    penilaianSalesDto.setJumvisit(getNilaiForAchivement("Jumlah Visit", sales.getJumlahvisit()));
+                    penilaianSalesDto.setJumcustomer(getNilaiForAchivement("Jumlah Customer", sales.getJumlahcustomer()));
+
+                    return penilaianSalesDto;
+                })
+                .collect(Collectors.toList());
+
+        return new PageImpl<>(resultList, salesPage.getPageable(), salesPage.getTotalElements());
+    }
+
+    public Page<PenilaianSalesDto> normalisasiMatrikskeputusan(Integer tahun,String nama, String order, int offset, int pageSize) {
+        log.info("Inside normalisasi matriks keputusan");
+
+        Page<Sales> salesPage;
+        if (tahun != null && nama != null) {
+            salesPage = salesRepository.findByTahunAndNamaContainingIgnoreCase(tahun, nama, PageRequest.of(offset - 1, pageSize,
+                    "desc".equals(order) ? Sort.by("idsales").descending() : Sort.by("idsales").ascending()));
+        } else if (tahun != null) {
+            salesPage = salesRepository.findByTahun(tahun, PageRequest.of(offset - 1, pageSize,
+                    "desc".equals(order) ? Sort.by("idsales").descending() : Sort.by("idsales").ascending()));
+        } else if (nama != null) {
+            salesPage = salesRepository.findByNamaContainingIgnoreCase(nama, PageRequest.of(offset - 1, pageSize,
+                    "desc".equals(order) ? Sort.by("idsales").descending() : Sort.by("idsales").ascending()));
+        } else {
+            salesPage = salesRepository.findAll(PageRequest.of(offset - 1, pageSize,
+                    "desc".equals(order) ? Sort.by("idsales").descending() : Sort.by("idsales").ascending()));
+        }
+
+        List<Sales> salesList = salesPage.getContent();
+
+        // Calculate max nilai for each achievement type
+        double maxNilaiAchivementTotal = getMaxNilai("Achivement Total");
+        double maxNilaiAchivementGadus = getMaxNilai("Achivement Gadus");
+        double maxNilaiAchivementPremium = getMaxNilai("Achivement Premium");
+        double maxNilaiJumlahVisit = getMaxNilai("Jumlah Visit");
+        double maxNilaiJumlahCustomer = getMaxNilai("Jumlah Customer");
+
+        List<PenilaianSalesDto> resultList = salesList.stream()
+                .map(sales -> {
+                    PenilaianSalesDto penilaianSalesDto = new PenilaianSalesDto();
+                    Karyawan karyawan = sales.getKaryawan();
+                    penilaianSalesDto.setIdsales(sales.getIdsales());
+                    penilaianSalesDto.setNama(karyawan.getNama());
+                    penilaianSalesDto.setTahun(sales.getTahun());
+
+                    // Normalize and set values
+                    penilaianSalesDto.setAchievtotal(getNilaiForAchivement("Achivement Total", sales.getTercapaipersentotal()) / maxNilaiAchivementTotal);
+                    penilaianSalesDto.setAchievgadus(getNilaiForAchivement("Achivement Gadus", sales.getTercapaipersengadus()) / maxNilaiAchivementGadus);
+                    penilaianSalesDto.setAchievpremium(getNilaiForAchivement("Achivement Premium", sales.getTercapaipersenpremium()) / maxNilaiAchivementPremium);
+                    penilaianSalesDto.setJumvisit(getNilaiForAchivement("Jumlah Visit", sales.getJumlahvisit()) / maxNilaiJumlahVisit);
+                    penilaianSalesDto.setJumcustomer(getNilaiForAchivement("Jumlah Customer", sales.getJumlahcustomer()) / maxNilaiJumlahCustomer);
+
+                    return penilaianSalesDto;
+                })
+                .collect(Collectors.toList());
+
+        return new PageImpl<>(resultList, salesPage.getPageable(), salesPage.getTotalElements());
+    }
+
+    public Page<RankDto> perangkinganSales(Integer tahun,String nama, String order, int offset, int pageSize) {
+        log.info("Inside perangkinganSales");
+
+        Page<Sales> salesPage;
+        if (tahun != null && nama != null) {
+            salesPage = salesRepository.findByTahunAndNamaContainingIgnoreCase(tahun, nama, PageRequest.of(offset - 1, pageSize,
+                    "desc".equals(order) ? Sort.by("idsales").descending() : Sort.by("idsales").ascending()));
+        } else if (tahun != null) {
+            salesPage = salesRepository.findByTahun(tahun, PageRequest.of(offset - 1, pageSize,
+                    "desc".equals(order) ? Sort.by("idsales").descending() : Sort.by("idsales").ascending()));
+        } else if (nama != null) {
+            salesPage = salesRepository.findByNamaContainingIgnoreCase(nama, PageRequest.of(offset - 1, pageSize,
+                    "desc".equals(order) ? Sort.by("idsales").descending() : Sort.by("idsales").ascending()));
+        } else {
+            salesPage = salesRepository.findAll(PageRequest.of(offset - 1, pageSize,
+                    "desc".equals(order) ? Sort.by("idsales").descending() : Sort.by("idsales").ascending()));
+        }
+
+        List<Sales> salesList = salesPage.getContent();
+
+        // Calculate max nilai for each achievement type
+        double maxNilaiAchivementTotal = getMaxNilai("Achivement Total");
+        double maxNilaiAchivementGadus = getMaxNilai("Achivement Gadus");
+        double maxNilaiAchivementPremium = getMaxNilai("Achivement Premium");
+        double maxNilaiJumlahVisit = getMaxNilai("Jumlah Visit");
+        double maxNilaiJumlahCustomer = getMaxNilai("Jumlah Customer");
+
+        List<RankDto> resultList = salesList.stream()
+                .map(sales -> {
+                    RankDto rankDto = new RankDto();
+                    Karyawan karyawan = sales.getKaryawan();
+                    rankDto.setIdsales(sales.getIdsales());
+                    rankDto.setNama(karyawan.getNama());
+                    rankDto.setTahun(sales.getTahun());
+
+                    // Calculate normalized and weighted values
+                    double achivementTotal = getNilaiForAchivement("Achivement Total", sales.getTercapaipersentotal()) / maxNilaiAchivementTotal;
+                    double achivementGadus = getNilaiForAchivement("Achivement Gadus", sales.getTercapaipersengadus()) / maxNilaiAchivementGadus;
+                    double achivementPremium = getNilaiForAchivement("Achivement Premium", sales.getTercapaipersenpremium()) / maxNilaiAchivementPremium;
+                    double jumlahVisit = getNilaiForAchivement("Jumlah Visit", sales.getJumlahvisit()) / maxNilaiJumlahVisit;
+                    double jumlahCustomer = getNilaiForAchivement("Jumlah Customer", sales.getJumlahcustomer()) / maxNilaiJumlahCustomer;
+
+                    // Apply weights
+                    achivementTotal *= getBobotForKriteria("Achivement Total");
+                    achivementGadus *= getBobotForKriteria("Achivement Gadus");
+                    achivementPremium *= getBobotForKriteria("Achivement Premium");
+                    jumlahVisit *= getBobotForKriteria("Jumlah Visit");
+                    jumlahCustomer *= getBobotForKriteria("Jumlah Customer");
+
+                    // Set values to rankDto
+                    rankDto.setAchivementtotal(achivementTotal);
+                    rankDto.setAchivementgadus(achivementGadus);
+                    rankDto.setAchivementpremium(achivementPremium);
+                    rankDto.setJumvisit(jumlahVisit);
+                    rankDto.setJumcustomer(jumlahCustomer);
+
+                    // Calculate hasil (total score) and set rank
+                    rankDto.setHasil(achivementTotal + achivementGadus + achivementPremium + jumlahVisit + jumlahCustomer);
+
+                    return rankDto;
+                })
+                .collect(Collectors.toList());
+
+        // Sort resultList by hasil and assign ranks
+        resultList.sort((r1, r2) -> Double.compare(r2.getHasil(), r1.getHasil()));
+        for (int i = 0; i < resultList.size(); i++) {
+            resultList.get(i).setRank(i + 1);
+        }
+
+        return new PageImpl<>(resultList, salesPage.getPageable(), salesPage.getTotalElements());
+    }
+
+    private int getBobotForKriteria(String nmkriteria) {
+        List<BobotKriteria> bobotKriteriaList = bobotKriteriaRepository.findByNmkriteria(nmkriteria);
+        for (BobotKriteria bobotKriteria : bobotKriteriaList) {
+            return bobotKriteria.getBobot();
+        }
+        return 0;
+    }
+
+    private double getMaxNilai(String nmkriteria) {
+        List<HimpunanKriteria> himpunanKriteriaList = himpunanKriteriaRepository.findByNmkriteria(nmkriteria);
+        return himpunanKriteriaList.stream()
+                .mapToInt(HimpunanKriteria::getNilai)
+                .max()
+                .orElse(1); // default to 1 if no values found
+    }
+
+    private int getNilaiForAchivement(String nmkriteria, double achivement) {
+        if (achivement >= 200) {
+            return 7;
+        }
+        List<HimpunanKriteria> himpunanKriteriaList = himpunanKriteriaRepository.findByNmkriteria(nmkriteria);
+        for (HimpunanKriteria himpunanKriteria : himpunanKriteriaList) {
+            String nmhimpunan = himpunanKriteria.getNmhimpunan();
+            int nilai = himpunanKriteria.getNilai();
+            if (isAchivementInRange(nmhimpunan, Math.round(achivement))) {
+                return nilai;
+            }
+        }
+        return 0;
+    }
+    
+private boolean isAchivementInRange(String nmhimpunan, double achivement) {
+    String[] range = nmhimpunan.split("-");
+    if (range.length == 2) {
+        int lowerBound = Integer.parseInt(range[0]);
+        int upperBound = Integer.parseInt(range[1]);
+        return achivement >= lowerBound && (achivement <= upperBound || (upperBound == 100 && achivement > 100));
+    }
+    return false;
+}
+
+
 }

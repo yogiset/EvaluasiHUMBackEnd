@@ -307,13 +307,17 @@ public class UserService {
         return mapUserToUserDto(user);
     }
 
-    public Page<UserDto> showAllAndPaginationUser(String role, String order, int offset, int pageSize) {
+    public Page<UserDto> showAllAndPaginationUser(String role,String username, String order, int offset, int pageSize) {
         log.info("Inside showAllAndPaginationUser");
         Page<User>userPage;
-        if (role == null) {
-            userPage = userRepository.findAll(PageRequest.of(offset - 1, pageSize,  "desc".equals(order) ? Sort.by("iduser").descending() : Sort.by("iduser").ascending()));
+        if (role != null && username != null) {
+            userPage = userRepository.findByUsernameAndRoleContainingIgnoreCase(username,role,PageRequest.of(offset - 1, pageSize,  "desc".equals(order) ? Sort.by("iduser").descending() : Sort.by("iduser").ascending()));
+        } else if (role != null) {
+            userPage = userRepository.findByRoleContainingIgnoreCase(role,PageRequest.of(offset - 1, pageSize,  "desc".equals(order) ? Sort.by("iduser").descending() : Sort.by("iduser").ascending()));
+        } else if (username != null) {
+            userPage = userRepository.findByUsernameContainingIgnoreCase(username,PageRequest.of(offset - 1, pageSize,  "desc".equals(order) ? Sort.by("iduser").descending() : Sort.by("iduser").ascending()));
         } else {
-            userPage = userRepository.findByRole(role,PageRequest.of(offset - 1,pageSize, "desc".equals(order) ? Sort.by("iduser").descending() : Sort.by("iduser").ascending()));
+            userPage = userRepository.findAll(PageRequest.of(offset - 1,pageSize, "desc".equals(order) ? Sort.by("iduser").descending() : Sort.by("iduser").ascending()));
         }
                 List<UserDto> resultList = userPage.getContent().stream()
                 .map(user -> {

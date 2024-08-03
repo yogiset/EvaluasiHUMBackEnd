@@ -50,13 +50,13 @@ public class CptController {
     @GetMapping(path = "/showall")
     @ResponseBody
     public ResponseEntity<Page<CptDto>> showAllAndPaginationCpt(
-            @RequestParam(required = false) Integer coveragepersen, // => optional
+            @RequestParam(required = false) String nama, // => optional
             @RequestParam(required = false) Integer tahun, // => optional
             @RequestParam(defaultValue = "desc") String order, // => optional
             @RequestParam(name = "page", defaultValue = "1") int offset, // => optional
             @RequestParam(name = "limit", defaultValue = "10") int pageSize // => optional
     ) {
-        Page<CptDto> cptDtoPage = cptService.showAllAndPaginationCpt(coveragepersen,tahun, order, offset, pageSize);
+        Page<CptDto> cptDtoPage = cptService.showAllAndPaginationCpt(nama,tahun, order, offset, pageSize);
         return ResponseEntity.ok(cptDtoPage);
     }
 

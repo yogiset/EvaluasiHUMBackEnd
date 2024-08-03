@@ -1,8 +1,6 @@
 package com.evaluasi.EvaluasiHUMBackEnd.controller;
 
-import com.evaluasi.EvaluasiHUMBackEnd.dto.PenilaianSalesDto;
-import com.evaluasi.EvaluasiHUMBackEnd.dto.SalesDto;
-import com.evaluasi.EvaluasiHUMBackEnd.dto.UserDto;
+import com.evaluasi.EvaluasiHUMBackEnd.dto.*;
 import com.evaluasi.EvaluasiHUMBackEnd.exception.AllException;
 import com.evaluasi.EvaluasiHUMBackEnd.service.SalesService;
 import lombok.RequiredArgsConstructor;
@@ -52,14 +50,70 @@ public class SalesController {
     @GetMapping(path = "/showall")
     @ResponseBody
     public ResponseEntity<Page<SalesDto>> showAllAndPaginationSales(
-            @RequestParam(required = false) Integer target, // => optional
             @RequestParam(required = false) Integer tahun, // => optional
+            @RequestParam(required = false) String nama, // => optional
             @RequestParam(defaultValue = "desc") String order, // => optional
             @RequestParam(name = "page", defaultValue = "1") int offset, // => optional
             @RequestParam(name = "limit", defaultValue = "10") int pageSize // => optional
     ) {
-        Page<SalesDto> salesDtoPage = salesService.showAllAndPaginationSales(target,tahun, order, offset, pageSize);
+        Page<SalesDto> salesDtoPage = salesService.showAllAndPaginationSales(tahun,nama, order, offset, pageSize);
         return ResponseEntity.ok(salesDtoPage);
+    }
+
+    // OR => <url>/sales/achivementtotal
+    @GetMapping(path = "/achivementtotal")
+    @ResponseBody
+    public ResponseEntity<Page<AchivementTotalDto>> showAllAndPaginationAchivementTotal(
+            @RequestParam(required = false) Integer tahun, // => optional
+            @RequestParam(required = false) String nama, // => optional
+            @RequestParam(defaultValue = "desc") String order, // => optional
+            @RequestParam(name = "page", defaultValue = "1") int offset, // => optional
+            @RequestParam(name = "limit", defaultValue = "10") int pageSize // => optional
+    ) {
+        Page<AchivementTotalDto> achivementTotalDtoPage = salesService.achivementTotalPagination(tahun,nama, order, offset, pageSize);
+        return ResponseEntity.ok(achivementTotalDtoPage);
+    }
+
+    // OR => <url>/sales/achivementgadus
+    @GetMapping(path = "/achivementgadus")
+    @ResponseBody
+    public ResponseEntity<Page<AchivementGadusDto>> showAllAndPaginationAchivementGadus(
+            @RequestParam(required = false) Integer tahun, // => optional
+            @RequestParam(required = false) String nama, // => optional
+            @RequestParam(defaultValue = "desc") String order, // => optional
+            @RequestParam(name = "page", defaultValue = "1") int offset, // => optional
+            @RequestParam(name = "limit", defaultValue = "10") int pageSize // => optional
+    ) {
+        Page<AchivementGadusDto> achivementGadusDtoPage = salesService.achivementGadusPagination(tahun,nama, order, offset, pageSize);
+        return ResponseEntity.ok(achivementGadusDtoPage);
+    }
+
+    // OR => <url>/sales/achivementpremium
+    @GetMapping(path = "/achivementpremium")
+    @ResponseBody
+    public ResponseEntity<Page<AchivementPremiumDto>> showAllAndPaginationAchivementPremium(
+            @RequestParam(required = false) Integer tahun, // => optional
+            @RequestParam(required = false) String nama, // => optional
+            @RequestParam(defaultValue = "desc") String order, // => optional
+            @RequestParam(name = "page", defaultValue = "1") int offset, // => optional
+            @RequestParam(name = "limit", defaultValue = "10") int pageSize // => optional
+    ) {
+        Page<AchivementPremiumDto> achivementPremiumDtoPage = salesService.achivementPremiumPagination(tahun,nama, order, offset, pageSize);
+        return ResponseEntity.ok(achivementPremiumDtoPage);
+    }
+
+    // OR => <url>/sales/jumlahcustomerandvisit
+    @GetMapping(path = "/jumlahcustomerandvisit")
+    @ResponseBody
+    public ResponseEntity<Page<JumlahCustomerAndVisitDto>> showAllAndPaginationJumlahCustomerAndVisit(
+            @RequestParam(required = false) Integer tahun, // => optional
+            @RequestParam(required = false) String nama, // => optional
+            @RequestParam(defaultValue = "desc") String order, // => optional
+            @RequestParam(name = "page", defaultValue = "1") int offset, // => optional
+            @RequestParam(name = "limit", defaultValue = "10") int pageSize // => optional
+    ) {
+        Page<JumlahCustomerAndVisitDto> jumlahCustomerAndVisitDtoPage = salesService.jumlahCustomerAndVisitPagination(tahun,nama, order, offset, pageSize);
+        return ResponseEntity.ok(jumlahCustomerAndVisitDtoPage);
     }
 
     @GetMapping("/findbyid/{id}")
@@ -71,11 +125,53 @@ public class SalesController {
     @ResponseBody
     public ResponseEntity<Page<PenilaianSalesDto>> penilaianSales(
             @RequestParam(required = false) Integer tahun, // => optional
+            @RequestParam(required = false) String nama, // => optional
             @RequestParam(defaultValue = "desc") String order, // => optional
             @RequestParam(name = "page", defaultValue = "1") int offset, // => optional
             @RequestParam(name = "limit", defaultValue = "10") int pageSize // => optional
     ) {
-        Page<PenilaianSalesDto> penilaianSalesDtoPage = salesService.paginationPenilaianSales(tahun, order, offset, pageSize);
+        Page<PenilaianSalesDto> penilaianSalesDtoPage = salesService.paginationPenilaianSales(tahun,nama, order, offset, pageSize);
         return ResponseEntity.ok(penilaianSalesDtoPage);
     }
+
+    @GetMapping(path = "/matrikskeputusan")
+    @ResponseBody
+    public ResponseEntity<Page<PenilaianSalesDto>> penilaianKriteriamatrikskeputusan(
+            @RequestParam(required = false) Integer tahun, // => optional
+            @RequestParam(required = false) String nama, // => optional
+            @RequestParam(defaultValue = "desc") String order, // => optional
+            @RequestParam(name = "page", defaultValue = "1") int offset, // => optional
+            @RequestParam(name = "limit", defaultValue = "10") int pageSize // => optional
+    ) {
+        Page<PenilaianSalesDto> penilaianSalesDtoPage = salesService.paginationPenilaianKriteria(tahun,nama, order, offset, pageSize);
+        return ResponseEntity.ok(penilaianSalesDtoPage);
+    }
+
+    @GetMapping(path = "/normalisasimatrikskeputusan")
+    @ResponseBody
+    public ResponseEntity<Page<PenilaianSalesDto>> normalisasiMatrikskeputusan(
+            @RequestParam(required = false) Integer tahun, // => optional
+            @RequestParam(required = false) String nama, // => optional
+            @RequestParam(defaultValue = "desc") String order, // => optional
+            @RequestParam(name = "page", defaultValue = "1") int offset, // => optional
+            @RequestParam(name = "limit", defaultValue = "10") int pageSize // => optional
+    ) {
+        Page<PenilaianSalesDto> penilaianSalesDtoPage = salesService.normalisasiMatrikskeputusan(tahun,nama, order, offset, pageSize);
+        return ResponseEntity.ok(penilaianSalesDtoPage);
+    }
+
+    @GetMapping(path = "/perangkingan")
+    @ResponseBody
+    public ResponseEntity<Page<RankDto>> perangkinganSales(
+            @RequestParam(required = false) Integer tahun, // => optional
+            @RequestParam(required = false) String nama, // => optional
+            @RequestParam(defaultValue = "desc") String order, // => optional
+            @RequestParam(name = "page", defaultValue = "1") int offset, // => optional
+            @RequestParam(name = "limit", defaultValue = "10") int pageSize // => optional
+    ) {
+        Page<RankDto> rankDtoPage = salesService.perangkinganSales(tahun,nama, order, offset, pageSize);
+        return ResponseEntity.ok(rankDtoPage);
+    }
+
+
 }

@@ -90,11 +90,12 @@ public class UserController {
     @ResponseBody
     public ResponseEntity<Page<UserDto>> showAllAndPaginationUser(
             @RequestParam(required = false) String role, // => optional
+            @RequestParam(required = false) String username, // => optional
             @RequestParam(defaultValue = "desc") String order, // => optional
             @RequestParam(name = "page", defaultValue = "1") int offset, // => optional
             @RequestParam(name = "limit", defaultValue = "10") int pageSize // => optional
     ) {
-        Page<UserDto> userDtoPage = userService.showAllAndPaginationUser(role, order, offset, pageSize);
+        Page<UserDto> userDtoPage = userService.showAllAndPaginationUser(role,username, order, offset, pageSize);
         return ResponseEntity.ok(userDtoPage);
     }
 

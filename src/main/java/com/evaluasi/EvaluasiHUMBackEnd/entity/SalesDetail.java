@@ -17,9 +17,16 @@ public class SalesDetail {
     @GeneratedValue(strategy = GenerationType.SEQUENCE,generator = "salesdetail_sequence")
     private Long id;
     private String bulan;
-    private int targetbln;
-    private int tercapaii;
-    private String tercapaipersenn;
+    private int targetblntotal;
+    private int tercapaiitotal;
+    private String tercapaipersenntotal;
+    private int targetblngadus;
+    private int tercapaiigadus;
+    private String tercapaipersenngadus;
+    private int targetblnpremium;
+    private int tercapaiipremium;
+    private String tercapaipersennpremium;
+    private double jumlahvisit;
 
     @ManyToOne(cascade = CascadeType.PERSIST)
     @JoinColumn(name = "idsales", nullable = false)

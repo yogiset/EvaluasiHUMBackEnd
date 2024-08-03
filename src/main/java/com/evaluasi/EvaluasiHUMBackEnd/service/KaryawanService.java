@@ -154,13 +154,17 @@ public class KaryawanService {
         return karyawanDto;
     }
 
-    public Page<KaryawanDto> showAllAndPaginationKaryawan(String jabatan, String order, int offset, int pageSize) {
+    public Page<KaryawanDto> showAllAndPaginationKaryawan(String jabatan, String nama, String order, int offset, int pageSize) {
         log.info("Inside showAllAndPaginationKaryawan");
         Page<Karyawan> karyawanPage;
-        if (jabatan == null) {
-            karyawanPage = karyawanRepository.findAll(PageRequest.of(offset - 1, pageSize,  "desc".equals(order) ? Sort.by("idkar").descending() : Sort.by("idkar").ascending()));
+        if (jabatan != null && nama != null) {
+            karyawanPage = karyawanRepository.findByNamaAndJabatanContainingIgnoreCase(nama,jabatan,PageRequest.of(offset - 1, pageSize,  "desc".equals(order) ? Sort.by("idkar").descending() : Sort.by("idkar").ascending()));
+        }else if (jabatan != null) {
+            karyawanPage = karyawanRepository.findByJabatanContainingIgnoreCase(jabatan,PageRequest.of(offset - 1, pageSize,  "desc".equals(order) ? Sort.by("idkar").descending() : Sort.by("idkar").ascending()));
+        }else if (nama != null) {
+            karyawanPage = karyawanRepository.findByNamaContainingIgnoreCase(nama,PageRequest.of(offset - 1, pageSize,  "desc".equals(order) ? Sort.by("idkar").descending() : Sort.by("idkar").ascending()));
         } else {
-            karyawanPage = karyawanRepository.findByJabatan(jabatan,PageRequest.of(offset - 1,pageSize, "desc".equals(order) ? Sort.by("idkar").descending() : Sort.by("idkar").ascending()));
+            karyawanPage = karyawanRepository.findAll(PageRequest.of(offset - 1,pageSize, "desc".equals(order) ? Sort.by("idkar").descending() : Sort.by("idkar").ascending()));
         }
                 List<KaryawanDto> resultList = karyawanPage.getContent().stream()
                 .map(karyawan -> {

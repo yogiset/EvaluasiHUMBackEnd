@@ -94,13 +94,13 @@ public class PicosService {
         }
     }
 
-    public Page<PicosDto> showAllAndPaginationPicos(String bulan,Integer tahun, String order, int offset, int pageSize) {
+    public Page<PicosDto> showAllAndPaginationPicos(String nama,Integer tahun, String order, int offset, int pageSize) {
         log.info("Inside showAllAndPaginationPicos");
         Page<Picos> picosPage;
-        if (tahun != null && bulan != null) {
-            picosPage = picosRepository.findByTahunAndBulan(tahun,bulan,PageRequest.of(offset - 1, pageSize,  "desc".equals(order) ? Sort.by("idpicos").descending() : Sort.by("idpicos").ascending()));
-        } else if (bulan != null) {
-            picosPage = picosRepository.findByBulan(bulan,PageRequest.of(offset - 1, pageSize,  "desc".equals(order) ? Sort.by("idpicos").descending() : Sort.by("idpicos").ascending()));
+        if (tahun != null && nama != null) {
+            picosPage = picosRepository.findByTahunAndNamaContainingIgnoreCase(tahun,nama,PageRequest.of(offset - 1, pageSize,  "desc".equals(order) ? Sort.by("idpicos").descending() : Sort.by("idpicos").ascending()));
+        } else if (nama != null) {
+            picosPage = picosRepository.findByNamaContainingIgnoreCase(nama,PageRequest.of(offset - 1, pageSize,  "desc".equals(order) ? Sort.by("idpicos").descending() : Sort.by("idpicos").ascending()));
         } else if (tahun != null) {
             picosPage = picosRepository.findByTahun(tahun,PageRequest.of(offset - 1, pageSize,  "desc".equals(order) ? Sort.by("idpicos").descending() : Sort.by("idpicos").ascending()));
         } else {

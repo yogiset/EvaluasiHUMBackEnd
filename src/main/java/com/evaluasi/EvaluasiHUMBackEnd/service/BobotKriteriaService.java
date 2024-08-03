@@ -87,11 +87,11 @@ public class BobotKriteriaService {
         log.info("Inside showAllAndPaginationBobot");
         Page<BobotKriteria> bobotKriteriaPage;
         if (bobot != null && nmkriteria != null) {
-            bobotKriteriaPage = bobotKriteriaRepository.findByBobotAndNmkriteria(bobot,nmkriteria, PageRequest.of(offset - 1, pageSize,  "desc".equals(order) ? Sort.by("idbobot").descending() : Sort.by("idbobot").ascending()));
+            bobotKriteriaPage = bobotKriteriaRepository.findByBobotAndNmkriteriaContainingIgnoreCase(bobot,nmkriteria, PageRequest.of(offset - 1, pageSize,  "desc".equals(order) ? Sort.by("idbobot").descending() : Sort.by("idbobot").ascending()));
         } else if (bobot != null) {
             bobotKriteriaPage = bobotKriteriaRepository.findByBobot(bobot, PageRequest.of(offset - 1, pageSize,  "desc".equals(order) ? Sort.by("idbobot").descending() : Sort.by("idbobot").ascending()));
         } else if (nmkriteria != null) {
-            bobotKriteriaPage = bobotKriteriaRepository.findByNmkriteria(nmkriteria, PageRequest.of(offset - 1, pageSize,  "desc".equals(order) ? Sort.by("idbobot").descending() : Sort.by("idbobot").ascending()));
+            bobotKriteriaPage = bobotKriteriaRepository.findByNmkriteriaContainingIgnoreCase(nmkriteria, PageRequest.of(offset - 1, pageSize,  "desc".equals(order) ? Sort.by("idbobot").descending() : Sort.by("idbobot").ascending()));
         } else {
             bobotKriteriaPage = bobotKriteriaRepository.findAll(PageRequest.of(offset - 1, pageSize,  "desc".equals(order) ? Sort.by("idbobot").descending() : Sort.by("idbobot").ascending()));
         }

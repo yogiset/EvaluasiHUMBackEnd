@@ -7,15 +7,12 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class RankDto {
+public class AchivementPremiumDto {
     private Long idsales;
+    private String nik;
     private String nama;
     private int tahun;
-    private double achivementtotal;
-    private double achivementgadus;
-    private double achivementpremium;
-    private double jumcustomer;
-    private double jumvisit;
-    private double hasil;
-    private Integer rank;
+    private int targetpremium;
+    private int tercapaipremium;
+    private double tercapaipersenpremium;
 }
