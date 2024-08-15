@@ -100,21 +100,21 @@ public class SalesService {
                     sales.getSalesDetails().add(salesDetail);
                 }
             }
-            // Sum the target values from all SalesDetail entries and cast to int
-            int totalTargetTotal = (int) sales.getSalesDetails().stream()
-                    .mapToDouble(SalesDetail::getTargetblntotal)
-                    .sum();
-            int totalTargetGadus = (int) sales.getSalesDetails().stream()
-                    .mapToDouble(SalesDetail::getTargetblngadus)
-                    .sum();
-            int totalTargetPremium = (int) sales.getSalesDetails().stream()
-                    .mapToDouble(SalesDetail::getTargetblnpremium)
-                    .sum();
-
-            // Set the aggregated target values in the Sales object
-            sales.setTargettotal(totalTargetTotal);
-            sales.setTargetgadus(totalTargetGadus);
-            sales.setTargetpremium(totalTargetPremium);
+//            // Sum the target values from all SalesDetail entries and cast to int
+//            int totalTargetTotal = (int) sales.getSalesDetails().stream()
+//                    .mapToDouble(SalesDetail::getTargetblntotal)
+//                    .sum();
+//            int totalTargetGadus = (int) sales.getSalesDetails().stream()
+//                    .mapToDouble(SalesDetail::getTargetblngadus)
+//                    .sum();
+//            int totalTargetPremium = (int) sales.getSalesDetails().stream()
+//                    .mapToDouble(SalesDetail::getTargetblnpremium)
+//                    .sum();
+//
+//            // Set the aggregated target values in the Sales object
+//            sales.setTargettotal(totalTargetTotal);
+//            sales.setTargetgadus(totalTargetGadus);
+//            sales.setTargetpremium(totalTargetPremium);
 
             double totalTercapaiitotal = sales.getSalesDetails().stream()
                     .mapToDouble(SalesDetail::getTercapaiitotal)
