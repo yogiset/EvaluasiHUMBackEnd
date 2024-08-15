@@ -6,5 +6,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface SalesDetailRepository extends JpaRepository<SalesDetail,Long> {
-
+    boolean existsByBulanAndSales_TahunAndSales_Karyawan_Nik(String bulan, int tahun, String nik);
 }

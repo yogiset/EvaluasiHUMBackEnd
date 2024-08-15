@@ -45,6 +45,13 @@ public class SalesService {
                 return ResponseEntity.status(HttpStatus.FORBIDDEN)
                         .body("Karyawan with NIK: " + salesDto.getNik() + " is not a Sales");
             }
+
+            // Check if a Sales record for the same nik and tahun already exists
+            boolean salesExists = salesRepository.existsByKaryawanAndTahun(karyawan, salesDto.getTahun());
+            if (salesExists) {
+                return ResponseEntity.status(HttpStatus.CONFLICT)
+                        .body("Sales record for the same NIK and year already exists.");
+            }
             sales.setKaryawan(karyawan);
             sales.setTahun(salesDto.getTahun());
             sales.setTargettotal(salesDto.getTargettotal());
@@ -55,15 +62,27 @@ public class SalesService {
 
             sales.setSalesDetails(new ArrayList<>());
 
+
             if (salesDto.getSalesDetailDtoList() != null) {
                 for (SalesDetailDto salesDetailDto : salesDto.getSalesDetailDtoList()) {
                     SalesDetail salesDetail = new SalesDetail();
+                    // Check if a SalesDetail for the same bulan, tahun, and nik already exists
+                    boolean bulanExists = salesRepository.existsBySalesDetails_BulanAndTahunAndKaryawan_Nik(
+                            salesDetailDto.getBulan(),
+                            sales.getTahun(),
+                            karyawan.getNik()
+                    );
+                    if (bulanExists) {
+                        return ResponseEntity.status(HttpStatus.CONFLICT)
+                                .body("Sales detail for the same month, year, and NIK already exists.");
+                    }
                     salesDetail.setBulan(salesDetailDto.getBulan());
                     salesDetail.setTargetblntotal(salesDetailDto.getTargetblntotal());
                     salesDetail.setTargetblngadus(salesDetailDto.getTargetblngadus());
                     salesDetail.setTargetblnpremium(salesDetailDto.getTargetblnpremium());
                     salesDetail.setTercapaiitotal(salesDetailDto.getTercapaiitotal());
-                    salesDetail.setTercapaiigadus(salesDetailDto.getTargetblngadus());
+                    salesDetail.setTercapaiigadus(salesDetailDto.getTercapaiigadus());
+                    salesDetail.setTercapaiipremium(salesDetailDto.getTercapaiipremium());
 
                     double percenttotal = (salesDetail.getTercapaiitotal() * 100.0) / salesDetail.getTargetblntotal();
                     salesDetail.setTercapaipersenntotal(String.format("%.2f%%", percenttotal));
@@ -81,6 +100,21 @@ public class SalesService {
                     sales.getSalesDetails().add(salesDetail);
                 }
             }
+            // Sum the target values from all SalesDetail entries and cast to int
+            int totalTargetTotal = (int) sales.getSalesDetails().stream()
+                    .mapToDouble(SalesDetail::getTargetblntotal)
+                    .sum();
+            int totalTargetGadus = (int) sales.getSalesDetails().stream()
+                    .mapToDouble(SalesDetail::getTargetblngadus)
+                    .sum();
+            int totalTargetPremium = (int) sales.getSalesDetails().stream()
+                    .mapToDouble(SalesDetail::getTargetblnpremium)
+                    .sum();
+
+            // Set the aggregated target values in the Sales object
+            sales.setTargettotal(totalTargetTotal);
+            sales.setTargetgadus(totalTargetGadus);
+            sales.setTargetpremium(totalTargetPremium);
 
             double totalTercapaiitotal = sales.getSalesDetails().stream()
                     .mapToDouble(SalesDetail::getTercapaiitotal)

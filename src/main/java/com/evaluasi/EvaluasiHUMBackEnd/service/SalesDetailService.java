@@ -1,6 +1,7 @@
 package com.evaluasi.EvaluasiHUMBackEnd.service;
 
 import com.evaluasi.EvaluasiHUMBackEnd.dto.SalesDetailDto;
+import com.evaluasi.EvaluasiHUMBackEnd.entity.Karyawan;
 import com.evaluasi.EvaluasiHUMBackEnd.entity.Sales;
 import com.evaluasi.EvaluasiHUMBackEnd.entity.SalesDetail;
 import com.evaluasi.EvaluasiHUMBackEnd.exception.AllException;
@@ -32,6 +33,20 @@ public class SalesDetailService {
 
             SalesDetail salesDetail = new SalesDetail();
             salesDetail.setSales(sales);
+
+            Karyawan karyawan = sales.getKaryawan();
+
+            // Check if a SalesDetail for the same bulan, tahun, and nik already exists
+            boolean bulanExists = salesDetailRepository.existsByBulanAndSales_TahunAndSales_Karyawan_Nik(
+                    salesDetailDto.getBulan(),
+                    sales.getTahun(),
+                    karyawan.getNik()
+            );
+            if (bulanExists) {
+                return ResponseEntity.status(HttpStatus.CONFLICT)
+                        .body("Sales detail for the same month, year, and NIK already exists.");
+            }
+
             salesDetail.setBulan(salesDetailDto.getBulan());
             salesDetail.setJumlahvisit(salesDetailDto.getJumlahvisit());
 
@@ -52,6 +67,21 @@ public class SalesDetailService {
 
             salesDetailRepository.save(salesDetail);
 
+            // Sum the target values from all SalesDetail entries and cast to int
+            int totalTargetTotal = (int) sales.getSalesDetails().stream()
+                    .mapToDouble(SalesDetail::getTargetblntotal)
+                    .sum();
+            int totalTargetGadus = (int) sales.getSalesDetails().stream()
+                    .mapToDouble(SalesDetail::getTargetblngadus)
+                    .sum();
+            int totalTargetPremium = (int) sales.getSalesDetails().stream()
+                    .mapToDouble(SalesDetail::getTargetblnpremium)
+                    .sum();
+
+            // Set the aggregated target values in the Sales object
+            sales.setTargettotal(totalTargetTotal);
+            sales.setTargetgadus(totalTargetGadus);
+            sales.setTargetpremium(totalTargetPremium);
 
 
             double totalTercapaiitotal = sales.getSalesDetails().stream()
@@ -110,6 +140,8 @@ public class SalesDetailService {
         }
     }
 
+
+
     public ResponseEntity<Object> editSalesDetail(Long id, SalesDetailDto salesDetailDto) {
         log.info("Inside EditSalesDetail");
         try {
@@ -139,6 +171,22 @@ public class SalesDetailService {
             salesDetail.setTercapaipersennpremium(String.format("%.2f%%",percentpremium));
 
             salesDetailRepository.save(salesDetail);
+
+            // Sum the target values from all SalesDetail entries and cast to int
+            int totalTargetTotal = (int) sales.getSalesDetails().stream()
+                    .mapToDouble(SalesDetail::getTargetblntotal)
+                    .sum();
+            int totalTargetGadus = (int) sales.getSalesDetails().stream()
+                    .mapToDouble(SalesDetail::getTargetblngadus)
+                    .sum();
+            int totalTargetPremium = (int) sales.getSalesDetails().stream()
+                    .mapToDouble(SalesDetail::getTargetblnpremium)
+                    .sum();
+
+            // Set the aggregated target values in the Sales object
+            sales.setTargettotal(totalTargetTotal);
+            sales.setTargetgadus(totalTargetGadus);
+            sales.setTargetpremium(totalTargetPremium);
 
             double totalTercapaiitotal = sales.getSalesDetails().stream()
                     .mapToDouble(SalesDetail::getTercapaiitotal)
@@ -183,7 +231,7 @@ public class SalesDetailService {
                 double averageVisit = numberOfDetails > 0 ? totalVisit / numberOfDetails : 0;
                 sales.setJumlahvisit(averageVisit);
             } else {
-                sales.setJumlahvisit(sales.getJumlahvisit());
+                sales.setJumlahvisit(0);
             }
 
 
@@ -208,6 +256,22 @@ public class SalesDetailService {
                 Sales sales = salesDetail.getSales();
 
                 salesDetailRepository.deleteById(id);
+
+                // Sum the target values from all SalesDetail entries and cast to int
+                int totalTargetTotal = (int) sales.getSalesDetails().stream()
+                        .mapToDouble(SalesDetail::getTargetblntotal)
+                        .sum();
+                int totalTargetGadus = (int) sales.getSalesDetails().stream()
+                        .mapToDouble(SalesDetail::getTargetblngadus)
+                        .sum();
+                int totalTargetPremium = (int) sales.getSalesDetails().stream()
+                        .mapToDouble(SalesDetail::getTargetblnpremium)
+                        .sum();
+
+                // Set the aggregated target values in the Sales object
+                sales.setTargettotal(totalTargetTotal);
+                sales.setTargetgadus(totalTargetGadus);
+                sales.setTargetpremium(totalTargetPremium);
 
                 double totalTercapaiitotal = sales.getSalesDetails().stream()
                         .mapToDouble(SalesDetail::getTercapaiitotal)
@@ -252,7 +316,7 @@ public class SalesDetailService {
                     double averageVisit = numberOfDetails > 0 ? totalVisit / numberOfDetails : 0;
                     sales.setJumlahvisit(averageVisit);
                 } else {
-                    sales.setJumlahvisit(sales.getJumlahvisit());
+                    sales.setJumlahvisit(0);
                 }
 
                 salesRepository.save(sales);

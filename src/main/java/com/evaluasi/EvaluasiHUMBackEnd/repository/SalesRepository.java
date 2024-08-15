@@ -1,5 +1,6 @@
 package com.evaluasi.EvaluasiHUMBackEnd.repository;
 
+import com.evaluasi.EvaluasiHUMBackEnd.entity.Karyawan;
 import com.evaluasi.EvaluasiHUMBackEnd.entity.Sales;
 import com.evaluasi.EvaluasiHUMBackEnd.entity.User;
 import org.springframework.data.domain.Page;
@@ -19,5 +20,9 @@ public interface SalesRepository extends JpaRepository<Sales,Long> {
 
     @Query("SELECT s FROM Sales s JOIN s.karyawan k WHERE s.tahun = :tahun AND LOWER(k.nama) LIKE LOWER(CONCAT('%', :nama, '%'))")
     Page<Sales> findByTahunAndNamaContainingIgnoreCase(Integer tahun, String nama, Pageable pageable);
+
+    boolean existsByKaryawanAndTahun(Karyawan karyawan, int tahun);
+
+    boolean existsBySalesDetails_BulanAndTahunAndKaryawan_Nik(String bulan, int tahun, String nik);
 
 }
