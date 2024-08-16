@@ -12,13 +12,13 @@ public class SalesDetailDto {
     private String bulan;
     private int targetblntotal;
     private int tercapaiitotal;
-    private String tercapaipersenntotal;
+    private double tercapaipersenntotal;
     private int targetblngadus;
     private int tercapaiigadus;
-    private String tercapaipersenngadus;
+    private double tercapaipersenngadus;
     private int targetblnpremium;
     private int tercapaiipremium;
-    private String tercapaipersennpremium;
+    private double tercapaipersennpremium;
     private double jumlahvisit;
     private Long idsales;
 }

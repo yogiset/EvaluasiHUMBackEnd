@@ -173,5 +173,19 @@ public class SalesController {
         return ResponseEntity.ok(rankDtoPage);
     }
 
+    @GetMapping(path = "/penilaiansalesbulanan")
+    @ResponseBody
+    public ResponseEntity<Page<PenilaianSalesBulananDto>> penilaianSalesBulanan(
+            @RequestParam(required = false) Integer tahun, // => optional
+            @RequestParam(required = false) String nama, // => optional
+            @RequestParam(required = false) String bulan, // => optional
+            @RequestParam(defaultValue = "desc") String order, // => optional
+            @RequestParam(name = "page", defaultValue = "1") int offset, // => optional
+            @RequestParam(name = "limit", defaultValue = "10") int pageSize // => optional
+    ) {
+        Page<PenilaianSalesBulananDto> penilaianSalesBulananDtoPage = salesService.paginationPenilaianSalesBulanan(tahun,nama,bulan,order, offset, pageSize);
+        return ResponseEntity.ok(penilaianSalesBulananDtoPage);
+    }
+
 
 }

@@ -22,6 +22,10 @@ public class SalesDetailService {
     private final SalesDetailRepository salesDetailRepository;
     private final SalesRepository salesRepository;
 
+    private double roundToTwoDecimalPlaces(double value) {
+        return Math.round(value * 100.0) / 100.0;
+    }
+
     public ResponseEntity<Object> createSalesDetail(SalesDetailDto salesDetailDto) {
         log.info("Inside CreateSalesDetail");
         try {
@@ -53,17 +57,17 @@ public class SalesDetailService {
             salesDetail.setTargetblntotal(salesDetailDto.getTargetblntotal());
             salesDetail.setTercapaiitotal(salesDetailDto.getTercapaiitotal());
             double percenttotal = (salesDetail.getTercapaiitotal() * 100.0) / salesDetail.getTargetblntotal();
-            salesDetail.setTercapaipersenntotal(String.format("%.2f%%",percenttotal));
+            salesDetail.setTercapaipersenntotal(roundToTwoDecimalPlaces(percenttotal));
 
             salesDetail.setTargetblngadus(salesDetailDto.getTargetblngadus());
             salesDetail.setTercapaiigadus(salesDetailDto.getTercapaiigadus());
             double percentgadus = (salesDetail.getTercapaiigadus() * 100.0) / salesDetail.getTargetblngadus();
-            salesDetail.setTercapaipersenngadus(String.format("%.2f%%",percentgadus));
+            salesDetail.setTercapaipersenngadus(roundToTwoDecimalPlaces(percentgadus));
 
             salesDetail.setTargetblnpremium(salesDetailDto.getTargetblnpremium());
             salesDetail.setTercapaiipremium(salesDetailDto.getTercapaiipremium());
             double percentpremium = (salesDetail.getTercapaiipremium() * 100.0) / salesDetail.getTargetblnpremium();
-            salesDetail.setTercapaipersennpremium(String.format("%.2f%%",percentpremium));
+            salesDetail.setTercapaipersennpremium(roundToTwoDecimalPlaces(percentpremium));
 
             salesDetailRepository.save(salesDetail);
 
@@ -92,7 +96,7 @@ public class SalesDetailService {
 
             double overallPercentagetotal = (totalTercapaiitotal * 100.0) / (sales.getTargettotal());
 
-            sales.setTercapaipersentotal(overallPercentagetotal);
+            sales.setTercapaipersentotal(roundToTwoDecimalPlaces(overallPercentagetotal));
 
 
 
@@ -104,7 +108,7 @@ public class SalesDetailService {
 
             double overallPercentagegadus = (totalTercapaiigadus * 100.0) / (sales.getTargetgadus());
 
-            sales.setTercapaipersengadus(overallPercentagegadus);
+            sales.setTercapaipersengadus(roundToTwoDecimalPlaces(overallPercentagegadus));
 
 
             double totalTercapaiipremium = sales.getSalesDetails().stream()
@@ -115,7 +119,7 @@ public class SalesDetailService {
 
             double overallPercentagepremium = (totalTercapaiipremium * 100.0) / (sales.getTargetpremium());
 
-            sales.setTercapaipersenpremium(overallPercentagepremium);
+            sales.setTercapaipersenpremium(roundToTwoDecimalPlaces(overallPercentagepremium));
 
 
             double totalVisit = sales.getSalesDetails().stream()
@@ -158,17 +162,17 @@ public class SalesDetailService {
             salesDetail.setTargetblntotal(salesDetailDto.getTargetblntotal());
             salesDetail.setTercapaiitotal(salesDetailDto.getTercapaiitotal());
             double percenttotal = (salesDetail.getTercapaiitotal() * 100.0) / salesDetail.getTargetblntotal();
-            salesDetail.setTercapaipersenntotal(String.format("%.2f%%",percenttotal));
+            salesDetail.setTercapaipersenntotal(roundToTwoDecimalPlaces(percenttotal));
 
             salesDetail.setTargetblngadus(salesDetailDto.getTargetblngadus());
             salesDetail.setTercapaiigadus(salesDetailDto.getTercapaiigadus());
             double percentgadus = (salesDetail.getTercapaiigadus() * 100.0) / salesDetail.getTargetblngadus();
-            salesDetail.setTercapaipersenngadus(String.format("%.2f%%",percentgadus));
+            salesDetail.setTercapaipersenngadus(roundToTwoDecimalPlaces(percentgadus));
 
             salesDetail.setTargetblnpremium(salesDetailDto.getTargetblnpremium());
             salesDetail.setTercapaiipremium(salesDetailDto.getTercapaiipremium());
             double percentpremium = (salesDetail.getTercapaiipremium() * 100.0) / salesDetail.getTargetblnpremium();
-            salesDetail.setTercapaipersennpremium(String.format("%.2f%%",percentpremium));
+            salesDetail.setTercapaipersennpremium(roundToTwoDecimalPlaces(percentpremium));
 
             salesDetailRepository.save(salesDetail);
 
@@ -196,7 +200,7 @@ public class SalesDetailService {
 
             double overallPercentagetotal = (totalTercapaiitotal * 100.0) / (sales.getTargettotal());
 
-            sales.setTercapaipersentotal(overallPercentagetotal);
+            sales.setTercapaipersentotal(roundToTwoDecimalPlaces(overallPercentagetotal));
 
 
 
@@ -208,7 +212,7 @@ public class SalesDetailService {
 
             double overallPercentagegadus = (totalTercapaiigadus * 100.0) / (sales.getTargetgadus());
 
-            sales.setTercapaipersengadus(overallPercentagegadus);
+            sales.setTercapaipersengadus(roundToTwoDecimalPlaces(overallPercentagegadus));
 
 
             double totalTercapaiipremium = sales.getSalesDetails().stream()
@@ -219,7 +223,7 @@ public class SalesDetailService {
 
             double overallPercentagepremium = (totalTercapaiipremium * 100.0) / (sales.getTargetpremium());
 
-            sales.setTercapaipersenpremium(overallPercentagepremium);
+            sales.setTercapaipersenpremium(roundToTwoDecimalPlaces(overallPercentagepremium));
 
 
             double totalVisit = sales.getSalesDetails().stream()
@@ -281,7 +285,7 @@ public class SalesDetailService {
 
                 double overallPercentagetotal = (totalTercapaiitotal * 100.0) / (sales.getTargettotal());
 
-                sales.setTercapaipersentotal(overallPercentagetotal);
+                sales.setTercapaipersentotal(roundToTwoDecimalPlaces(overallPercentagetotal));
 
 
 
@@ -293,7 +297,7 @@ public class SalesDetailService {
 
                 double overallPercentagegadus = (totalTercapaiigadus * 100.0) / (sales.getTargetgadus());
 
-                sales.setTercapaipersengadus(overallPercentagegadus);
+                sales.setTercapaipersengadus(roundToTwoDecimalPlaces(overallPercentagegadus));
 
 
                 double totalTercapaiipremium = sales.getSalesDetails().stream()
@@ -304,7 +308,7 @@ public class SalesDetailService {
 
                 double overallPercentagepremium = (totalTercapaiipremium * 100.0) / (sales.getTargetpremium());
 
-                sales.setTercapaipersenpremium(overallPercentagepremium);
+                sales.setTercapaipersenpremium(roundToTwoDecimalPlaces(overallPercentagepremium));
 
 
                 double totalVisit = sales.getSalesDetails().stream()
