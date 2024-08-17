@@ -187,5 +187,46 @@ public class SalesController {
         return ResponseEntity.ok(penilaianSalesBulananDtoPage);
     }
 
+    @GetMapping(path = "/matrikskeputusanbulanan")
+    @ResponseBody
+    public ResponseEntity<Page<PenilaianSalesBulananDto>> penilaianKriteriamatrikskeputusanBulanan(
+            @RequestParam(required = false) Integer tahun, // => optional
+            @RequestParam(required = false) String nama, // => optional
+            @RequestParam(required = false) String bulan, // => optional
+            @RequestParam(defaultValue = "desc") String order, // => optional
+            @RequestParam(name = "page", defaultValue = "1") int offset, // => optional
+            @RequestParam(name = "limit", defaultValue = "10") int pageSize // => optional
+    ) {
+        Page<PenilaianSalesBulananDto> penilaianSalesBulananDtoPage = salesService.paginationPenilaianKriteriaBulanan(tahun,nama,bulan, order, offset, pageSize);
+        return ResponseEntity.ok(penilaianSalesBulananDtoPage);
+    }
+
+    @GetMapping(path = "/normalisasimatrikskeputusanbulanan")
+    @ResponseBody
+    public ResponseEntity<Page<PenilaianSalesBulananDto>> normalisasiMatrikskeputusanBulanan(
+            @RequestParam(required = false) Integer tahun, // => optional
+            @RequestParam(required = false) String nama, // => optional
+            @RequestParam(required = false) String bulan, // => optional
+            @RequestParam(defaultValue = "desc") String order, // => optional
+            @RequestParam(name = "page", defaultValue = "1") int offset, // => optional
+            @RequestParam(name = "limit", defaultValue = "10") int pageSize // => optional
+    ) {
+        Page<PenilaianSalesBulananDto> penilaianSalesBulananDtoPage = salesService.normalisasiMatrikskeputusanBulanan(tahun,nama,bulan,order, offset, pageSize);
+        return ResponseEntity.ok(penilaianSalesBulananDtoPage);
+    }
+
+    @GetMapping(path = "/perangkinganbulananan")
+    @ResponseBody
+    public ResponseEntity<Page<RankBulanDto>> perangkinganSales(
+            @RequestParam(required = false) Integer tahun, // => optional
+            @RequestParam(required = false) String nama, // => optional
+            @RequestParam(required = false) String bulan, // => optional
+            @RequestParam(defaultValue = "desc") String order, // => optional
+            @RequestParam(name = "page", defaultValue = "1") int offset, // => optional
+            @RequestParam(name = "limit", defaultValue = "10") int pageSize // => optional
+    ) {
+        Page<RankBulanDto> rankBulanDtoPage = salesService.perangkinganSalesBulanan(tahun,nama,bulan,order, offset, pageSize);
+        return ResponseEntity.ok(rankBulanDtoPage);
+    }
 
 }
