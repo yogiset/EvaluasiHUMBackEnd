@@ -2,6 +2,7 @@ package com.evaluasi.EvaluasiHUMBackEnd.repository;
 
 import com.evaluasi.EvaluasiHUMBackEnd.entity.Karyawan;
 import com.evaluasi.EvaluasiHUMBackEnd.entity.Sales;
+import com.evaluasi.EvaluasiHUMBackEnd.entity.SalesDetail;
 import com.evaluasi.EvaluasiHUMBackEnd.entity.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -18,20 +19,8 @@ public interface SalesRepository extends JpaRepository<Sales,Long> {
     @Query("SELECT s FROM Sales s JOIN s.karyawan k WHERE LOWER(k.nama) LIKE LOWER(CONCAT('%', :nama, '%'))")
     Page<Sales> findByNamaContainingIgnoreCase(String nama, Pageable pageable);
 
-    @Query("SELECT s FROM Sales s JOIN s.salesDetails sd WHERE LOWER(sd.bulan) LIKE LOWER(CONCAT('%', :bulan, '%'))")
-    Page<Sales> findByBulanContainingIgnoreCase(String bulan, Pageable pageable);
-
     @Query("SELECT s FROM Sales s JOIN s.karyawan k WHERE s.tahun = :tahun AND LOWER(k.nama) LIKE LOWER(CONCAT('%', :nama, '%'))")
     Page<Sales> findByTahunAndNamaContainingIgnoreCase(Integer tahun, String nama, Pageable pageable);
-
-    @Query("SELECT s FROM Sales s JOIN s.salesDetails k WHERE s.tahun = :tahun AND LOWER(k.bulan) LIKE LOWER(CONCAT('%', :bulan, '%'))")
-    Page<Sales> findByTahunAndBulanContainingIgnoreCase(Integer tahun, String bulan, Pageable pageable);
-
-    @Query("SELECT s FROM Sales s JOIN s.karyawan k JOIN s.salesDetails sd WHERE LOWER(k.nama) LIKE LOWER(CONCAT('%', :nama, '%')) AND LOWER(sd.bulan) LIKE LOWER(CONCAT('%', :bulan, '%'))")
-    Page<Sales> findByNamaAndBulanContainingIgnoreCase(String nama,String bulan, Pageable pageable);
-
-    @Query("SELECT s FROM Sales s JOIN s.karyawan k JOIN s.salesDetails sd WHERE s.tahun = :tahun AND LOWER(k.nama) LIKE LOWER(CONCAT('%', :nama, '%')) AND LOWER(sd.bulan) LIKE LOWER(CONCAT('%', :bulan, '%'))")
-    Page<Sales> findByTahunAndNamaAndBulanContainingIgnoreCase(Integer tahun,String nama,String bulan, Pageable pageable);
 
     boolean existsByKaryawanAndTahun(Karyawan karyawan, int tahun);
 

@@ -1,19 +1,27 @@
 package com.evaluasi.EvaluasiHUMBackEnd.service;
 
+import com.evaluasi.EvaluasiHUMBackEnd.dto.PenilaianSalesBulananDto;
+import com.evaluasi.EvaluasiHUMBackEnd.dto.PenilaianSalesDto;
+import com.evaluasi.EvaluasiHUMBackEnd.dto.RankBulanDto;
 import com.evaluasi.EvaluasiHUMBackEnd.dto.SalesDetailDto;
-import com.evaluasi.EvaluasiHUMBackEnd.entity.Karyawan;
-import com.evaluasi.EvaluasiHUMBackEnd.entity.Sales;
-import com.evaluasi.EvaluasiHUMBackEnd.entity.SalesDetail;
+import com.evaluasi.EvaluasiHUMBackEnd.entity.*;
 import com.evaluasi.EvaluasiHUMBackEnd.exception.AllException;
+import com.evaluasi.EvaluasiHUMBackEnd.repository.BobotKriteriaRepository;
+import com.evaluasi.EvaluasiHUMBackEnd.repository.HimpunanKriteriaRepository;
 import com.evaluasi.EvaluasiHUMBackEnd.repository.SalesDetailRepository;
 import com.evaluasi.EvaluasiHUMBackEnd.repository.SalesRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -21,6 +29,8 @@ import java.util.Optional;
 public class SalesDetailService {
     private final SalesDetailRepository salesDetailRepository;
     private final SalesRepository salesRepository;
+    private final HimpunanKriteriaRepository himpunanKriteriaRepository;
+    private final BobotKriteriaRepository bobotKriteriaRepository;
 
     private double roundToTwoDecimalPlaces(double value) {
         return Math.round(value * 100.0) / 100.0;
@@ -335,7 +345,46 @@ public class SalesDetailService {
         }
     }
 
+    private int getBobotForKriteria(String nmkriteria) {
+        List<BobotKriteria> bobotKriteriaList = bobotKriteriaRepository.findByNmkriteria(nmkriteria);
+        for (BobotKriteria bobotKriteria : bobotKriteriaList) {
+            return bobotKriteria.getBobot();
+        }
+        return 0;
+    }
 
+    private double getMaxNilai(String nmkriteria) {
+        List<HimpunanKriteria> himpunanKriteriaList = himpunanKriteriaRepository.findByNmkriteria(nmkriteria);
+        return himpunanKriteriaList.stream()
+                .mapToInt(HimpunanKriteria::getNilai)
+                .max()
+                .orElse(1); // default to 1 if no values found
+    }
+
+    private int getNilaiForAchivement(String nmkriteria, double achivement) {
+        if (achivement >= 200) {
+            return 7;
+        }
+        List<HimpunanKriteria> himpunanKriteriaList = himpunanKriteriaRepository.findByNmkriteria(nmkriteria);
+        for (HimpunanKriteria himpunanKriteria : himpunanKriteriaList) {
+            String nmhimpunan = himpunanKriteria.getNmhimpunan();
+            int nilai = himpunanKriteria.getNilai();
+            if (isAchivementInRange(nmhimpunan, Math.round(achivement))) {
+                return nilai;
+            }
+        }
+        return 0;
+    }
+
+    private boolean isAchivementInRange(String nmhimpunan, double achivement) {
+        String[] range = nmhimpunan.split("-");
+        if (range.length == 2) {
+            int lowerBound = Integer.parseInt(range[0]);
+            int upperBound = Integer.parseInt(range[1]);
+            return achivement >= lowerBound && (achivement <= upperBound || (upperBound == 100 && achivement > 100));
+        }
+        return false;
+    }
 
     public SalesDetailDto fetchSalesDetailDtoById(Long id) throws AllException {
         log.info("Inside fetchSalesDetailDtoById");
@@ -365,4 +414,258 @@ public class SalesDetailService {
 
         return salesDetailDto;
     }
+
+    public Page<PenilaianSalesBulananDto> paginationPenilaianSalesBulanan(Integer tahun, String nama, String bulan, String order, int offset, int pageSize) {
+        log.info("Inside Pagination Penilaian Kriteria Sales Bulanan");
+        Sort sort = "desc".equals(order) ? Sort.by("id").descending() : Sort.by("id").ascending();
+        Pageable pageable = PageRequest.of(offset - 1, pageSize, sort);
+        Page<SalesDetail> salesDetailPage;
+
+        // Fetch the SalesDetail page based on provided filters
+        if (tahun != null && nama != null && bulan != null) {
+            salesDetailPage = salesDetailRepository.findByTahunAndNamaAndBulanContainingIgnoreCase(tahun, nama, bulan, pageable);
+        } else if (tahun != null && nama != null) {
+            salesDetailPage = salesDetailRepository.findByTahunAndNamaContainingIgnoreCase(tahun, nama, pageable);
+        } else if (tahun != null && bulan != null) {
+            salesDetailPage = salesDetailRepository.findByTahunAndBulan(tahun, bulan, pageable);
+        } else if (nama != null && bulan != null) {
+            salesDetailPage = salesDetailRepository.findByNamaAndBulanContainingIgnoreCase(nama, bulan, pageable);
+        } else if (tahun != null) {
+            salesDetailPage = salesDetailRepository.findByTahun(tahun, pageable);
+        } else if (bulan != null) {
+            salesDetailPage = salesDetailRepository.findByBulan(bulan, pageable);
+        } else if (nama != null) {
+            salesDetailPage = salesDetailRepository.findByNamaContainingIgnoreCase(nama, pageable);
+        } else {
+            salesDetailPage = salesDetailRepository.findAll(pageable);
+        }
+
+        List<PenilaianSalesBulananDto> resultList = new ArrayList<>();
+        // Loop through the SalesDetails and map them to PenilaianSalesBulananDto
+        for (SalesDetail salesDetail : salesDetailPage.getContent()) {
+            Sales sales = salesDetail.getSales();
+            Karyawan karyawan = sales.getKaryawan();
+
+            PenilaianSalesBulananDto penilaianSalesBulananDto = new PenilaianSalesBulananDto();
+            penilaianSalesBulananDto.setIdsales(sales.getIdsales());
+            penilaianSalesBulananDto.setNama(karyawan.getNama());
+            penilaianSalesBulananDto.setTahun(sales.getTahun());
+            penilaianSalesBulananDto.setBulan(salesDetail.getBulan());
+            penilaianSalesBulananDto.setId(salesDetail.getId());
+
+            penilaianSalesBulananDto.setAchievtotal(salesDetail.getTercapaipersenntotal());
+            penilaianSalesBulananDto.setAchievgadus(salesDetail.getTercapaipersenngadus());
+            penilaianSalesBulananDto.setAchievpremium(salesDetail.getTercapaipersennpremium());
+            penilaianSalesBulananDto.setJumvisit(salesDetail.getJumlahvisit());
+            penilaianSalesBulananDto.setJumcustomer(sales.getJumlahcustomer());
+            // Add to resultList
+            resultList.add(penilaianSalesBulananDto);
+        }
+
+        // Return as a paginated result
+        return new PageImpl<>(resultList, pageable, salesDetailPage.getTotalElements());
+
+    }
+
+    public Page<PenilaianSalesBulananDto> paginationPenilaianKriteriaBulanan(Integer tahun, String nama, String bulan, String order, int offset, int pageSize) {
+        log.info("Inside Pagination Penilaian Kriteria Sales Bulanan");
+        Sort sort = "desc".equals(order) ? Sort.by("id").descending() : Sort.by("id").ascending();
+        Pageable pageable = PageRequest.of(offset - 1, pageSize, sort);
+        Page<SalesDetail> salesDetailPage;
+
+        // Fetch the SalesDetail page based on provided filters
+        if (tahun != null && nama != null && bulan != null) {
+            salesDetailPage = salesDetailRepository.findByTahunAndNamaAndBulanContainingIgnoreCase(tahun, nama, bulan, pageable);
+        } else if (tahun != null && nama != null) {
+            salesDetailPage = salesDetailRepository.findByTahunAndNamaContainingIgnoreCase(tahun, nama, pageable);
+        } else if (tahun != null && bulan != null) {
+            salesDetailPage = salesDetailRepository.findByTahunAndBulan(tahun, bulan, pageable);
+        } else if (nama != null && bulan != null) {
+            salesDetailPage = salesDetailRepository.findByNamaAndBulanContainingIgnoreCase(nama, bulan, pageable);
+        } else if (tahun != null) {
+            salesDetailPage = salesDetailRepository.findByTahun(tahun, pageable);
+        } else if (bulan != null) {
+            salesDetailPage = salesDetailRepository.findByBulan(bulan, pageable);
+        } else if (nama != null) {
+            salesDetailPage = salesDetailRepository.findByNamaContainingIgnoreCase(nama, pageable);
+        } else {
+            salesDetailPage = salesDetailRepository.findAll(pageable);
+        }
+
+        List<PenilaianSalesBulananDto> resultList = new ArrayList<>();
+
+        // Loop through the SalesDetails and map them to PenilaianSalesBulananDto
+        for (SalesDetail salesDetail : salesDetailPage.getContent()) {
+            Sales sales = salesDetail.getSales();
+            Karyawan karyawan = sales.getKaryawan();
+
+            PenilaianSalesBulananDto penilaianSalesBulananDto = new PenilaianSalesBulananDto();
+            penilaianSalesBulananDto.setIdsales(sales.getIdsales());
+            penilaianSalesBulananDto.setNama(karyawan.getNama());
+            penilaianSalesBulananDto.setTahun(sales.getTahun());
+            penilaianSalesBulananDto.setBulan(salesDetail.getBulan());
+            penilaianSalesBulananDto.setId(salesDetail.getId());
+
+            penilaianSalesBulananDto.setAchievtotal(getNilaiForAchivement("Achivement Total",salesDetail.getTercapaipersenntotal()));
+            penilaianSalesBulananDto.setAchievgadus(getNilaiForAchivement("Achivement Gadus",salesDetail.getTercapaipersenngadus()));
+            penilaianSalesBulananDto.setAchievpremium(getNilaiForAchivement("Achivement Premium",salesDetail.getTercapaipersennpremium()));
+            penilaianSalesBulananDto.setJumvisit(getNilaiForAchivement("Jumlah Visit",salesDetail.getJumlahvisit()));
+            penilaianSalesBulananDto.setJumcustomer(getNilaiForAchivement("Jumlah Customer",sales.getJumlahcustomer()));
+
+            // Add to resultList
+            resultList.add(penilaianSalesBulananDto);
+        }
+
+        // Return as a paginated result
+        return new PageImpl<>(resultList, pageable, salesDetailPage.getTotalElements());
+
+    }
+
+    public Page<PenilaianSalesBulananDto> normalisasiMatrikskeputusanBulanan(Integer tahun, String nama, String bulan, String order, int offset, int pageSize) {
+        log.info("Inside Normalisasi Matriks Keputusan Bulanan");
+        Sort sort = "desc".equals(order) ? Sort.by("id").descending() : Sort.by("id").ascending();
+        Pageable pageable = PageRequest.of(offset - 1, pageSize, sort);
+        Page<SalesDetail> salesDetailPage;
+
+        // Fetch the SalesDetail page based on provided filters
+        if (tahun != null && nama != null && bulan != null) {
+            salesDetailPage = salesDetailRepository.findByTahunAndNamaAndBulanContainingIgnoreCase(tahun, nama, bulan, pageable);
+        } else if (tahun != null && nama != null) {
+            salesDetailPage = salesDetailRepository.findByTahunAndNamaContainingIgnoreCase(tahun, nama, pageable);
+        } else if (tahun != null && bulan != null) {
+            salesDetailPage = salesDetailRepository.findByTahunAndBulan(tahun, bulan, pageable);
+        } else if (nama != null && bulan != null) {
+            salesDetailPage = salesDetailRepository.findByNamaAndBulanContainingIgnoreCase(nama, bulan, pageable);
+        } else if (tahun != null) {
+            salesDetailPage = salesDetailRepository.findByTahun(tahun, pageable);
+        } else if (bulan != null) {
+            salesDetailPage = salesDetailRepository.findByBulan(bulan, pageable);
+        } else if (nama != null) {
+            salesDetailPage = salesDetailRepository.findByNamaContainingIgnoreCase(nama, pageable);
+        } else {
+            salesDetailPage = salesDetailRepository.findAll(pageable);
+        }
+
+        // Calculate max values for normalizing scores
+        double maxNilaiAchivementTotal = getMaxNilai("Achivement Total");
+        double maxNilaiAchivementGadus = getMaxNilai("Achivement Gadus");
+        double maxNilaiAchivementPremium = getMaxNilai("Achivement Premium");
+        double maxNilaiJumlahVisit = getMaxNilai("Jumlah Visit");
+        double maxNilaiJumlahCustomer = getMaxNilai("Jumlah Customer");
+
+        List<PenilaianSalesBulananDto> resultList = new ArrayList<>();
+
+        // Loop through the SalesDetails and map them to PenilaianSalesBulananDto
+        for (SalesDetail salesDetail : salesDetailPage.getContent()) {
+            Sales sales = salesDetail.getSales();
+            Karyawan karyawan = sales.getKaryawan();
+
+            PenilaianSalesBulananDto penilaianSalesBulananDto = new PenilaianSalesBulananDto();
+            penilaianSalesBulananDto.setIdsales(sales.getIdsales());
+            penilaianSalesBulananDto.setNama(karyawan.getNama());
+            penilaianSalesBulananDto.setTahun(sales.getTahun());
+            penilaianSalesBulananDto.setBulan(salesDetail.getBulan());
+            penilaianSalesBulananDto.setId(salesDetail.getId());
+
+            // Calculate normalized values and round to two decimal places
+            double achievTotal = roundToTwoDecimalPlaces(getNilaiForAchivement("Achivement Total", salesDetail.getTercapaipersenntotal()) / maxNilaiAchivementTotal);
+            double achievGadus = roundToTwoDecimalPlaces(getNilaiForAchivement("Achivement Gadus", salesDetail.getTercapaipersenngadus()) / maxNilaiAchivementGadus);
+            double achievPremium = roundToTwoDecimalPlaces(getNilaiForAchivement("Achivement Premium", salesDetail.getTercapaipersennpremium()) / maxNilaiAchivementPremium);
+            double jumVisit = roundToTwoDecimalPlaces(getNilaiForAchivement("Jumlah Visit", salesDetail.getJumlahvisit()) / maxNilaiJumlahVisit);
+            double jumCustomer = roundToTwoDecimalPlaces(getNilaiForAchivement("Jumlah Customer", sales.getJumlahcustomer()) / maxNilaiJumlahCustomer);
+
+            // Set the rounded values to the DTO
+            penilaianSalesBulananDto.setAchievtotal(achievTotal);
+            penilaianSalesBulananDto.setAchievgadus(achievGadus);
+            penilaianSalesBulananDto.setAchievpremium(achievPremium);
+            penilaianSalesBulananDto.setJumvisit(jumVisit);
+            penilaianSalesBulananDto.setJumcustomer(jumCustomer);
+
+            // Add to resultList
+            resultList.add(penilaianSalesBulananDto);
+        }
+
+        // Return as a paginated result
+        return new PageImpl<>(resultList, pageable, salesDetailPage.getTotalElements());
+    }
+
+
+    public Page<RankBulanDto> perangkinganSalesBulanan(Integer tahun, String nama, String bulan, String order, int offset, int pageSize) {
+        log.info("Inside Perankingan sales bulanan");
+        Page<SalesDetail> salesDetailPage;
+        Sort sort = "desc".equals(order) ? Sort.by("id").descending() : Sort.by("id").ascending();
+        Pageable pageable = PageRequest.of(offset - 1, pageSize, sort);
+
+        // Fetch the SalesDetail page based on provided filters
+        if (tahun != null && nama != null && bulan != null) {
+            salesDetailPage = salesDetailRepository.findByTahunAndNamaAndBulanContainingIgnoreCase(tahun, nama, bulan, pageable);
+        } else if (tahun != null && nama != null) {
+            salesDetailPage = salesDetailRepository.findByTahunAndNamaContainingIgnoreCase(tahun, nama, pageable);
+        } else if (tahun != null && bulan != null) {
+            salesDetailPage = salesDetailRepository.findByTahunAndBulan(tahun, bulan, pageable);
+        } else if (nama != null && bulan != null) {
+            salesDetailPage = salesDetailRepository.findByNamaAndBulanContainingIgnoreCase(nama, bulan, pageable);
+        } else if (tahun != null) {
+            salesDetailPage = salesDetailRepository.findByTahun(tahun, pageable);
+        } else if (bulan != null) {
+            salesDetailPage = salesDetailRepository.findByBulan(bulan, pageable);
+        } else if (nama != null) {
+            salesDetailPage = salesDetailRepository.findByNamaContainingIgnoreCase(nama, pageable);
+        } else {
+            salesDetailPage = salesDetailRepository.findAll(pageable);
+        }
+
+        // Calculate max values for normalizing scores
+        double maxNilaiAchivementTotal = getMaxNilai("Achivement Total");
+        double maxNilaiAchivementGadus = getMaxNilai("Achivement Gadus");
+        double maxNilaiAchivementPremium = getMaxNilai("Achivement Premium");
+        double maxNilaiJumlahVisit = getMaxNilai("Jumlah Visit");
+        double maxNilaiJumlahCustomer = getMaxNilai("Jumlah Customer");
+
+        List<RankBulanDto> resultList = new ArrayList<>();
+
+        // Loop through the SalesDetails and map them to RankBulanDto
+        for (SalesDetail salesDetail : salesDetailPage) {
+            Sales sales = salesDetail.getSales();
+            Karyawan karyawan = sales.getKaryawan();
+
+            RankBulanDto rankBulanDto = new RankBulanDto();
+            rankBulanDto.setIdsales(sales.getIdsales());
+            rankBulanDto.setNama(karyawan.getNama());
+            rankBulanDto.setTahun(sales.getTahun());
+            rankBulanDto.setBulan(salesDetail.getBulan());
+            rankBulanDto.setId(salesDetail.getId());
+
+            // Normalize and apply weights to scores
+            double achivementTotal = roundToTwoDecimalPlaces(getNilaiForAchivement("Achivement Total", salesDetail.getTercapaipersenntotal()) / maxNilaiAchivementTotal * getBobotForKriteria("Achivement Total"));
+            double achivementGadus = roundToTwoDecimalPlaces(getNilaiForAchivement("Achivement Gadus", salesDetail.getTercapaipersenngadus()) / maxNilaiAchivementGadus * getBobotForKriteria("Achivement Gadus"));
+            double achivementPremium = roundToTwoDecimalPlaces(getNilaiForAchivement("Achivement Premium", salesDetail.getTercapaipersennpremium()) / maxNilaiAchivementPremium * getBobotForKriteria("Achivement Premium"));
+            double jumlahVisit = roundToTwoDecimalPlaces(getNilaiForAchivement("Jumlah Visit", salesDetail.getJumlahvisit()) / maxNilaiJumlahVisit * getBobotForKriteria("Jumlah Visit"));
+            double jumlahCustomer = roundToTwoDecimalPlaces(getNilaiForAchivement("Jumlah Customer", sales.getJumlahcustomer()) / maxNilaiJumlahCustomer * getBobotForKriteria("Jumlah Customer"));
+
+            // Calculate total score
+            double hasil = roundToTwoDecimalPlaces(achivementTotal + achivementGadus + achivementPremium + jumlahVisit + jumlahCustomer);
+            rankBulanDto.setAchivementtotal(achivementTotal);
+            rankBulanDto.setAchivementgadus(achivementGadus);
+            rankBulanDto.setAchivementpremium(achivementPremium);
+            rankBulanDto.setJumvisit(jumlahVisit);
+            rankBulanDto.setJumcustomer(jumlahCustomer);
+            rankBulanDto.setHasil(hasil);
+
+            resultList.add(rankBulanDto);
+        }
+
+        // Sort resultList by hasil and assign ranks
+        resultList.sort((r1, r2) -> Double.compare(r2.getHasil(), r1.getHasil()));
+        for (int i = 0; i < resultList.size(); i++) {
+            resultList.get(i).setRank(i + 1);
+        }
+
+        // Return as a paginated result
+        return new PageImpl<>(resultList, pageable, salesDetailPage.getTotalElements());
+    }
+
+
+
+
 }
